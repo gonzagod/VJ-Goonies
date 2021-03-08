@@ -30,6 +30,21 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
+	switch (level) {
+		
+		case 1:
+			levelmap = "levels/Scene1.txt";
+			break;
+
+		case 2:
+			levelmap = "levels/Scene2.txt";
+			break;
+		
+		default:
+			levelmap = "levels/Scene1.txt";
+			break;
+	
+	}
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -42,6 +57,12 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	if (Game::instance().getKey(49)) {
+		level = 1;
+	}
+	if (Game::instance().getKey(49)) {
+		level = 2;
+	}
 	player->update(deltaTime);
 }
 
