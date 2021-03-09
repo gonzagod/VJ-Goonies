@@ -32,8 +32,6 @@ private:
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
-	int level = 1;
-	string levelmap;
 
 };
 
