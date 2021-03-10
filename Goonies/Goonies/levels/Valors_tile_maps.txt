@@ -1,0 +1,170 @@
+PRIMERA FILA
+Aa = 1
+Ab = 2
+Ac = 3
+Ad = 4
+Ae = 5
+Af = 6
+Ag = 7
+Ah = 8
+Aj = 10
+Ak = 11
+Am = 13
+An = 14
+Ao = 15
+Ap = 16
+
+SEGONA FILA
+Ba = 17
+Bb = 18
+Bc = 19
+Bd = 20
+Be = 21
+Bf = 22
+Bg = 23
+Bh = 24
+Bj = 26
+Bk = 27
+Bm = 29
+Bn = 30
+Bo = 31
+Bp = 32
+
+TERCERA FILA
+Ca = 33
+Cb = 34
+Cc = 35
+Cd = 36
+Ce = 37
+Cf = 38
+Cg = 39
+Ch = 40
+Cj = 42
+Ck = 43
+Cm = 45
+Cn = 46
+Co = 47
+Cp = 48
+
+CUARTA FILA
+Da = 49
+Db = 50
+Dc = 51
+Dd = 52
+De = 53
+Df = 54
+Dg = 55
+Dh = 56
+Dj = 58
+Dk = 59
+Dm = 61
+Dn = 62
+Do = 63
+Dp = 64
+
+CINQUENA FILA
+Ea = 65
+Eb = 66 
+Ec = 67
+Ed = 68
+Ee = 69
+Ef = 70
+Eg = 71
+Eh = 72
+Ej = 74
+Ek = 75
+Em = 77
+En = 78
+Eo = 79
+Ep = 80
+
+SISENA FILA
+Fa = 81
+Fb = 82
+Fc = 83
+Fd = 84
+Fe = 85
+Ff = 86
+Fg = 87
+Fh = 88
+Fj = 90
+Fk = 91
+Fm = 93
+Fn = 94
+Fo = 95
+Fp = 96
+
+SETENA FILA
+Ga = 97
+Gb = 98
+Gc = 99
+Gd = 100
+Ge = 101
+Gf = 102
+Gg = 103
+Gh = 104
+Gj = 106
+Gk = 107
+Gm = 109
+Gn = 110
+Go = 111 
+Gp = 112
+
+VUITENA FILA
+Ha = 113
+Hb = 114
+Hc = 115
+Hd = 116
+He = 117
+Hf = 118
+Hg = 119
+Hh = 120
+Hj = 122
+Hk = 123
+Hm = 125
+Hn = 126
+Ho = 127
+Hp = 128
+
+DESENA FILA
+Ja = 145
+Jb = 146
+Jc = 147
+Jd = 148
+Je = 149
+Jf = 150
+Jg = 151
+Jh = 152
+Jj = 154
+Jk = 155
+Jm = 157
+Jn = 158
+Jo = 159
+Jp = 160
+
+ONZENA FILA
+Ka = 161
+Kb = 162
+Kc = 163
+Kd = 164
+Ke = 165
+Kf = 166
+Kg = 167
+Kh = 168
+Kj = 170
+Kk = 171
+Km = 173
+Kn = 174
+Ko = 175
+Kp = 176
+
+TRETZENA FILA
+Ma = 193
+Mb = 194
+Mc = 195
+Md = 196
+Me = 197
+Mf = 198
+Mg = 199
+Mj = 201
+Mk = 202
