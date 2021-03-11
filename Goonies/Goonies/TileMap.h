@@ -18,9 +18,9 @@ class TileMap
 
 public:
 	// Tile maps can only be created inside an OpenGL context
-	static TileMap *createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	static TileMap* createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
 
-	TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
 	~TileMap();
 
 	void render() const;
@@ -28,13 +28,19 @@ public:
 
 	int getTileSize() const { return tileSize; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
+	bool collisionMoveLeft(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionMoveRight(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool descendingPlant(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool finalPartOfPlantClimbing(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool finalPartOfPlantDescending(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
+	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
 
 private:
-	bool loadLevel(const string &levelFile);
-	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
+	bool loadLevel(const string& levelFile);
+	void prepareArrays(const glm::vec2& minCoords, ShaderProgram& program);
 
 private:
 	GLuint vao;
@@ -44,7 +50,7 @@ private:
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
-	int *map;
+	int* map;
 
 };
 
