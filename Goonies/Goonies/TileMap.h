@@ -33,10 +33,13 @@ public:
 	bool esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool descendingPlant(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool attackFoundTargetLeft(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool attackFoundTargetRight(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool finalPartOfPlantClimbing(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool finalPartOfPlantDescending(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
 	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
+
 
 private:
 	bool loadLevel(const string& levelFile);

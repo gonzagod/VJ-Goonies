@@ -8,6 +8,11 @@
 #define SCREEN_WIDTH 576
 #define SCREEN_HEIGHT 352
 
+#define STATE_INTRO		0
+#define STATE_MENU		1
+#define STATE_RUN		2
+#define STATE_GAME_OVER 3
+
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 

@@ -11,6 +11,8 @@
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
 
+#define SPACEBAR 32
+
 
 enum PlayerAnims
 {
@@ -22,8 +24,10 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
 
-	spritesheet.loadFromFile("images/Goon_32.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	//Carreguem la spritesheet del personatge.
+	spritesheet.loadFromFile("images/Goon.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.33, 0.25), &spritesheet, &shaderProgram);
+	//Creem un vector de 9 posicions, amb els diferents moviments del personatge.
 	sprite->setNumberAnimations(9);
 
 	sprite->setAnimationSpeed(STAND_LEFT, 8);
@@ -73,27 +77,53 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+	//Reiniciem les variables només començar el update.
 	bFalling = false;
 	bJumping = false;
+	bAttacking = false;
+	
+	//En cas d'haver atacat tornem a posició normal.
+	if (sprite->animation() == ATTACK_LEFT) sprite->changeAnimation(STAND_LEFT);
+	else if (sprite->animation() == ATTACK_RIGHT) sprite->changeAnimation(STAND_RIGHT);
+
+	//Si no està sobre terra el personatge cau
 	if (!map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)))
 	{
 		bFalling = true;
 	}
+
+	//Si fem servir la tecla barra espaciadora, el personatge atacarà
+	else if (Game::instance().getKey(SPACEBAR)) 
+	{
+		bAttacking = true;
+		if (sprite->animation() == (JUMP_LEFT) || sprite->animation() == (MOVE_LEFT) || sprite->animation() == (STAND_LEFT))
+		sprite->changeAnimation(ATTACK_LEFT);
+		else if (sprite->animation() == (JUMP_RIGHT) || sprite->animation() == (MOVE_RIGHT) || sprite->animation() == (STAND_RIGHT))
+		sprite->changeAnimation(ATTACK_RIGHT);
+	}
+
+	//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
 	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling)
 	{
+		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_LEFT)
 			sprite->changeAnimation(MOVE_LEFT);
 
+		//Si no colisionem amb la paret, avancem
 		if (!map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32)))
 		{
 			posPlayer.x -= 2;
 		}
 	}
+
+	//Si premem fletxa dreta, ens movem a la dreta, sempre que no colisionem amb res
 	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling)
 	{
+		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_RIGHT)
 			sprite->changeAnimation(MOVE_RIGHT);
 
+		//Si no colisionem amb la paret, avancem
 		if (!map->collisionMoveRight(posPlayer, glm::ivec2(32, 32)))
 		{
 			posPlayer.x += 2;
@@ -101,17 +131,25 @@ void Player::update(int deltaTime)
 	}
 
 	else if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
-		if (map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32))) {
+		//if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)))
+			//bJumping = true;
+
+	    //Si just estem al inici d'una planta, pujarem.	
+	    if (map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32))) 
+		{
 			bClimbing = true;
 			posPlayer.y -= 1;
 			sprite->changeAnimation(CLIMB);
 		}
-		else if (bClimbing && map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32)))
+		//Si arribem al final de la planta, instantàment arribem al nivell de sobre
+	    else if (bClimbing && map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32)))
 		{
 			bClimbing = false;
 			posPlayer.y -= 16;
 			sprite->changeAnimation(STAND_RIGHT);
 		}
+
+		//En cas que encara quedi planta per pujar, simplement pujem
 		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)))
 		{
 			posPlayer.y -= 1;
@@ -120,15 +158,21 @@ void Player::update(int deltaTime)
 	}
 
 	else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+
+		//Si estem al inici d'una enredadera, podrem baixar.
 		if (map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32))) {
 			bClimbing = true;
 			posPlayer.y += 1;
 			sprite->changeAnimation(CLIMB);
 		}
+
+		//Si ja estavem a una enredadera seguirem baixant.
 		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)))
 		{
 			posPlayer.y += 1;
 		}
+
+		//Si es el final d'una enredadera, simplement quedarem de peu
 		else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32)))
 		{
 			bClimbing = false;
@@ -136,7 +180,7 @@ void Player::update(int deltaTime)
 		}
 	}
 
-
+	//En cas de no estar fent res per teclat ens quedarem en la "idle" position
 	else
 	{
 		if (sprite->animation() == MOVE_LEFT)
@@ -172,6 +216,7 @@ void Player::update(int deltaTime)
 	}
 	}*/
 
+	//En cas de no estar sobre una tile de moviment, caurem.
 	if (bFalling)
 	{
 		posPlayer.y += 2;
@@ -180,6 +225,14 @@ void Player::update(int deltaTime)
 		else if (sprite->animation() == MOVE_RIGHT)
 			sprite->changeAnimation(STAND_RIGHT);
 	}
+
+	//En cas d'estar atacant, si impactem contra un enemic li farem mal.
+	if (bAttacking)
+	{
+		if (map->attackFoundTargetRight(posPlayer, glm::ivec2(32,32)));
+		else if (map->attackFoundTargetLeft(posPlayer, glm::ivec2(32, 32)));
+	}
+
 	_RPT1(0, "%d\n", posPlayer.x);
 	_RPT1(0, "%d\n", posPlayer.y);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));

@@ -185,8 +185,8 @@ bool TileMap::collisionMoveRight(const glm::ivec2& pos, const glm::ivec2& size) 
 bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y;
-	x = (pos.x) / tileSize;
-	y = (pos.y) / tileSize;
+	x = (pos.x + 16) / tileSize;
+	y = (pos.y + 16) / tileSize;
 	if (map[y * mapSize.x + x] == 1 ||  //Aa
 		map[y * mapSize.x + x] == 2 || //Ab
 		map[y * mapSize.x + x] == 3 || //Ac
@@ -228,8 +228,8 @@ bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) con
 bool TileMap::climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y;
-	x = (pos.x) / tileSize;
-	y = (pos.y) / tileSize;
+	x = (pos.x + 16) / tileSize;
+	y = (pos.y + 16) / tileSize;
 	if (map[y * mapSize.x + x] == 83 || //Fc
 		map[y * mapSize.x + x] == 84	//Fd
 		) return true;
@@ -239,9 +239,9 @@ bool TileMap::climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const
 bool TileMap::descendingPlant(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y, y1;
-	x = (pos.x) / tileSize;
-	y = (pos.y) / tileSize;
-	y1 = (pos.y + 16) / tileSize;
+	x = (pos.x + 16) / tileSize;
+	y = (pos.y + 16) / tileSize;
+	y1 = (pos.y + 32) / tileSize;
 	if (map[y1 * mapSize.x + x] == 83 && //Fc
 		map[y * mapSize.x + x] == 1		 // Aa
 		) return true;
@@ -251,21 +251,31 @@ bool TileMap::descendingPlant(const glm::ivec2& pos, const glm::ivec2& size) con
 bool TileMap::finalPartOfPlantClimbing(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y, y1;
-	x = (pos.x) / tileSize;
-	y = (pos.y) / tileSize;
-	y1 = (pos.y - 16) / tileSize;
+	x = (pos.x + 16) / tileSize;
+	y = (pos.y + 16) / tileSize;
+	y1 = (pos.y) / tileSize;
 	if (map[y * mapSize.x + x] == 83 &&  //Fc
 		map[y1 * mapSize.x + x] == 1	 // Aa
 		) return true;
 	else return false;
 }
 
-bool TileMap::finalPartOfPlantDescending(const glm::ivec2& pos, const glm::ivec2& size) const
+bool TileMap::attackFoundTargetRight(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y;
-	x = (pos.x) / tileSize;
+	x = (pos.x + 16) / tileSize;
 	y = (pos.y) / tileSize;
-	if (map[y * mapSize.x + x] == 2		 // Ab
+	if (map[y * mapSize.x + x] == 69  //Ee
+		) return true;
+	else return false;
+}
+
+bool TileMap::attackFoundTargetLeft(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	int x, y;
+	x = (pos.x - 16) / tileSize;
+	y = (pos.y) / tileSize;
+	if (map[y * mapSize.x + x] == 69  //Ee
 		) return true;
 	else return false;
 }
