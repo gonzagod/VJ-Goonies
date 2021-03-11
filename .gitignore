@@ -36,6 +36,8 @@ bld/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
+Debug/*.tlog/
+Debug/*.idb
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
