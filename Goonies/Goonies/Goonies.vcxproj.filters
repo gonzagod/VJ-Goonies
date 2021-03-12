@@ -48,10 +48,10 @@
     <ClInclude Include="Skull.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cEnemy.h">
+    <ClInclude Include="InitialScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cBicho.h">
+    <ClInclude Include="pjLoadingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,10 +86,10 @@
     <ClCompile Include="Skull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cEnemy.cpp">
+    <ClCompile Include="InitialScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cBicho.cpp">
+    <ClCompile Include="pjLoadingScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

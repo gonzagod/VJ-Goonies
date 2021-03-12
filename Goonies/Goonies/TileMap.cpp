@@ -260,6 +260,17 @@ bool TileMap::finalPartOfPlantClimbing(const glm::ivec2& pos, const glm::ivec2& 
 	else return false;
 }
 
+bool TileMap::finalPartOfPlantDescending(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	int x, y;
+	x = (pos.x + 16) / tileSize;
+	y = (pos.y + 16) / tileSize;
+	if (map[y * mapSize.x + x] == 2	 // Ab
+		) return true;
+	else return false;
+}
+
+
 bool TileMap::attackFoundTargetRight(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y;
