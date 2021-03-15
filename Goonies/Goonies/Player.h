@@ -24,7 +24,7 @@ public:
 private:
 	bool bJumping, bAttacking, bFalling, bClimbing;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jumpAngle, startY;
+	int jump_force, startY, jump_velocity;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
