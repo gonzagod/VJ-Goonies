@@ -11,7 +11,7 @@ int cont = 0;
 
 enum SkullAnims
 {
-	MOVE_LEFT, MOVE_RIGHT, RESPAWN,DEAD
+	MOVE_LEFT, MOVE_RIGHT, RESPAWN, DEAD
 };
 
 void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
@@ -37,7 +37,7 @@ void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	sprite->changeAnimation(RESPAWN);
 	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));	
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
 }
 
 void Skull::update(int deltaTime)

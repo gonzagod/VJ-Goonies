@@ -3,14 +3,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
-#include <crtdbg.h>
 
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 13
-#define INIT_PLAYER_Y_TILES 9
+#define INIT_PLAYER_X_TILES 12.5
+#define INIT_PLAYER_Y_TILES 8
 
 #define INIT_SKULL_X_TILES 19
 #define INIT_SKULL_Y_TILES 14
@@ -37,12 +36,30 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
+	switch (level) {
+	case 1:
+		levelmap = "levels/Scene1.txt";
+		break;
 
+	case 2:
+		levelmap = "levels/Scene2.txt";
+		break;
+
+	default:
+		levelmap = "levels/Scene1.txt";
+		break;
+
+	}
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	skull = new Skull();
+	skull->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	skull->setPosition(glm::vec2(INIT_SKULL_X_TILES * map->getTileSize(), INIT_SKULL_Y_TILES * map->getTileSize()));
+	skull->setTileMap(map);
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()-8));
 	player->setTileMap(map);
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -51,16 +68,13 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-  skull->update(deltaTime);
-  
 	if (Game::instance().getKey(49)) {
-		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		level = 1;
 	}
-  
-	if (Game::instance().getKey(50)) {
-		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	if (Game::instance().getKey(49)) {
+		level = 2;
 	}
-
+	skull->update(deltaTime);
 	player->update(deltaTime);
 }
 
