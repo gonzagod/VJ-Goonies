@@ -9,14 +9,18 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 4
-#define INIT_PLAYER_Y_TILES 25
+#define INIT_PLAYER_X_TILES 13
+#define INIT_PLAYER_Y_TILES 9
+
+#define INIT_SKULL_X_TILES 19
+#define INIT_SKULL_Y_TILES 14
 
 
 Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
+	skull = NULL;
 }
 
 Scene::~Scene()
@@ -25,13 +29,17 @@ Scene::~Scene()
 		delete map;
 	if (player != NULL)
 		delete player;
+	if (skull != NULL)
+		delete skull;
 }
 
 
 void Scene::init()
 {
 	initShaders();
+
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
@@ -43,12 +51,16 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+  skull->update(deltaTime);
+  
 	if (Game::instance().getKey(49)) {
 		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
+  
 	if (Game::instance().getKey(50)) {
 		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
+
 	player->update(deltaTime);
 }
 
@@ -64,6 +76,7 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
 	player->render();
+	skull->render();
 }
 
 void Scene::initShaders()
