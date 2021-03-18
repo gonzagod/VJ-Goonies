@@ -9,7 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-
+*.exe
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -36,8 +36,8 @@ bld/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
-Debug/*.tlog/
-Debug/*.idb
+*.tlog
+*.idb
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
