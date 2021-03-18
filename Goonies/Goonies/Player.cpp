@@ -112,7 +112,7 @@ void Player::update(int deltaTime)
 	else if (sprite->animation() == ATTACK_RIGHT) sprite->changeAnimation(STAND_RIGHT);
 
 	//Si no està sobre terra el personatge cau
-	if ((!map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bJumping))
+	if ((!map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bJumping && !bClimbing))
 	{
 		bFalling = true;
 	}
@@ -165,10 +165,10 @@ void Player::update(int deltaTime)
 		{
 			posPlayer.x += 1; //Moviment menys fluit però més similar al joc real.
 		}
-		else {
+		/*else {
 			_RPTF0(0, "choca ");
 			_RPT1(0, "%d\n", posPlayer.x);
-		}
+		}*/
 	}
 
 	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping)
@@ -268,8 +268,8 @@ void Player::update(int deltaTime)
 			{
 				posPlayer.y += 2;
 			}
-			if (movingR) posPlayer.x += 2;
-			else if (movingL) posPlayer.x -= 2;
+			if (movingR) posPlayer.x += 1;
+			else if (movingL) posPlayer.x -= 1;
 			jump_velocity -= 1;
 		}
 		else if (jump_velocity >= -jump_force) {
@@ -281,19 +281,9 @@ void Player::update(int deltaTime)
 			bJumping = false;
 		}
 	}
-	/*else{
-	posPlayer.y += FALL_STEP;
-	if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
-	if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
-	bJumping = true;
-	jumpAngle = 0;
-	startY = posPlayer.y;
-	}
-	}
-	}*/
 
 	//En cas de no estar sobre una tile de moviment, caurem.
-	if (bFalling && !bJumping)
+	if (bFalling && !bJumping && !bClimbing)
 	{
 		posPlayer.y += 2;
 		if (sprite->animation() == MOVE_LEFT)

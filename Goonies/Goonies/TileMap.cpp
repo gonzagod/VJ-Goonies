@@ -210,7 +210,7 @@ bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) con
 	x1 = (pos.x + 24) / tileSize;
 	y = (pos.y + 16) / tileSize;
 	for (int x = x0; x <= x1; x++) {
-		if (map[y * mapSize.x + x] >= 1 && map[y * mapSize.x + x] <= 37 && map[y *mapSize.x + x] != 32)
+		if (map[y * mapSize.x + x] >= 1 && map[y * mapSize.x + x] <= 37 && map[y * mapSize.x + x]!=32)
 			return true;
 	}
 	return false;
