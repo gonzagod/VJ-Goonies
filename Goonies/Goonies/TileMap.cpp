@@ -87,6 +87,7 @@ bool TileMap::loadLevel(const string& levelFile)
 			irow = row - 65;
 			fin.get(column);
 			icolumn = column - 96;
+
 			coords = irow * tilesheetSize.x + icolumn;
 			map[j * mapSize.x + i] = coords;
 			/*if (tile == ' ')
