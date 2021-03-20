@@ -19,7 +19,7 @@ Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
-	skull1 = NULL;
+	//skullsScene1[0] = NULL;
 }
 
 Scene::~Scene()
@@ -28,8 +28,8 @@ Scene::~Scene()
 		delete map;
 	if (player != NULL)
 		delete player;
-	if (skull1 != NULL)
-		delete skull1;
+	/*if (skull1 != NULL)
+		delete skull1;*/
 }
 
 
@@ -38,10 +38,10 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
-	skull1 = new Skull();
-	skull1->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	skull1->setPosition(glm::vec2(INIT_SKULL_X_TILES * map->getTileSize(), INIT_SKULL_Y_TILES * map->getTileSize()));
-	skull1->setTileMap(map);
+	//skullsScene1[0] = new Skull();
+	skullsScene1[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	skullsScene1[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
+	skullsScene1[0].setTileMap(map);
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -60,7 +60,13 @@ void Scene::update(int deltaTime)
 	if (Game::instance().getKey(50)) {
 		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
-	skull1->update(deltaTime);
+	int maxSkullToRender = 0;
+	for (int i = 0; i < level; ++i) {
+		maxSkullToRender += skullsPerScreen1[i];
+	}
+	for (int i = 0; i < maxSkullToRender; ++i) {
+		skullsScene1[i].update(deltaTime);
+	}
 	player->update(deltaTime);
 }
 
@@ -80,11 +86,12 @@ void Scene::render()
 	switch (level)
 	{
 		case(1):
-			skull1->render();
-			break;
-		case(2):
+			skullsScene1[0].render();
 			break;
 		default:
+			for (int i = 1; i < skullsPerScreen1[level - 1] +1; ++i) {
+				skullsScene1[i].render();
+			}
 			break;
 	}
 }
@@ -113,6 +120,11 @@ void Scene::updateScene()
 			break;
 		case(2):
 			map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			for (int i = 1; i < skullsPerScreen1[level - 1] + 1; ++i) {
+				skullsScene1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				skullsScene1[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
+				skullsScene1[i].setTileMap(map);
+			}
 			break;
 		default:
 			break;
