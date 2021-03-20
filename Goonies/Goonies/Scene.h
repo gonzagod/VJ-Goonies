@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Player.h"
+#include "pjLoadingScreen.h"
 #include "Skull.h"
 
 
@@ -32,10 +33,20 @@ private:
 
 private:
 	TileMap *map;
+	pjLoadingScreen *goon;
+	pjLoadingScreen *goonie1;
+	pjLoadingScreen *goonie2;
+	pjLoadingScreen *goonie3;
+	pjLoadingScreen *goonie4;
+	pjLoadingScreen *goonie5;
+	pjLoadingScreen *goonie6;
+	pjLoadingScreen *evil;
+	pjLoadingScreen *konami;
 	Player *player;
 	Skull *skull1;
 	ShaderProgram texProgram;
 	float currentTime;
+	int estat;
 	glm::mat4 projection;
 	int level = 1;
 	string levelmap;

@@ -3,7 +3,6 @@
 
 
 #include "Scene.h"
-#include "InitialScreen.h"
 
 
 #define SCREEN_WIDTH 576

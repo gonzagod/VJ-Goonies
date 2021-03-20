@@ -11,10 +11,9 @@ class pjLoadingScreen
 {
 
 public:
-	void initGoonie(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-	void initGoon(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-	void initEvil(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-	void update(int deltaTime);
+	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
+	void initKonami(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
+	void update(int deltaTime,int numPersonatge,int &estat);
 	void render();
 
 	void setTileMap(TileMap* tileMap);
@@ -23,6 +22,8 @@ public:
 private:
 	glm::ivec2 tileMapDispl, posPJ;
 	int startX, startY;
+	int cont;
+	bool moved;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

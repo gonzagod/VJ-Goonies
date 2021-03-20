@@ -125,7 +125,6 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="InitialScreen.h" />
     <ClInclude Include="pjLoadingScreen.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
@@ -139,7 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="InitialScreen.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pjLoadingScreen.cpp" />
     <ClCompile Include="Player.cpp" />
