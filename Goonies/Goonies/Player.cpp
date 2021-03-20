@@ -27,6 +27,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	bJumping = false;
 	jump_force_moving = 6; //Salt sembla correcte, però velocitat massa ràpida
 	jump_force = 12;
+	up_key_released = true;
 
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -93,6 +94,7 @@ void Player::update(int deltaTime)
 	//Reiniciem les variables només començar el update.
 	bFalling = false;
 	bAttacking = false;
+	if (!Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping) up_key_released = true;
 	
 	if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)))
 	{
@@ -131,10 +133,11 @@ void Player::update(int deltaTime)
 	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping)
 	{
 		movingL = true;
-		if (Game::instance().getSpecialKey(GLUT_KEY_UP))
+		if (Game::instance().getSpecialKey(GLUT_KEY_UP) && up_key_released)
 		{
 			jump_velocity = jump_force_moving;
 			bJumping = true;
+			up_key_released = false;
 		}
 		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_LEFT)
@@ -151,10 +154,11 @@ void Player::update(int deltaTime)
 	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling && !bJumping)
 	{
 		movingR = true;
-		if (Game::instance().getSpecialKey(GLUT_KEY_UP))
+		if (Game::instance().getSpecialKey(GLUT_KEY_UP) && up_key_released)
 		{
 			jump_velocity = jump_force_moving;
 			bJumping = true;
+			up_key_released = false;
 		}
 		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_RIGHT)
@@ -171,8 +175,9 @@ void Player::update(int deltaTime)
 		}*/
 	}
 
-	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping)
+	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping && up_key_released)
 	{
+		
 		if (bClimbing) {
 			if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
 			else sprite->changeAnimation(CLIMB_ANIM1);
@@ -190,6 +195,7 @@ void Player::update(int deltaTime)
 		else if (bClimbing && map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32), &posPlayer.x))
 		{
 			bClimbing = false;
+			up_key_released = false;
 			//Perquè estigui a una posició múltiple de 16.
 			int miss = posPlayer.y % 16;
 			posPlayer.y -= 32 - miss;
@@ -203,6 +209,7 @@ void Player::update(int deltaTime)
 			posPlayer.y -= 1; //Moviment menys fluit però més similar al joc real.
 		}
 		else if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bClimbing) {
+			up_key_released = false;
 			jump_velocity = jump_force;
 			bJumping = true;
 		}
@@ -298,6 +305,17 @@ void Player::update(int deltaTime)
 		if (map->attackFoundTargetRight(posPlayer, glm::ivec2(32, 32)));
 		else if (map->attackFoundTargetLeft(posPlayer, glm::ivec2(32, 32)));
 	}
+
+	if (map->nextScreen(posPlayer, glm::ivec2(32, 32))) {
+		int level = Game::instance().nextScreen();
+		posPlayer.x = 16;
+	}
+
+	if (map->prevScreen(posPlayer, glm::ivec2(32, 32))) {
+		int level = Game::instance().prevScreen();
+		posPlayer.x = 468;
+	}
+
 
 	//_RPT1(0, "%d\n", posPlayer.x);
 	//_RPT1(0, "%d\n", posPlayer.y);

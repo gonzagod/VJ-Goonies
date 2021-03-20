@@ -23,6 +23,9 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
+	void updateScene();
+	int nextScreen();
+	int prevScreen();
 
 private:
 	void initShaders();
@@ -30,7 +33,7 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Skull *skull;
+	Skull *skull1;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;

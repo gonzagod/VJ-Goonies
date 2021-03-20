@@ -35,6 +35,8 @@ public:
 	void init();
 	bool update(int deltaTime);
 	void render();
+	int nextScreen();
+	int prevScreen();
 
 	// Input callback methods
 	void keyPressed(int key);
