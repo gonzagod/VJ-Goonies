@@ -127,6 +127,11 @@ void Scene::init()
 	lletres->setPosition(glm::vec2(LLETRES_INIT_X_TILES * map->getTileSize(), LLETRES_INIT_Y_TILES * map->getTileSize()));
 
 
+	playStart = new pjLoadingScreen();
+	playStart->initPlayStart(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	playStart->setPosition(glm::vec2(LLETRES_INIT_X_TILES * map->getTileSize(), LLETRES_INIT_Y_TILES * map->getTileSize()));
+
+
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -139,6 +144,10 @@ void Scene::update(int deltaTime)
 	}
 	if (Game::instance().getKey(50)) {
 		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	}
+	if (level <= 2 && Game::instance().getKey(32)) {
+		estat = 22;
+		level = 2;
 	}
 	switch (level) {
 	case(0):
@@ -153,13 +162,14 @@ void Scene::update(int deltaTime)
 		if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat >= 4) goon->update(deltaTime, 3, estat);
-		goonie1->update(deltaTime, 4, estat);
-		goonie2->update(deltaTime, 5, estat);
-		goonie3->update(deltaTime, 6, estat);
-		goonie4->update(deltaTime, 7, estat);
-		goonie5->update(deltaTime, 8, estat);
-		goonie6->update(deltaTime, 9, estat);
-		evil->update(deltaTime, 10, estat);
+		if (estat >= 6 && estat <= 14) goonie1->update(deltaTime, 4, estat);
+		if (estat >= 7 && estat <= 15) goonie2->update(deltaTime, 5, estat);
+		if (estat >= 8 && estat <= 16) goonie3->update(deltaTime, 6, estat);
+		if (estat >= 9 && estat <= 17) goonie4->update(deltaTime, 7, estat);
+		if (estat >= 10 && estat <= 18) goonie5->update(deltaTime, 8, estat);
+		if (estat >= 11 && estat <= 19) goonie6->update(deltaTime, 9, estat);
+		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 10, estat);
+		if (estat == 22 || estat == 23) playStart->update(deltaTime,12,estat);
 		break;
 	case(3):
 		skull1->update(deltaTime);
@@ -198,13 +208,14 @@ void Scene::render()
 			break;
 		case(2):
 			if (estat >= 5 && estat <= 21) goon->render();
-			goonie1->render();
-			goonie2->render();
-			goonie3->render();
-			goonie4->render();
-			goonie5->render();
-			goonie6->render();
-			evil->render();
+			if (estat >= 6 && estat <= 14) goonie1->render();
+			if (estat >= 7 && estat <= 15) goonie2->render();
+			if (estat >= 8 && estat <= 16) goonie3->render();
+			if (estat >= 9 && estat <= 17) goonie4->render();
+			if (estat >= 10 && estat <= 18) goonie5->render();
+			if (estat >= 11 && estat <= 19) goonie6->render();
+			if (estat >= 12 && estat <= 21) evil->render();
+			if (estat == 22 || estat == 23) playStart->render();
 			break;
 		case(3):
 			skull1->render();

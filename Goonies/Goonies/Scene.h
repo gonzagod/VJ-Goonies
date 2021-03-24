@@ -45,6 +45,7 @@ private:
 	pjLoadingScreen *msx; 
 	pjLoadingScreen *msx2;
 	pjLoadingScreen *lletres;
+	pjLoadingScreen *playStart;
 	Player *player;
 	Skull *skull1;
 	ShaderProgram texProgram;

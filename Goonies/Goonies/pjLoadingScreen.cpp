@@ -22,11 +22,15 @@ enum msxAnimation {
 };
 
 enum estats {
-	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START
+	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START, PLAY_START2
 };
 
 enum lletres {
 	LLETRES0, LLETRES1, LLETRES2, LLETRES3, LLETRES4, LLETRES5, LLETRES6
+};
+
+enum PlayStart {
+	PLAYSTART
 };
 
 
@@ -122,6 +126,20 @@ void pjLoadingScreen::initLletres(const glm::ivec2& tileMapPos, ShaderProgram& s
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
 }
 
+void pjLoadingScreen::initPlayStart(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
+	spritesheet.loadFromFile("images/PlayStart.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(80, 8), glm::vec2(1, 0.5), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(1);
+
+	sprite->setAnimationSpeed(PLAYSTART, 8);
+	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.0f));
+	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.5f));
+	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.5f));
+
+	tileMapDispl = tileMapPos;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
+}
+
 void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 {
 	if (numPersonatge == 0) {
@@ -176,23 +194,10 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			else if (!waiting) {
 				estat = LLETRES_GOONIES;
 				int level = Game::instance().nextScreen();
-			}
-		
-			
-			
-			
+			}	
 		}
 	}
 	else if (numPersonatge == 3) {
-		if (estat == PLAY_START) {
-			if (!waiting) {
-				if (clock() > endwait) waiting = true;
-			}
-
-			else if (waiting) {
-				int level = Game::instance().nextScreen();
-			}
-		}
 		if (estat == LLETRES_GOONIES && !waiting) {
 			endwait = clock() + 2 * CLOCKS_PER_SEC;
 			waiting = true;
@@ -344,6 +349,25 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			sprite->changeAnimation(LLETRES0);
 			posPJ.x = 136;
 			posPJ.y = 224;
+		}
+	}
+
+	else if (numPersonatge == 12) {
+		if (estat == PLAY_START) {
+			if (!waiting) {
+				posPJ.x = 216;
+				posPJ.y = 224;
+				endwait = clock() + 2 * CLOCKS_PER_SEC;
+				waiting = true;
+			}
+
+			else if (waiting && clock() > endwait) {
+				if (Game::instance().getKey(32)) estat = PLAY_START2;
+			}
+			if (sprite->animation() != PLAYSTART) sprite->changeAnimation(PLAYSTART);
+		}
+		else if (estat == PLAY_START2) {
+			int level = Game::instance().nextScreen();
 		}
 	}
 

@@ -16,6 +16,7 @@ public:
 	void initKonami(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 	void initMsx(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 	void initLletres(const glm::ivec2&tileMapPos, ShaderProgram& shaderProgram);
+	void initPlayStart(const glm::ivec2&tileMapsPos, ShaderProgram& shaderProgram);
 	void update(int deltaTime,int numPersonatge,int &estat);
 	void render();
 
