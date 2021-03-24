@@ -42,6 +42,9 @@ private:
 	pjLoadingScreen *goonie6;
 	pjLoadingScreen *evil;
 	pjLoadingScreen *konami;
+	pjLoadingScreen *msx; 
+	pjLoadingScreen *msx2;
+	pjLoadingScreen *lletres;
 	Player *player;
 	Skull *skull1;
 	ShaderProgram texProgram;

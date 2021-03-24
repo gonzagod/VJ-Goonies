@@ -2,6 +2,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <time.h>
 #include "pjLoadingScreen.h"
 #include "Game.h"
 #include <crtdbg.h> 
@@ -16,10 +17,18 @@ enum logoAnimation {
 	KONAMI_UP, KONAMI_SOFT
 };
 
+enum msxAnimation {
+	MSX_LLETRES, MSX_FONS
+};
 
 enum estats {
-	MSX, KONAMI, KONAMI2, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START
+	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START
 };
+
+enum lletres {
+	LLETRES0, LLETRES1, LLETRES2, LLETRES3, LLETRES4, LLETRES5, LLETRES6
+};
+
 
 void pjLoadingScreen::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
@@ -86,24 +95,114 @@ void pjLoadingScreen::initKonami(const glm::ivec2& tileMapPos, ShaderProgram& sh
 	
 	}
 
+void pjLoadingScreen::initMsx(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
+	spritesheet.loadFromFile("images/MsX.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(256, 256), glm::vec2(1, 0.5), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(2);
+
+	sprite->setAnimationSpeed(MSX_LLETRES, 8);
+	sprite->addKeyframe(MSX_LLETRES, glm::vec2(0.f, 0.f));
+
+	sprite->setAnimationSpeed(MSX_FONS, 8);
+	sprite->addKeyframe(MSX_FONS, glm::vec2(0.f, 0.5f));
+
+	sprite->changeAnimation(MSX_LLETRES);
+	tileMapDispl = tileMapPos;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
+}
+
+void pjLoadingScreen::initLletres(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
+	spritesheet.loadFromFile("images/msxLletres.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(256, 16), glm::vec2(1, 1), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(1);
+
+	sprite->setAnimationSpeed(LLETRES0, 8);
+	sprite->addKeyframe(LLETRES0, glm::vec2(0.f, 0.0f));
+	tileMapDispl = tileMapPos;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
+}
+
 void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 {
 	if (numPersonatge == 0) {
-			if (estat == KONAMI) {
+		if (estat == MSX) {
+			if (sprite->animation() != MSX_FONS) sprite->changeAnimation(MSX_FONS);
+			posPJ.x += 8;
+			if (posPJ.x == 128) {
+				waiting = true;
+				endwait = clock() + 2 * CLOCKS_PER_SEC;
+				estat = MSX2;
+			}
+		}
+		else if (estat == MSX2) {
+			
+			if (waiting) {
+				if (clock() > endwait) waiting = false;
+			}
+
+			else if (!waiting) {
+				estat = KONAMI;
+				int level = Game::instance().nextScreen();
+			}
+			
+		}
+	}
+
+	else if (numPersonatge == 1) {
+		if (estat == MSX) {
+			if (sprite->animation() != MSX_LLETRES) sprite->changeAnimation(MSX_LLETRES);
+			posPJ.x -= 8;
+		}
+	}
+
+	else if (numPersonatge == 2) {
+		
+		if (estat == KONAMI) {
 			if (sprite->animation() != KONAMI_UP) sprite->changeAnimation(KONAMI_UP);
 			posPJ.y -= 2;
-			if (posPJ.y == 108) estat = KONAMI2;
+			if (posPJ.y == 108) {
+				waiting = true;
+				endwait = clock() + 2* CLOCKS_PER_SEC;
+				estat = KONAMI2;
+			}
 		}
 		else if (estat == KONAMI2) {
 			if (sprite->animation() != KONAMI_SOFT) sprite->changeAnimation(KONAMI_SOFT);
-			cont++;
-			if (cont == 100) {
-				estat = GOON;
+			
+			if (waiting) {
+				if (clock() > endwait) waiting = false;
+			}
+			
+			else if (!waiting) {
+				estat = LLETRES_GOONIES;
+				int level = Game::instance().nextScreen();
+			}
+		
+			
+			
+			
+		}
+	}
+	else if (numPersonatge == 3) {
+		if (estat == PLAY_START) {
+			if (!waiting) {
+				if (clock() > endwait) waiting = true;
+			}
+
+			else if (waiting) {
 				int level = Game::instance().nextScreen();
 			}
 		}
-	}
-	else if (numPersonatge == 1) {
+		if (estat == LLETRES_GOONIES && !waiting) {
+			endwait = clock() + 2 * CLOCKS_PER_SEC;
+			waiting = true;
+		}
+		else if (estat == LLETRES_GOONIES && waiting) {
+			if (clock() > endwait) {
+				waiting = false;
+				estat = GOON;
+			}
+		}
 		if (estat == GOON) {
 			if (sprite->animation() != MOVE_RIGHT_GOON) sprite->changeAnimation(MOVE_RIGHT_GOON);
 			posPJ.x += 4;
@@ -116,13 +215,13 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (sprite->animation() != MOVE_LEFT_GOON) sprite->changeAnimation(MOVE_LEFT_GOON);
 			posPJ.x -= 4;
 			if (posPJ.x == 100) {
-				estat == PLAY_START;
-				int level = Game::instance().nextScreen();
+				endwait = clock() + 4 * CLOCKS_PER_SEC;
+				estat = PLAY_START;
 			}
 		}
 		else if (sprite->animation() != IDLE_GOON) sprite->changeAnimation(IDLE_GOON);
 	}
-	else if (numPersonatge == 2) {
+	else if (numPersonatge == 4) {
 		if (estat == GOONIE1) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -135,7 +234,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
 		else if (estat == GOONIE1_GONE) posPJ.x -= 500;
 	}
-	else if (numPersonatge == 3) {
+	else if (numPersonatge == 5) {
 		if (estat == GOONIE2) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -148,7 +247,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
 		else if (estat == GOONIE2_GONE) posPJ.x -= 500;
 	}
-	else if (numPersonatge == 4) {
+	else if (numPersonatge == 6) {
 		if (estat == GOONIE3) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -161,7 +260,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
 		else if (estat == GOONIE3_GONE) posPJ.x -= 500;
 	}
-	else if (numPersonatge == 5) {
+	else if (numPersonatge == 7) {
 		if (estat == GOONIE4) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -175,7 +274,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (estat == GOONIE4_GONE) posPJ.x -= 500;
 
 	}
-	else if (numPersonatge == 6) {
+	else if (numPersonatge == 8) {
 		if (estat == GOONIE5) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -188,7 +287,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
 		else if (estat == GOONIE5_GONE) posPJ.x -= 500;
 	}
-	else if (numPersonatge == 7) {
+	else if (numPersonatge == 9) {
 		if (estat == GOONIE6) {
 			if (!moved) {
 				posPJ.x += 188;
@@ -201,7 +300,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
 		else if (estat == GOONIE6_GONE) posPJ.x -= 500;
 	}
-	else if (numPersonatge == 8) {
+	else if (numPersonatge == 10) {
 		if (estat >= EVIL && estat < GOONIE6_GONE) {
 			if (!moved) {
 				posPJ.x += 528;
@@ -215,12 +314,22 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (posPJ.x == 256) estat = GOONIE3_GONE;
 			if (posPJ.x == 224) estat = GOONIE4_GONE;
 			if (posPJ.x == 192) estat = GOONIE5_GONE;
-			if (posPJ.x == 160) estat = GOONIE6_GONE;
+			if (posPJ.x == 160) {
+				waiting = true;
+				endwait = clock() + 2 * CLOCKS_PER_SEC;
+				estat = GOONIE6_GONE;
+			}
 		}
 		else if (estat == GOONIE6_GONE) {
-			cont++;
 			if (sprite->animation() != IDLE_EVIL) sprite->changeAnimation(IDLE_EVIL);
-			if (cont == 100) estat = EVIL_LAUGH;
+			if (waiting) {
+				if (clock() > endwait) waiting = false;
+			}
+
+			else if (!waiting) {
+				estat = EVIL_LAUGH;
+			}
+			
 		}
 		else if (estat == EVIL_LAUGH) {
 			if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
@@ -228,6 +337,14 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (posPJ.x == 100) posPJ.x -= 500;
 		}
 
+	}
+
+	else if (numPersonatge == 11) {
+		if (estat == MSX2) {
+			sprite->changeAnimation(LLETRES0);
+			posPJ.x = 136;
+			posPJ.y = 224;
+		}
 	}
 
 	sprite->update(deltaTime);

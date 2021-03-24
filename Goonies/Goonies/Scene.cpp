@@ -12,6 +12,10 @@
 #define INIT_PLAYER_X_TILES 12.5
 #define INIT_PLAYER_Y_TILES 8
 
+#define INIT_MSX_X_TILES -7
+#define INIT_MSX2_X_TILES 23
+#define INIT_MSX_Y_TILES 0
+
 #define INIT_SKULL_X_TILES 19
 #define INIT_SKULL_Y_TILES 14
 
@@ -24,14 +28,17 @@
 #define KONAMI_INIT_X_TILES 12
 #define KONAMI_INIT_Y_TILES 14
 
+#define LLETRES_INIT_X_TILES -20
+#define LLETRES_INIT_Y_TILES -20
+
 
 Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
 	skull1 = NULL;
-	level = 1;
-	estat = 1;
+	level = 0;
+	estat = 0;
 }
 
 Scene::~Scene()
@@ -54,6 +61,16 @@ void Scene::init()
 	skull1->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	skull1->setPosition(glm::vec2(INIT_SKULL_X_TILES * map->getTileSize(), INIT_SKULL_Y_TILES * map->getTileSize()));
 	skull1->setTileMap(map);
+	
+	msx = new pjLoadingScreen();
+	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	msx->setPosition(glm::vec2(INIT_MSX_X_TILES * map->getTileSize(), INIT_MSX_Y_TILES * map->getTileSize()));
+	msx->setTileMap(map);
+
+	msx2 = new pjLoadingScreen();
+	msx2->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	msx2->setPosition(glm::vec2(INIT_MSX2_X_TILES * map->getTileSize(), INIT_MSX_Y_TILES * map->getTileSize()));
+	msx2->setTileMap(map);
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -105,6 +122,10 @@ void Scene::init()
 	konami->initKonami(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	konami->setPosition(glm::vec2(KONAMI_INIT_X_TILES * map->getTileSize(), KONAMI_INIT_Y_TILES * map->getTileSize()));
 
+	lletres = new pjLoadingScreen();
+	lletres->initLletres(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	lletres->setPosition(glm::vec2(LLETRES_INIT_X_TILES * map->getTileSize(), LLETRES_INIT_Y_TILES * map->getTileSize()));
+
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -121,20 +142,24 @@ void Scene::update(int deltaTime)
 	}
 	switch (level) {
 	case(0):
-
+		msx->update(deltaTime, 0, estat);
+		msx2->update(deltaTime, 1, estat);
+		lletres->update(deltaTime, 11, estat);
 		break;
 	case(1):
-		konami->update(deltaTime,0,estat);
+		konami->update(deltaTime,2,estat);
 		break;
 	case(2):
-		goon->update(deltaTime, 1, estat);
-		goonie1->update(deltaTime, 2, estat);
-		goonie2->update(deltaTime, 3, estat);
-		goonie3->update(deltaTime, 4, estat);
-		goonie4->update(deltaTime, 5, estat);
-		goonie5->update(deltaTime, 6, estat);
-		goonie6->update(deltaTime, 7, estat);
-		evil->update(deltaTime, 8, estat);
+		if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		if (estat >= 4) goon->update(deltaTime, 3, estat);
+		goonie1->update(deltaTime, 4, estat);
+		goonie2->update(deltaTime, 5, estat);
+		goonie3->update(deltaTime, 6, estat);
+		goonie4->update(deltaTime, 7, estat);
+		goonie5->update(deltaTime, 8, estat);
+		goonie6->update(deltaTime, 9, estat);
+		evil->update(deltaTime, 10, estat);
 		break;
 	case(3):
 		skull1->update(deltaTime);
@@ -164,13 +189,15 @@ void Scene::render()
 	switch (level)
 	{
 		case(0):
-			
+			msx->render();
+			msx2->render();
+			lletres->render();
 			break;
 		case(1):
 			konami->render();
 			break;
 		case(2):
-			goon->render();
+			if (estat >= 5 && estat <= 21) goon->render();
 			goonie1->render();
 			goonie2->render();
 			goonie3->render();
@@ -218,7 +245,7 @@ void Scene::updateScene()
 			map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 			break;
 		case(2):
-			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 			break;
 		case(3):
 			map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
