@@ -1,5 +1,8 @@
 # VJ-Goonies
 
+# IdeaBoardz
+[IdeaBoardz](https://ideaboardz.com/for/VJ-Goonies/3781511)
+
 # Xuleta git
 
 ## Clonar Repo:
