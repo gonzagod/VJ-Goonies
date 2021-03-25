@@ -40,6 +40,7 @@ private:
 	pjLoadingScreen *goonie4;
 	pjLoadingScreen *goonie5;
 	pjLoadingScreen *goonie6;
+	pjLoadingScreen* goonie = new pjLoadingScreen[6];
 	pjLoadingScreen *evil;
 	pjLoadingScreen *konami;
 	pjLoadingScreen *msx; 
@@ -52,7 +53,7 @@ private:
 	float currentTime;
 	int estat;
 	glm::mat4 projection;
-	int level = 1;
+	int level;
 	string levelmap;
 
 };

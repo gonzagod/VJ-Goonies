@@ -19,7 +19,7 @@
 #define INIT_SKULL_X_TILES 19
 #define INIT_SKULL_Y_TILES 14
 
-#define GOONIE_INIT_X_TILES -10
+#define GOONIE_INIT_X_TILES 8
 #define GOONIE_INIT_Y_TILES 10
 
 #define GOON_INIT_X_TILES 8
@@ -82,35 +82,11 @@ void Scene::init()
 	goon->setPosition(glm::vec2(GOON_INIT_X_TILES * map->getTileSize(), GOON_INIT_Y_TILES * map->getTileSize()));
 	goon->setTileMap(map);
 
-	goonie1 = new pjLoadingScreen();
-	goonie1->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie1->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie1->setTileMap(map);
-
-	goonie2 = new pjLoadingScreen();
-	goonie2->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie2->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie2->setTileMap(map);
-
-	goonie3 = new pjLoadingScreen();
-	goonie3->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie3->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie3->setTileMap(map);
-
-	goonie4 = new pjLoadingScreen();
-	goonie4->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie4->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie4->setTileMap(map);
-
-	goonie5 = new pjLoadingScreen();
-	goonie5->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie5->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie5->setTileMap(map);
-
-	goonie6 = new pjLoadingScreen();
-	goonie6->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	goonie6->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
-	goonie6->setTileMap(map);
+	for (int i = 0; i < 6; ++i) {
+		goonie[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		goonie[i].setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
+		goonie[i].setTileMap(map);
+	}
 
 
 	evil = new pjLoadingScreen();
@@ -153,7 +129,7 @@ void Scene::update(int deltaTime)
 	case(0):
 		msx->update(deltaTime, 0, estat);
 		msx2->update(deltaTime, 1, estat);
-		lletres->update(deltaTime, 11, estat);
+		lletres->update(deltaTime, 6, estat);
 		break;
 	case(1):
 		konami->update(deltaTime,2,estat);
@@ -162,14 +138,9 @@ void Scene::update(int deltaTime)
 		if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat >= 4) goon->update(deltaTime, 3, estat);
-		if (estat >= 6 && estat <= 14) goonie1->update(deltaTime, 4, estat);
-		if (estat >= 7 && estat <= 15) goonie2->update(deltaTime, 5, estat);
-		if (estat >= 8 && estat <= 16) goonie3->update(deltaTime, 6, estat);
-		if (estat >= 9 && estat <= 17) goonie4->update(deltaTime, 7, estat);
-		if (estat >= 10 && estat <= 18) goonie5->update(deltaTime, 8, estat);
-		if (estat >= 11 && estat <= 19) goonie6->update(deltaTime, 9, estat);
-		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 10, estat);
-		if (estat == 22 || estat == 23) playStart->update(deltaTime,12,estat);
+		if (estat >= 6 && estat <= 11) goonie[estat-6].update(deltaTime, 4, estat);
+		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
+		if (estat == 22 || estat == 23) playStart->update(deltaTime,7,estat);
 		break;
 	case(3):
 		skull1->update(deltaTime);
@@ -208,12 +179,12 @@ void Scene::render()
 			break;
 		case(2):
 			if (estat >= 5 && estat <= 21) goon->render();
-			if (estat >= 6 && estat <= 14) goonie1->render();
-			if (estat >= 7 && estat <= 15) goonie2->render();
-			if (estat >= 8 && estat <= 16) goonie3->render();
-			if (estat >= 9 && estat <= 17) goonie4->render();
-			if (estat >= 10 && estat <= 18) goonie5->render();
-			if (estat >= 11 && estat <= 19) goonie6->render();
+			if (estat >= 6 && estat <= 19) {
+				for (int i = 0; i < estat; ++i) {
+					goonie[i].render();
+				}
+			}
+				
 			if (estat >= 12 && estat <= 21) evil->render();
 			if (estat == 22 || estat == 23) playStart->render();
 			break;

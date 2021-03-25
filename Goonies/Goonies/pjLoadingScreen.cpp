@@ -139,236 +139,171 @@ void pjLoadingScreen::initPlayStart(const glm::ivec2& tileMapPos, ShaderProgram&
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
 }
-
+    
 void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 {
-	if (numPersonatge == 0) {
-		if (estat == MSX) {
-			if (sprite->animation() != MSX_FONS) sprite->changeAnimation(MSX_FONS);
-			posPJ.x += 8;
-			if (posPJ.x == 128) {
-				waiting = true;
+	switch (numPersonatge) {
+		case 0:
+			if (estat == MSX) {
+				if (sprite->animation() != MSX_FONS) sprite->changeAnimation(MSX_FONS);
+				posPJ.x += 8;
+				if (posPJ.x == 128) {
+					waiting = true;
+					endwait = clock() + 2 * CLOCKS_PER_SEC;
+					estat = MSX2;
+				}
+			}
+			else if (estat == MSX2) {
+
+				if (waiting) {
+					if (clock() > endwait) waiting = false;
+				}
+
+				else if (!waiting) {
+					estat = KONAMI;
+					int level = Game::instance().nextScreen();
+				}
+
+			}
+			break;
+
+		case 1:
+			if (estat == MSX) {
+				if (sprite->animation() != MSX_LLETRES) sprite->changeAnimation(MSX_LLETRES);
+				posPJ.x -= 8;
+			}
+			break;
+
+		case 2:
+			if (estat == KONAMI) {
+				if (sprite->animation() != KONAMI_UP) sprite->changeAnimation(KONAMI_UP);
+				posPJ.y -= 2;
+				if (posPJ.y == 108) {
+					waiting = true;
+					endwait = clock() + 2 * CLOCKS_PER_SEC;
+					estat = KONAMI2;
+				}
+			}
+			else if (estat == KONAMI2) {
+				if (sprite->animation() != KONAMI_SOFT) sprite->changeAnimation(KONAMI_SOFT);
+
+				if (waiting) {
+					if (clock() > endwait) waiting = false;
+				}
+
+				else if (!waiting) {
+					estat = LLETRES_GOONIES;
+					int level = Game::instance().nextScreen();
+				}
+			}
+			break;
+
+		case 3:
+			if (estat == LLETRES_GOONIES && !waiting) {
 				endwait = clock() + 2 * CLOCKS_PER_SEC;
-				estat = MSX2;
+				waiting = true;
 			}
-		}
-		else if (estat == MSX2) {
-			
-			if (waiting) {
-				if (clock() > endwait) waiting = false;
+			else if (estat == LLETRES_GOONIES && waiting) {
+				if (clock() > endwait) {
+					waiting = false;
+					estat = GOON;
+				}
 			}
-
-			else if (!waiting) {
-				estat = KONAMI;
-				int level = Game::instance().nextScreen();
+			if (estat == GOON) {
+				if (sprite->animation() != MOVE_RIGHT_GOON) sprite->changeAnimation(MOVE_RIGHT_GOON);
+				posPJ.x += 4;
+				if (posPJ.x == 360) estat = GOONIE1;
 			}
-			
-		}
-	}
+			else if (estat >= STUN_GOON && estat < EVIL_LAUGH) {
+				if (sprite->animation() != STUN) sprite->changeAnimation(STUN);
+			}
+			else if (estat == EVIL_LAUGH) {
+				if (sprite->animation() != MOVE_LEFT_GOON) sprite->changeAnimation(MOVE_LEFT_GOON);
+				posPJ.x -= 4;
+				if (posPJ.x == 100) {
+					endwait = clock() + 4 * CLOCKS_PER_SEC;
+					estat = PLAY_START;
+				}
+			}
+			else if (sprite->animation() != IDLE_GOON) sprite->changeAnimation(IDLE_GOON);
+			break;
 
-	else if (numPersonatge == 1) {
-		if (estat == MSX) {
-			if (sprite->animation() != MSX_LLETRES) sprite->changeAnimation(MSX_LLETRES);
-			posPJ.x -= 8;
-		}
-	}
+		case 4:
+			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
+			posPJ.x += 4;
+			if (posPJ.x == (320 - (estat - 6) * 32)) {
+				++estat;
+				sprite->changeAnimation(IDLE_GOONIE);
+			}
+			break;
+		case 5:
+			if (estat >= EVIL && estat < GOONIE6_GONE) {
+				if (!moved) {
+					posPJ.x += 528;
+					moved = true;
+				}
+				estat = STUN_GOON;
+				if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
+				posPJ.x -= 2;
+				if (posPJ.x == 320) estat = GOONIE1_GONE;
+				if (posPJ.x == 288) estat = GOONIE2_GONE;
+				if (posPJ.x == 256) estat = GOONIE3_GONE;
+				if (posPJ.x == 224) estat = GOONIE4_GONE;
+				if (posPJ.x == 192) estat = GOONIE5_GONE;
+				if (posPJ.x == 160) {
+					waiting = true;
+					endwait = clock() + 2 * CLOCKS_PER_SEC;
+					estat = GOONIE6_GONE;
+				}
+			}
+			else if (estat == GOONIE6_GONE) {
+				if (sprite->animation() != IDLE_EVIL) sprite->changeAnimation(IDLE_EVIL);
+				if (waiting) {
+					if (clock() > endwait) waiting = false;
+				}
 
-	else if (numPersonatge == 2) {
+				else if (!waiting) {
+					estat = EVIL_LAUGH;
+				}
+
+			}
+			else if (estat == EVIL_LAUGH) {
+				if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
+				posPJ.x -= 2;
+				if (posPJ.x == 100) posPJ.x -= 500;
+			}
+			break;
 		
-		if (estat == KONAMI) {
-			if (sprite->animation() != KONAMI_UP) sprite->changeAnimation(KONAMI_UP);
-			posPJ.y -= 2;
-			if (posPJ.y == 108) {
-				waiting = true;
-				endwait = clock() + 2* CLOCKS_PER_SEC;
-				estat = KONAMI2;
-			}
-		}
-		else if (estat == KONAMI2) {
-			if (sprite->animation() != KONAMI_SOFT) sprite->changeAnimation(KONAMI_SOFT);
-			
-			if (waiting) {
-				if (clock() > endwait) waiting = false;
-			}
-			
-			else if (!waiting) {
-				estat = LLETRES_GOONIES;
-				int level = Game::instance().nextScreen();
-			}	
-		}
-	}
-	else if (numPersonatge == 3) {
-		if (estat == LLETRES_GOONIES && !waiting) {
-			endwait = clock() + 2 * CLOCKS_PER_SEC;
-			waiting = true;
-		}
-		else if (estat == LLETRES_GOONIES && waiting) {
-			if (clock() > endwait) {
-				waiting = false;
-				estat = GOON;
-			}
-		}
-		if (estat == GOON) {
-			if (sprite->animation() != MOVE_RIGHT_GOON) sprite->changeAnimation(MOVE_RIGHT_GOON);
-			posPJ.x += 4;
-			if (posPJ.x == 360) estat = GOONIE1;
-		}
-		else if (estat >= STUN_GOON && estat < EVIL_LAUGH) {
-			if (sprite->animation() != STUN) sprite->changeAnimation(STUN);
-		}
-		else if (estat == EVIL_LAUGH) {
-			if (sprite->animation() != MOVE_LEFT_GOON) sprite->changeAnimation(MOVE_LEFT_GOON);
-			posPJ.x -= 4;
-			if (posPJ.x == 100) {
-				endwait = clock() + 4 * CLOCKS_PER_SEC;
-				estat = PLAY_START;
-			}
-		}
-		else if (sprite->animation() != IDLE_GOON) sprite->changeAnimation(IDLE_GOON);
-	}
-	else if (numPersonatge == 4) {
-		if (estat == GOONIE1) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 320) estat = GOONIE2;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE1_GONE) posPJ.x -= 500;
-	}
-	else if (numPersonatge == 5) {
-		if (estat == GOONIE2) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 288) estat = GOONIE3;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE2_GONE) posPJ.x -= 500;
-	}
-	else if (numPersonatge == 6) {
-		if (estat == GOONIE3) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 256) estat = GOONIE4;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE3_GONE) posPJ.x -= 500;
-	}
-	else if (numPersonatge == 7) {
-		if (estat == GOONIE4) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 224) estat = GOONIE5;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE4_GONE) posPJ.x -= 500;
-
-	}
-	else if (numPersonatge == 8) {
-		if (estat == GOONIE5) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 192) estat = GOONIE6;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE5_GONE) posPJ.x -= 500;
-	}
-	else if (numPersonatge == 9) {
-		if (estat == GOONIE6) {
-			if (!moved) {
-				posPJ.x += 188;
-				moved = true;
-			}
-			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == 160) estat = EVIL;
-		}
-		else if (sprite->animation() != IDLE_GOONIE) sprite->changeAnimation(IDLE_GOONIE);
-		else if (estat == GOONIE6_GONE) posPJ.x -= 500;
-	}
-	else if (numPersonatge == 10) {
-		if (estat >= EVIL && estat < GOONIE6_GONE) {
-			if (!moved) {
-				posPJ.x += 528;
-				moved = true;
-			}
-			estat = STUN_GOON;
-			if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
-			posPJ.x -= 2;
-			if (posPJ.x == 320) estat = GOONIE1_GONE;
-			if (posPJ.x == 288) estat = GOONIE2_GONE;
-			if (posPJ.x == 256) estat = GOONIE3_GONE;
-			if (posPJ.x == 224) estat = GOONIE4_GONE;
-			if (posPJ.x == 192) estat = GOONIE5_GONE;
-			if (posPJ.x == 160) {
-				waiting = true;
-				endwait = clock() + 2 * CLOCKS_PER_SEC;
-				estat = GOONIE6_GONE;
-			}
-		}
-		else if (estat == GOONIE6_GONE) {
-			if (sprite->animation() != IDLE_EVIL) sprite->changeAnimation(IDLE_EVIL);
-			if (waiting) {
-				if (clock() > endwait) waiting = false;
-			}
-
-			else if (!waiting) {
-				estat = EVIL_LAUGH;
-			}
-			
-		}
-		else if (estat == EVIL_LAUGH) {
-			if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
-			posPJ.x -= 2;
-			if (posPJ.x == 100) posPJ.x -= 500;
-		}
-
-	}
-
-	else if (numPersonatge == 11) {
-		if (estat == MSX2) {
-			sprite->changeAnimation(LLETRES0);
-			posPJ.x = 136;
-			posPJ.y = 224;
-		}
-	}
-
-	else if (numPersonatge == 12) {
-		if (estat == PLAY_START) {
-			if (!waiting) {
-				posPJ.x = 216;
+		case 6:
+			if (estat == MSX2) {
+				sprite->changeAnimation(LLETRES0);
+				posPJ.x = 136;
 				posPJ.y = 224;
-				endwait = clock() + 2 * CLOCKS_PER_SEC;
-				waiting = true;
 			}
+			break;
 
-			else if (waiting && clock() > endwait) {
-				if (Game::instance().getKey(32)) estat = PLAY_START2;
+		case 7:
+			if (estat == PLAY_START) {
+				if (!waiting) {
+					posPJ.x = 216;
+					posPJ.y = 224;
+					endwait = clock() + 2 * CLOCKS_PER_SEC;
+					waiting = true;
+				}
+
+				else if (waiting && clock() > endwait) {
+					if (Game::instance().getKey(32)) estat = PLAY_START2;
+				}
+				if (sprite->animation() != PLAYSTART) sprite->changeAnimation(PLAYSTART);
 			}
-			if (sprite->animation() != PLAYSTART) sprite->changeAnimation(PLAYSTART);
-		}
-		else if (estat == PLAY_START2) {
-			int level = Game::instance().nextScreen();
-		}
+			else if (estat == PLAY_START2) {
+				int level = Game::instance().nextScreen();
+			}
+			break;
+
+		default:
+			break;
+
 	}
 
 	sprite->update(deltaTime);

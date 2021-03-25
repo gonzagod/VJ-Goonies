@@ -29,6 +29,7 @@ private:
 	int cont;
 	bool moved;
 	bool waiting = false;
+	bool alive;
 	clock_t endwait;
 	Texture spritesheet;
 	Sprite *sprite;
