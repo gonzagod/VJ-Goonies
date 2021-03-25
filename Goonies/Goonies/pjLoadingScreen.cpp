@@ -142,6 +142,7 @@ void pjLoadingScreen::initPlayStart(const glm::ivec2& tileMapPos, ShaderProgram&
     
 void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 {
+	
 	switch (numPersonatge) {
 		case 0:
 			if (estat == MSX) {
@@ -238,11 +239,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			break;
 		case 5:
 			if (estat >= EVIL && estat < GOONIE6_GONE) {
-				if (!moved) {
-					posPJ.x += 528;
-					moved = true;
-				}
-				estat = STUN_GOON;
+				if (estat == EVIL) estat = STUN_GOON;
 				if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
 				posPJ.x -= 2;
 				if (posPJ.x == 320) estat = GOONIE1_GONE;

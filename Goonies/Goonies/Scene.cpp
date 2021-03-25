@@ -25,6 +25,9 @@
 #define GOON_INIT_X_TILES 8
 #define GOON_INIT_Y_TILES 10
 
+#define EVIL_INIT_X_TILES 23
+#define EVIL_INIT_Y_TILES 10
+
 #define KONAMI_INIT_X_TILES 12
 #define KONAMI_INIT_Y_TILES 14
 
@@ -91,7 +94,7 @@ void Scene::init()
 
 	evil = new pjLoadingScreen();
 	evil->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	evil->setPosition(glm::vec2(GOONIE_INIT_X_TILES * map->getTileSize(), GOONIE_INIT_Y_TILES * map->getTileSize()));
+	evil->setPosition(glm::vec2(EVIL_INIT_X_TILES * map->getTileSize(), EVIL_INIT_Y_TILES * map->getTileSize()));
 	evil->setTileMap(map);
 
 	konami = new pjLoadingScreen();
@@ -179,8 +182,19 @@ void Scene::render()
 			break;
 		case(2):
 			if (estat >= 5 && estat <= 21) goon->render();
-			if (estat >= 6 && estat <= 19) {
-				for (int i = 0; i < estat; ++i) {
+			if (estat >= 6 && estat <= 11) {
+				for (int i = 0; i < estat-5; ++i) {
+					goonie[i].render();
+				}
+			}
+			else if (estat >= 12 && estat <= 13) {
+				for (int i = 0; i < 6; ++i) {
+					goonie[i].render();
+				}
+			}		
+
+			else if (estat >= 14 && estat <= 18) {
+				for (int i = 5; i > estat - 14; --i) {
 					goonie[i].render();
 				}
 			}

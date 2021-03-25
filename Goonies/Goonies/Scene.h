@@ -34,12 +34,6 @@ private:
 private:
 	TileMap *map;
 	pjLoadingScreen *goon;
-	pjLoadingScreen *goonie1;
-	pjLoadingScreen *goonie2;
-	pjLoadingScreen *goonie3;
-	pjLoadingScreen *goonie4;
-	pjLoadingScreen *goonie5;
-	pjLoadingScreen *goonie6;
 	pjLoadingScreen* goonie = new pjLoadingScreen[6];
 	pjLoadingScreen *evil;
 	pjLoadingScreen *konami;
