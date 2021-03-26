@@ -179,7 +179,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (estat == KONAMI) {
 				if (sprite->animation() != KONAMI_UP) sprite->changeAnimation(KONAMI_UP);
 				posPJ.y -= 2;
-				if (posPJ.y == 108) {
+				if (posPJ.y == 156) {
 					waiting = true;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					estat = KONAMI2;
@@ -275,7 +275,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (estat == MSX2) {
 				sprite->changeAnimation(LLETRES0);
 				posPJ.x = 136;
-				posPJ.y = 224;
+				posPJ.y = 272;
 			}
 			break;
 
@@ -283,7 +283,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (estat == PLAY_START) {
 				if (!waiting) {
 					posPJ.x = 216;
-					posPJ.y = 224;
+					posPJ.y = 272;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					waiting = true;
 				}

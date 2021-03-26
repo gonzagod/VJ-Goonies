@@ -6,7 +6,7 @@
 
 
 #define SCREEN_WIDTH 576
-#define SCREEN_HEIGHT 352
+#define SCREEN_HEIGHT 448
 
 #define STATE_INTRO		0
 #define STATE_MENU		1
@@ -36,6 +36,7 @@ public:
 	void render();
 	int nextScreen();
 	int prevScreen();
+	int addPoints(int points);
 
 	// Input callback methods
 	void keyPressed(int key);
@@ -51,8 +52,8 @@ public:
 
 private:
 	bool bPlay;                       // Continue to play game?
+	int points;
 	Scene scene;
-	//InitialScreen scene;                      // Scene to render
 	bool keys[256], specialKeys[256]; // Store key states so that 
 									  // we can have access at any time
 

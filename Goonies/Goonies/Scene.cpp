@@ -9,30 +9,35 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
+
+
 #define INIT_PLAYER_X_TILES 12.5
-#define INIT_PLAYER_Y_TILES 8
+#define INIT_PLAYER_Y_TILES 11
 
 #define INIT_MSX_X_TILES -7
 #define INIT_MSX2_X_TILES 23
-#define INIT_MSX_Y_TILES 0
+#define INIT_MSX_Y_TILES 4
 
 #define INIT_SKULL_X_TILES 19
 #define INIT_SKULL_Y_TILES 14
 
 #define GOONIE_INIT_X_TILES 8
-#define GOONIE_INIT_Y_TILES 10
+#define GOONIE_INIT_Y_TILES 13
 
 #define GOON_INIT_X_TILES 8
-#define GOON_INIT_Y_TILES 10
+#define GOON_INIT_Y_TILES 13
 
 #define EVIL_INIT_X_TILES 23
-#define EVIL_INIT_Y_TILES 10
+#define EVIL_INIT_Y_TILES 13
 
 #define KONAMI_INIT_X_TILES 12
 #define KONAMI_INIT_Y_TILES 14
 
 #define LLETRES_INIT_X_TILES -20
 #define LLETRES_INIT_Y_TILES -20
+
+#define PUNTUATION_INIT_X_TILES 0
+#define PUNTUATION_INIT_Y_TILES 0
 
 
 Scene::Scene()
@@ -91,6 +96,23 @@ void Scene::init()
 		goonie[i].setTileMap(map);
 	}
 
+	for (int i = 0; i < 6; ++i) {
+		puntuation[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16*(i+4), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 16));
+		puntuation[i].setTileMap(map);
+	}
+	for (int i = 6; i < 12; ++i) {
+		puntuation[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (i-2), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+		puntuation[i].setTileMap(map);
+	}
+		puntuation[12].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		puntuation[12].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (27), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+		puntuation[12].setTileMap(map);
+
+		puntuation[13].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		puntuation[13].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (30), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+		puntuation[13].setTileMap(map);
 
 	evil = new pjLoadingScreen();
 	evil->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -146,6 +168,7 @@ void Scene::update(int deltaTime)
 		if (estat == 22 || estat == 23) playStart->update(deltaTime,7,estat);
 		break;
 	case(3):
+		
 		skull1->update(deltaTime);
 		break;
 	case(4):
@@ -155,7 +178,13 @@ void Scene::update(int deltaTime)
 	default:
 		break;
 	}
-	if (level >= 3) player->update(deltaTime);
+	if (level >= 3) {
+		for (int i = 0; i < 14; ++i) {
+			puntuation[i].update(deltaTime, i, punts, level);
+		}
+		int p = addPoints(1);
+		player->update(deltaTime);
+	}
 }
 
 void Scene::render()
@@ -212,7 +241,12 @@ void Scene::render()
 		default:
 			break;
 	}
-	if (level >= 3) player->render();
+	if (level >= 3) {
+		for (int i = 0; i < 14; ++i) {
+			puntuation[i].render();
+		}
+		player->render();
+	}
 }
 
 int Scene::nextScreen()
@@ -227,6 +261,12 @@ int Scene::prevScreen()
 	--level;
 	updateScene();
 	return level;
+}
+
+int Scene::addPoints(int points)
+{
+	punts += points;
+	return punts;
 }
 
 

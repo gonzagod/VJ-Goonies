@@ -6,6 +6,7 @@
 void Game::init()
 {
 	bPlay = true;
+	points = 0;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	scene.init();
 }
@@ -25,6 +26,10 @@ int Game::nextScreen()
 int Game::prevScreen()
 {
 	return scene.prevScreen();
+}
+
+int Game::addPoints(int points) {
+	return scene.addPoints(points);
 }
 
 void Game::render()

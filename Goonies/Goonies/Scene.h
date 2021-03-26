@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "pjLoadingScreen.h"
+#include "Puntuacio.h"
 #include "Skull.h"
 
 
@@ -27,6 +28,7 @@ public:
 	void updateScene();
 	int nextScreen();
 	int prevScreen();
+	int addPoints(int points);
 
 private:
 	void initShaders();
@@ -41,6 +43,7 @@ private:
 	pjLoadingScreen *msx2;
 	pjLoadingScreen *lletres;
 	pjLoadingScreen *playStart;
+	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
 	Skull *skull1;
 	ShaderProgram texProgram;
@@ -48,6 +51,7 @@ private:
 	int estat;
 	glm::mat4 projection;
 	int level;
+	int punts;
 	string levelmap;
 
 };
