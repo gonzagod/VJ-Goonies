@@ -23,7 +23,7 @@ public:
 
 private:
 	bool bJumping, bAttacking, bFalling, bClimbing;
-	bool movingR, movingL;
+	bool movingR, movingL, up_key_released;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jump_force, jump_force_moving, startY;
 	double jump_velocity;

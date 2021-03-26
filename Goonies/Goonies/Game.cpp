@@ -17,6 +17,16 @@ bool Game::update(int deltaTime)
 	return bPlay;
 }
 
+int Game::nextScreen()
+{
+	return scene.nextScreen();
+}
+
+int Game::prevScreen()
+{
+	return scene.prevScreen();
+}
+
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
