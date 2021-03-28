@@ -29,6 +29,7 @@ public:
 
 private:
 	void initShaders();
+	bool colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side);
 
 private:
 	TileMap *map;
@@ -42,6 +43,7 @@ private:
 	string levelmap;
 	int initSkullsPos[num_skulls_Scene1][2] = { {19,14}, {5,8}, {21,4} };
 	int skullsPerScreen1[3] = { 1,2,0 };
+	int firstSkulli;
 };
 
 

@@ -17,6 +17,9 @@ public:
 
 	void setTileMap(TileMap* tileMap);
 	void setPosition(const glm::vec2& pos);
+	glm::ivec2 getPosition();
+	void die();
+	bool isAlive();
 
 private:
 	glm::ivec2 tileMapDispl, posSkull;
@@ -24,7 +27,8 @@ private:
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-
+	bool alive, dying;
+	int cont_spawn, cont_dying;
 };
 
 #endif

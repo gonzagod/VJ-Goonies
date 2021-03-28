@@ -37,7 +37,7 @@ void Scene::init()
 {
 	initShaders();
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-
+	firstSkulli = 0;
 	//skullsScene1[0] = new Skull();
 	skullsScene1[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	skullsScene1[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
@@ -67,7 +67,27 @@ void Scene::update(int deltaTime)
 	for (int i = 0; i < maxSkullToRender; ++i) {
 		skullsScene1[i].update(deltaTime);
 	}
+
 	player->update(deltaTime);
+	bool attack_side = true; //True = LEFT ||False = Right
+	int enemy = 0;
+	bool player_attacking = player->isAttacking(attack_side);
+	bool hit = false;
+	bool hit_side = true; //True = LEFT ||False = Right
+	if (player_attacking) {
+		_RPT1(0, "attack_side = %d\n", attack_side);
+		hit = colision_with_enemies(attack_side, enemy, 8, hit_side);
+	}
+	else hit = colision_with_enemies(attack_side, enemy, 0, hit_side);
+	if (hit) {
+		if (player_attacking && attack_side == hit_side) {
+			skullsScene1[enemy].die();
+		}
+		else {
+			bool enemy_hit = player->got_hit();
+			_RPT2(0, "enemy_hit = %d , side = %d\n", enemy_hit, hit_side);
+		}
+	}
 }
 
 void Scene::render()
@@ -98,6 +118,7 @@ void Scene::render()
 
 int Scene::nextScreen()
 {
+	firstSkulli += skullsPerScreen1[level - 1];
 	++level;
 	updateScene();
 	return level;
@@ -160,6 +181,28 @@ void Scene::initShaders()
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
+}
+
+bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side)
+{
+	int x_left = 0;
+	int x_right = 0;
+	if (attack_side) x_left = attack_dist;
+	else x_right = attack_dist;
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = 0; i < skullsPerScreen1[level - 1]; ++i) {
+		glm::ivec2 SkullPos = skullsScene1[firstSkulli + i].getPosition();
+		enemy = firstSkulli + i;
+		if (skullsScene1[firstSkulli + i].isAlive()) {
+			if (PlayerPos.y > (SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
+				if (PlayerPos.x > (SkullPos.x - (16+x_right)) && PlayerPos.x < (SkullPos.x + (16+x_left))) {
+					hit_side = SkullPos.x < PlayerPos.x;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 

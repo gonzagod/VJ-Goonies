@@ -34,6 +34,8 @@ public:
 
 	void setPosition(const glm::vec2 &pos);
 
+	void changeSpriteSheet(Texture *spritesheet);
+
 private:
 	Texture *texture;
 	ShaderProgram *shaderProgram;
