@@ -88,7 +88,13 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	glutCreateWindow(argv[0]);
+	glutCreateWindow("Goonies");
+
+	HWND win_handle = FindWindow(0, L"Goonies");
+
+	SetWindowLong(win_handle, GWL_STYLE, (GetWindowLong(win_handle, GWL_STYLE)));
+	ShowWindowAsync(win_handle, SW_SHOWMAXIMIZED);
+
 	glutDisplayFunc(drawCallback);
 	glutIdleFunc(idleCallback);
 	glutKeyboardFunc(keyboardDownCallback);
@@ -98,9 +104,13 @@ int main(int argc, char **argv)
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 
+
+
 	// GLEW will take care of OpenGL extension functions
 	glewExperimental = GL_TRUE;
 	glewInit();
+	
+
 
 	// Game instance initialization
 	Game::instance().init();
