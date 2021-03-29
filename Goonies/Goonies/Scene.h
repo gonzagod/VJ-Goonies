@@ -6,6 +6,8 @@
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Player.h"
+#include "pjLoadingScreen.h"
+#include "Puntuacio.h"
 #include "Skull.h"
 
 
@@ -26,19 +28,32 @@ public:
 	void updateScene();
 	int nextScreen();
 	int prevScreen();
+	int goToScreen(int x);
+	int addPoints(int points);
 
 private:
 	void initShaders();
 
 private:
 	TileMap *map;
+	pjLoadingScreen *goon;
+	pjLoadingScreen* goonie = new pjLoadingScreen[6];
+	pjLoadingScreen *evil;
+	pjLoadingScreen *konami;
+	pjLoadingScreen *msx; 
+	pjLoadingScreen *msx2;
+	pjLoadingScreen *lletres;
+	pjLoadingScreen *playStart;
+	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
 	static const int num_skulls_Scene1 = 3;
 	Skull* skullsScene1 = new Skull[num_skulls_Scene1];
 	ShaderProgram texProgram;
 	float currentTime;
+	int estat;
 	glm::mat4 projection;
-	int level = 1;
+	int level;
+	int punts;
 	string levelmap;
 	int initSkullsPos[num_skulls_Scene1][2] = { {19,14}, {5,8}, {21,4} };
 	int skullsPerScreen1[3] = { 1,2,0 };

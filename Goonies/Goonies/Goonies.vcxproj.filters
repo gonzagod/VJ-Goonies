@@ -48,10 +48,10 @@
     <ClInclude Include="Skull.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InitialScreen.h">
+    <ClInclude Include="pjLoadingScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pjLoadingScreen.h">
+    <ClInclude Include="Puntuacio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,10 +86,10 @@
     <ClCompile Include="Skull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InitialScreen.cpp">
+    <ClCompile Include="pjLoadingScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pjLoadingScreen.cpp">
+    <ClCompile Include="Puntuacio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

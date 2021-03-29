@@ -1,7 +1,7 @@
 TILEMAP
 32 26							-- Size of tile map in tiles
 16 16 							-- Tile size & block size
-images/PantallaInici_TileMap.png 			-- Tilesheet
+images/PantallaInici3_TileMap.png 			-- Tilesheet
 16 16							-- Number of tiles in tilesheet
 AaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa
 AaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa
@@ -28,4 +28,3 @@ AaAaAaAaAaAaAaAaAaAbAcAdAeAfAgAhAiAjAkAlAmAnAoApAaAaAaAaAaAaAaAa
 AaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa
 AaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa
 AaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAaAa
-
