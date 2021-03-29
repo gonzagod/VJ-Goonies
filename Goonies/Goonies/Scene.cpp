@@ -44,7 +44,7 @@ Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
-	skull1 = NULL;
+	// skull1 = NULL;
 	level = 0;
 	estat = 0;
 }
@@ -55,8 +55,8 @@ Scene::~Scene()
 		delete map;
 	if (player != NULL)
 		delete player;
-	if (skull1 != NULL)
-		delete skull1;
+	/*if (skull1 != NULL)
+		delete skull1;*/
 }
 
 
@@ -65,10 +65,9 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
-	skull1 = new Skull();
-	skull1->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	skull1->setPosition(glm::vec2(INIT_SKULL_X_TILES * map->getTileSize(), INIT_SKULL_Y_TILES * map->getTileSize()));
-	skull1->setTileMap(map);
+	skullsScene1[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	skullsScene1[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
+	skullsScene1[0].setTileMap(map);
 	
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -140,8 +139,8 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	if (Game::instance().getKey(48)) {
-		map = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	/*if (Game::instance().getKey(49)) {
+		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
 	if (Game::instance().getKey(49)) {
 		map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -150,7 +149,7 @@ void Scene::update(int deltaTime)
 	if (level <= 2 && Game::instance().getKey(32)) {
 		estat = 22;
 		level = 2;
-	}
+	}*/	
 	switch (level) {
 	case(0):
 		msx->update(deltaTime, 0, estat);
@@ -168,41 +167,11 @@ void Scene::update(int deltaTime)
 		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
 		if (estat == 22 || estat == 23) playStart->update(deltaTime,7,estat);
 		break;
-	case(3):
-		
-		skull1->update(deltaTime);
-		break;
-	case(4):
-		break;
-	case(5):
-		break;
-	case(6):
-		break;
-	case(7):
-		break;
-	case(8):
-		break;
-	case(9):
-		break;
-	case(10):
-		break;
-	case(11):
-		break;
-	case(12):
-		break;
-	case(13):
-		break;
-	case(14):
-		break;
-	case(15):
-		break;
-	case(16):
-		break;
-	case(17):
-		break;
-	case(18):
-		break;
 	default:
+		for (int i = skullsPerScreen[level-1]; i < skullsPerScreen[level]; ++i) {
+			skullsScene1[i].update(deltaTime);
+		}
+
 		break;
 	}
 	if (level >= 3) {
@@ -258,38 +227,10 @@ void Scene::render()
 			if (estat >= 12 && estat <= 21) evil->render();
 			if (estat == 22 || estat == 23) playStart->render();
 			break;
-		case(3):
-			skull1->render();
-			break;
-		case(4):
-			break;
-		case(5):
-			break;
-		case(6):
-			break;
-		case(7):
-			break;
-		case(8):
-			break;
-		case(9):
-			break;
-		case(10):
-			break;
-		case(11):
-			break;
-		case(12):
-			break;
-		case(13):
-			break;
-		case(14):
-			break;
-		case(15):
-			break;
-		case(16):
-			break;
-		case(17):
-			break;
 		default:
+			for (int i = skullsPerScreen[level - 1]; i < skullsPerScreen[level]; ++i) {
+				skullsScene1[i].render();
+			}
 			break;
 	}
 	if (level >= 3) {
@@ -329,6 +270,13 @@ int Scene::addPoints(int points)
 
 void Scene::updateScene()
 {
+
+	for (int i = 1; i < skullsPerScreen[level - 1] + 1; ++i) {
+		skullsScene1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		skullsScene1[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
+		skullsScene1[i].setTileMap(map);
+	}
+
 	switch (level)
 	{
 		case(0):
