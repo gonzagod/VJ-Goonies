@@ -7,8 +7,6 @@
 #include <crtdbg.h> 
 
 
-int cont = 0;
-
 enum SkullAnims
 {
 	MOVE_LEFT, MOVE_RIGHT, RESPAWN, DEAD
@@ -38,13 +36,18 @@ void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->changeAnimation(RESPAWN);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
+
+	alive = true;
+	dying = false;
+	cont_spawn = 0;
+	cont_dying = 0;
 }
 
 void Skull::update(int deltaTime)
 {
 	sprite->update(deltaTime);
-	if (sprite->animation() == RESPAWN && cont > 100) sprite->changeAnimation(MOVE_LEFT);
-	else if (sprite->animation() == RESPAWN) ++cont;
+	if (sprite->animation() == RESPAWN && cont_spawn > 100) sprite->changeAnimation(MOVE_LEFT);
+	else if (sprite->animation() == RESPAWN) ++cont_spawn;
 	else if (sprite->animation() == MOVE_RIGHT) {
 		if (map->collisionMoveRight(posSkull, glm::ivec2(32, 32))) sprite->changeAnimation(MOVE_LEFT);
 		else posSkull.x += 2;
@@ -53,7 +56,14 @@ void Skull::update(int deltaTime)
 		if (map->collisionMoveLeft(posSkull, glm::ivec2(32, 32))) sprite->changeAnimation(MOVE_RIGHT);
 		else posSkull.x -= 2;
 	}
-	else sprite->changeAnimation(DEAD);
+
+	if (cont_dying == 16) {
+		cont_dying = 0;
+		alive = false;
+		dying = false;
+	}
+	if (dying) ++cont_dying;
+
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
 
 	//_RPT1(0,"%d\n", posSkull.x);
@@ -62,7 +72,7 @@ void Skull::update(int deltaTime)
 
 void Skull::render()
 {
-	sprite->render();
+	if (alive) sprite->render();
 }
 
 void Skull::setTileMap(TileMap* tileMap)
@@ -76,6 +86,18 @@ void Skull::setPosition(const glm::vec2& pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
 }
 
+glm::ivec2 Skull::getPosition()
+{
+	return posSkull;
+}
 
+void Skull::die() {
+	dying = true;
+	sprite->changeAnimation(DEAD);
+}
+
+bool Skull::isAlive() {
+	return (alive && !dying);
+}
 
 
