@@ -36,6 +36,7 @@ public:
 	void render();
 	int nextScreen();
 	int prevScreen();
+	int goToScreen(int level);
 	int addPoints(int points);
 
 	// Input callback methods

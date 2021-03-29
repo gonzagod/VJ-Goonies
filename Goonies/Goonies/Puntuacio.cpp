@@ -94,7 +94,7 @@ void Puntuacio::update(int deltaTime, int numPersonatge, int points, int level) 
 		sprite->changeAnimation((level/3));
 		break;
 	case 13:
-		sprite->changeAnimation((level + 1) % 3);
+		sprite->changeAnimation((level) % 3 + 1);
 		break;
 	default:
 		break;

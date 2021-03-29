@@ -28,6 +28,7 @@ public:
 	void updateScene();
 	int nextScreen();
 	int prevScreen();
+	int goToScreen(int x);
 	int addPoints(int points);
 
 private:

@@ -140,12 +140,13 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	if (Game::instance().getKey(48)) {
+		map = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	}
 	if (Game::instance().getKey(49)) {
-		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
-	if (Game::instance().getKey(50)) {
-		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	}
+
 	if (level <= 2 && Game::instance().getKey(32)) {
 		estat = 22;
 		level = 2;
@@ -174,6 +175,32 @@ void Scene::update(int deltaTime)
 	case(4):
 		break;
 	case(5):
+		break;
+	case(6):
+		break;
+	case(7):
+		break;
+	case(8):
+		break;
+	case(9):
+		break;
+	case(10):
+		break;
+	case(11):
+		break;
+	case(12):
+		break;
+	case(13):
+		break;
+	case(14):
+		break;
+	case(15):
+		break;
+	case(16):
+		break;
+	case(17):
+		break;
+	case(18):
 		break;
 	default:
 		break;
@@ -238,6 +265,30 @@ void Scene::render()
 			break;
 		case(5):
 			break;
+		case(6):
+			break;
+		case(7):
+			break;
+		case(8):
+			break;
+		case(9):
+			break;
+		case(10):
+			break;
+		case(11):
+			break;
+		case(12):
+			break;
+		case(13):
+			break;
+		case(14):
+			break;
+		case(15):
+			break;
+		case(16):
+			break;
+		case(17):
+			break;
 		default:
 			break;
 	}
@@ -259,6 +310,12 @@ int Scene::nextScreen()
 int Scene::prevScreen()
 {
 	--level;
+	updateScene();
+	return level;
+}
+
+int Scene::goToScreen(int x) {
+	level = x;
 	updateScene();
 	return level;
 }
@@ -288,6 +345,45 @@ void Scene::updateScene()
 			break;
 		case(4):
 			map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(5):
+			map = TileMap::createTileMap("levels/Scene3.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(6):
+			map = TileMap::createTileMap("levels/Scene4.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(7):
+			map = TileMap::createTileMap("levels/Scene5.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(8):
+			map = TileMap::createTileMap("levels/Scene6.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(9):
+			map = TileMap::createTileMap("levels/Scene7.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(10):
+			map = TileMap::createTileMap("levels/Scene8.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(11):
+			map = TileMap::createTileMap("levels/Scene9.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(12):
+			map = TileMap::createTileMap("levels/Scene10.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(13):
+			map = TileMap::createTileMap("levels/Scene11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(14):
+			map = TileMap::createTileMap("levels/Scene12.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(15):
+			map = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(16):
+			map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			break;
+		case(17):
+			map = TileMap::createTileMap("levels/Scene15.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 			break;
 		default:
 			break;

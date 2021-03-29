@@ -1,0 +1,7 @@
+Next screen: Nn, Pn
+Previous Screen: Pp, Po
+Portal1: Pa/Pf (+-1 level) del level 3(5) al 4(6).
+Portal2: Pb/Pg (+-4 level) del level 3(5) al 7(9)
+Portal3: Pc/Ph (+-2 level) del level 9(11) al 11(12)
+Portal4: Pd/Pi (+-1 level) del level 12(14) al 13(14)
+Portal5: Pe/Pj (+-4 level) del level 6(8) al 10(11)

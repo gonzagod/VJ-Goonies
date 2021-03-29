@@ -28,6 +28,10 @@ int Game::prevScreen()
 	return scene.prevScreen();
 }
 
+int Game::goToScreen(int level) {
+	return scene.goToScreen(level);
+}
+
 int Game::addPoints(int points) {
 	return scene.addPoints(points);
 }
