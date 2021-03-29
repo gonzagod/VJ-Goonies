@@ -25,9 +25,16 @@ bool last_anim_before_climb = true; //true -> STAND_RIGHT || false -> STAND_LEFT
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
+	bAttacking = false;
 	jump_force_moving = 6; //Salt sembla correcte, però velocitat massa ràpida
-	jump_force = 12;
+	jump_force = 16;
 	up_key_released = true;
+	jump_colision = false;
+	damaged = false;
+	hit_cont = 0;
+	attack_cont = 0;
+	invencible = false;
+	space_key_released = true;
 
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -93,13 +100,14 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 	//Reiniciem les variables només començar el update.
 	bFalling = false;
-	bAttacking = false;
 	if (!Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping) up_key_released = true;
-	
+	if (!Game::instance().getKey(SPACEBAR)) space_key_released = true;
+
 	if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)))
 	{
 		bFalling = false;
 		bJumping = false;
+		jump_colision = false;
 	}
 
 	if (!bJumping)
@@ -107,11 +115,30 @@ void Player::update(int deltaTime)
 		movingL = false;
 		movingR = false;
 	}
-	
+
+	//Damage taken
+	if (damaged) {
+		if (hit_cont < 22) dmg_sprite_manager();
+		else {
+			damaged = false;
+			hit_cont = 0;
+			invencible = false;
+			spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
+			sprite->changeSpriteSheet(&spritesheet);
+		}
+	}
 
 	//En cas d'haver atacat tornem a posició normal.
-	if (sprite->animation() == ATTACK_LEFT) sprite->changeAnimation(STAND_LEFT);
-	else if (sprite->animation() == ATTACK_RIGHT) sprite->changeAnimation(STAND_RIGHT);
+	if (sprite->animation() == ATTACK_LEFT && attack_cont == 5) {
+		sprite->changeAnimation(STAND_LEFT);
+		attack_cont = 0;
+		bAttacking = false;
+	}
+	else if (sprite->animation() == ATTACK_RIGHT && attack_cont == 5) {
+		sprite->changeAnimation(STAND_RIGHT);
+		attack_cont = 0;
+		bAttacking = false;
+	}
 
 	//Si no està sobre terra el personatge cau
 	if ((!map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bJumping && !bClimbing))
@@ -120,9 +147,10 @@ void Player::update(int deltaTime)
 	}
 
 	//Si fem servir la tecla barra espaciadora, el personatge atacarà
-	else if (Game::instance().getKey(SPACEBAR))
+	else if (Game::instance().getKey(SPACEBAR) && space_key_released)
 	{
 		bAttacking = true;
+		space_key_released = false;
 		if (sprite->animation() == (JUMP_LEFT) || sprite->animation() == (MOVE_LEFT) || sprite->animation() == (STAND_LEFT))
 			sprite->changeAnimation(ATTACK_LEFT);
 		else if (sprite->animation() == (JUMP_RIGHT) || sprite->animation() == (MOVE_RIGHT) || sprite->animation() == (STAND_RIGHT))
@@ -130,56 +158,73 @@ void Player::update(int deltaTime)
 	}
 
 	//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
-	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping)
+	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
 	{
 		movingL = true;
 		if (Game::instance().getSpecialKey(GLUT_KEY_UP) && up_key_released)
 		{
-			jump_velocity = jump_force_moving;
-			bJumping = true;
-			up_key_released = false;
+			if (map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32), &posPlayer.x))
+			{
+				bClimbing = true;
+				last_anim_before_climb = false;
+				posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+				sprite->changeAnimation(CLIMB_ANIM1);
+			}
+			else {
+				jump_velocity = jump_force_moving;
+				bJumping = true;
+				up_key_released = false;
+			}
 		}
 		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_LEFT)
 			sprite->changeAnimation(MOVE_LEFT);
 
 		//Si no colisionem amb la paret, avancem
-		if (!map->collisionMoveLeft(posPlayer, glm::ivec2(16, 32)))
+		if (!map->collisionMoveLeft(posPlayer, glm::ivec2(16, 32)) && !bClimbing)
 		{
-			//posPlayer.x -= 1; //Moviment menys fluit però més similar al joc real.
-			posPlayer.x -= 4; //Moviment menys fluit però més similar al joc real.
+			posPlayer.x -= 2; //Moviment menys fluit però més similar al joc real.
 		}
 	}
 
 	//Si premem fletxa dreta, ens movem a la dreta, sempre que no colisionem amb res
-	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling && !bJumping)
+	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
 	{
 		movingR = true;
+
 		if (Game::instance().getSpecialKey(GLUT_KEY_UP) && up_key_released)
 		{
-			jump_velocity = jump_force_moving;
-			bJumping = true;
-			up_key_released = false;
+			if (map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32), &posPlayer.x))
+			{
+				bClimbing = true;
+				last_anim_before_climb = true;
+				posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+				sprite->changeAnimation(CLIMB_ANIM1);
+			}
+			else {
+				jump_velocity = jump_force_moving;
+				bJumping = true;
+				up_key_released = false;
+			}
 		}
 		//Si l'animació no era la correcta la posem
 		if (sprite->animation() != MOVE_RIGHT)
 			sprite->changeAnimation(MOVE_RIGHT);
 
 		//Si no colisionem amb la paret, avancem
-		if (!map->collisionMoveRight(posPlayer, glm::ivec2(16, 32)))
+		if (!map->collisionMoveRight(posPlayer, glm::ivec2(16, 32)) && !bClimbing)
 		{
-			//posPlayer.x += 1; //Moviment menys fluit però més similar al joc real.
-			posPlayer.x += 4; //Moviment menys fluit però més similar al joc real.
+			posPlayer.x += 2; //Moviment menys fluit però més similar al joc real.
 		}
 		/*else {
-			_RPTF0(0, "choca ");
-			_RPT1(0, "%d\n", posPlayer.x);
+		_RPTF0(0, "choca ");
+		_RPT1(0, "%d\n", posPlayer.x);
 		}*/
 	}
 
 	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping && up_key_released)
 	{
-		
+
 		if (bClimbing) {
 			if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
 			else sprite->changeAnimation(CLIMB_ANIM1);
@@ -190,7 +235,7 @@ void Player::update(int deltaTime)
 			bClimbing = true;
 			if (sprite->animation() == MOVE_LEFT || sprite->animation() == STAND_LEFT) last_anim_before_climb = false;
 			else last_anim_before_climb = true;
-			posPlayer.y -= 1; //Moviment menys fluit però més similar al joc real.
+			posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 			sprite->changeAnimation(CLIMB_ANIM1);
 		}
 		//Si arribem al final de la planta, instantàment arribem al nivell de sobre
@@ -208,7 +253,7 @@ void Player::update(int deltaTime)
 		//En cas que encara quedi planta per pujar, simplement pujem
 		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)) && !bJumping)
 		{
-			posPlayer.y -= 1; //Moviment menys fluit però més similar al joc real.
+			posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 		}
 		else if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bClimbing) {
 			up_key_released = false;
@@ -219,33 +264,33 @@ void Player::update(int deltaTime)
 
 	else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
 
-if (bClimbing) {
-	if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
-	else sprite->changeAnimation(CLIMB_ANIM1);
-}
+		if (bClimbing) {
+			if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
+			else sprite->changeAnimation(CLIMB_ANIM1);
+		}
 
-//Si estem al inici d'una enredadera, podrem baixar.
-if (map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32), &posPlayer.x) && !bJumping) {
-	bClimbing = true;
-	if (sprite->animation() == MOVE_LEFT || sprite->animation() == STAND_LEFT) last_anim_before_climb = false;
-	else last_anim_before_climb = true;
-	posPlayer.y += 32;
-	sprite->changeAnimation(CLIMB_ANIM2);
-}
+		//Si estem al inici d'una enredadera, podrem baixar.
+		if (map->finalPartOfPlantClimbing(glm::ivec2(posPlayer.x, posPlayer.y + 16), glm::ivec2(32, 32), &posPlayer.x) && !bJumping) {
+			bClimbing = true;
+			if (sprite->animation() == MOVE_LEFT || sprite->animation() == STAND_LEFT) last_anim_before_climb = false;
+			else last_anim_before_climb = true;
+			posPlayer.y += 32;
+			sprite->changeAnimation(CLIMB_ANIM2);
+		}
 
-//Si ja estavem a una enredadera seguirem baixant.
-else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)) && !bJumping)
-{
-	posPlayer.y += 1; //Moviment menys fluit però més similar al joc real.
-}
+		//Si ja estavem a una enredadera seguirem baixant.
+		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)) && !bJumping)
+		{
+			posPlayer.y += 2; //Moviment menys fluit però més similar al joc real.
+		}
 
-//Si es el final d'una enredadera, simplement quedarem de peu
-else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32), &posPlayer.x) && !bJumping)
-{
-	bClimbing = false;
-	if (last_anim_before_climb) sprite->changeAnimation(STAND_RIGHT);
-	else  sprite->changeAnimation(STAND_LEFT);
-}
+		//Si es el final d'una enredadera, simplement quedarem de peu
+		else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 32), &posPlayer.x) && !bJumping)
+		{
+			bClimbing = false;
+			if (last_anim_before_climb) sprite->changeAnimation(STAND_RIGHT);
+			else  sprite->changeAnimation(STAND_LEFT);
+		}
 	}
 
 	//En cas de no estar fent res per teclat ens quedarem en la "idle" position
@@ -258,7 +303,7 @@ else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 
 			sprite->changeAnimation(STAND_LEFT);
 		else if (!bJumping && sprite->animation() == JUMP_RIGHT)
 			sprite->changeAnimation(STAND_RIGHT);
-		else if (bJumping) {
+		else if (bJumping && !jump_colision) {
 			if (sprite->animation() == MOVE_LEFT || sprite->animation() == STAND_LEFT)
 				sprite->changeAnimation(JUMP_LEFT);
 			else if (sprite->animation() == MOVE_RIGHT || sprite->animation() == STAND_RIGHT)
@@ -267,46 +312,51 @@ else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 
 	}
 
 	if (bJumping) {
-		if (movingR || movingL)
+		if (jump_velocity >= -jump_force)
 		{
-			if (jump_velocity >= -jump_force)
-			{
+			if (!map->collisionMoveUp(posPlayer, glm::ivec2(16, 32))) {
 				posPlayer.y -= 2;
 			}
-			else
-			{
-				posPlayer.y += 2;
-			}
-			if (movingR) posPlayer.x += 1;
-			else if (movingL) posPlayer.x -= 1;
-			jump_velocity -= 1;
-		}
-		else if (jump_velocity >= -jump_force) {
-			posPlayer.y -= 2;
-			jump_velocity -= 1;
+			else jump_velocity = -jump_force;
 		}
 		else
 		{
-			bJumping = false;
+			posPlayer.y += 2;
 		}
+		if (movingR) {
+			if (!map->collisionMoveRight(posPlayer, glm::ivec2(16, 32))) {
+				posPlayer.x += 2;
+			}
+			else {
+				movingR = false;
+				jump_colision = true;
+				sprite->changeAnimation(STAND_RIGHT);
+			}
+		}
+		else if (movingL) {
+			if (!map->collisionMoveLeft(posPlayer, glm::ivec2(16, 32))) {
+				posPlayer.x -= 2;
+			}
+			else {
+				movingL = false;
+				jump_colision = true;
+				sprite->changeAnimation(STAND_LEFT);
+			}
+		}
+		jump_velocity -= 2;
+
 	}
 
 	//En cas de no estar sobre una tile de moviment, caurem.
 	if (bFalling && !bJumping && !bClimbing)
 	{
-		posPlayer.y += 2;
+		posPlayer.y += 4;
 		if (sprite->animation() == MOVE_LEFT)
 			sprite->changeAnimation(STAND_LEFT);
 		else if (sprite->animation() == MOVE_RIGHT)
 			sprite->changeAnimation(STAND_RIGHT);
 	}
 
-	//En cas d'estar atacant, si impactem contra un enemic li farem mal.
-	if (bAttacking)
-	{
-		if (map->attackFoundTargetRight(posPlayer, glm::ivec2(32, 32)));
-		else if (map->attackFoundTargetLeft(posPlayer, glm::ivec2(32, 32)));
-	}
 
 	if (map->nextScreen(posPlayer, glm::ivec2(32, 32))) {
 		int level = Game::instance().nextScreen();
@@ -328,61 +378,64 @@ else if (bClimbing && map->finalPartOfPlantDescending(posPlayer, glm::ivec2(32, 
 		int num = map->quinPortal(posPlayer, glm::ivec2(32, 32));
 		int level = 0;
 		switch (num) {
-			case 1:
-				level = Game::instance().goToScreen(6);
-				posPlayer.x = 416;
-				posPlayer.y = 176;
-				break;
-			case 2:
-				level = Game::instance().goToScreen(9);
-				posPlayer.x = 128;
-				posPlayer.y = 176;
-				break;
-			case 3:
-				level = Game::instance().goToScreen(13);
-				posPlayer.x = 96;
-				posPlayer.y = 144;
-				break;
-			case 4: 
-				level = Game::instance().goToScreen(15);
-				posPlayer.x = 400;
-				posPlayer.y = 112;
-				break;
-			case 5:
-				level = Game::instance().goToScreen(12);
-				posPlayer.x = 416;
-				posPlayer.y = 144;
-				break;
-			case 6:
-				level = Game::instance().goToScreen(5);
-				posPlayer.x = 240;
-				posPlayer.y = 112;
-				break;
-			case 7: 
-				level = Game::instance().goToScreen(5);
-				posPlayer.x = 416;
-				posPlayer.y = 112;
-				break;
-			case 8:
-				level = Game::instance().goToScreen(11);
-				posPlayer.x = 320;
-				posPlayer.y = 176;
-				break;
-			case 9: 
-				level = Game::instance().goToScreen(14);
-				posPlayer.x = 288;
-				posPlayer.y = 304;
-				break;
-			case 10:
-				level = Game::instance().goToScreen(8);
-				posPlayer.x = 256;
-				posPlayer.y = 80;
-				break;
-			default:
-				break;
+		case 1:
+			level = Game::instance().goToScreen(6);
+			posPlayer.x = 416;
+			posPlayer.y = 176;
+			break;
+		case 2:
+			level = Game::instance().goToScreen(9);
+			posPlayer.x = 128;
+			posPlayer.y = 176;
+			break;
+		case 3:
+			level = Game::instance().goToScreen(13);
+			posPlayer.x = 96;
+			posPlayer.y = 144;
+			break;
+		case 4:
+			level = Game::instance().goToScreen(15);
+			posPlayer.x = 400;
+			posPlayer.y = 112;
+			break;
+		case 5:
+			level = Game::instance().goToScreen(12);
+			posPlayer.x = 416;
+			posPlayer.y = 144;
+			break;
+		case 6:
+			level = Game::instance().goToScreen(5);
+			posPlayer.x = 240;
+			posPlayer.y = 112;
+			break;
+		case 7:
+			level = Game::instance().goToScreen(5);
+			posPlayer.x = 416;
+			posPlayer.y = 112;
+			break;
+		case 8:
+			level = Game::instance().goToScreen(11);
+			posPlayer.x = 320;
+			posPlayer.y = 176;
+			break;
+		case 9:
+			level = Game::instance().goToScreen(14);
+			posPlayer.x = 288;
+			posPlayer.y = 304;
+			break;
+		case 10:
+			level = Game::instance().goToScreen(8);
+			posPlayer.x = 256;
+			posPlayer.y = 80;
+			break;
+		default:
+			break;
 		}
 
 	}
+
+	if (bAttacking) ++attack_cont;
+
 	//_RPT1(0, "%d\n", posPlayer.x);
 	//_RPT1(0, "%d\n", posPlayer.y);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -404,6 +457,37 @@ void Player::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
+glm::ivec2 Player::getPosition()
+{
+	return posPlayer;
+}
 
+bool Player::got_hit()
+{
+	if (!invencible) {
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
 
+void Player::dmg_sprite_manager()
+{
+	if (hit_cont % 2) {
+		spritesheet.loadFromFile("images/Goon_128_hit_B.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		sprite->changeSpriteSheet(&spritesheet);
+		++hit_cont;
+	}
+	else
+	{
+		spritesheet.loadFromFile("images/Goon_128_hit_W.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		sprite->changeSpriteSheet(&spritesheet);
+		++hit_cont;
+	}
+}
 
+bool Player::isAttacking(bool& side) {
+	side = sprite->animation() == ATTACK_LEFT;
+	return bAttacking;
+}

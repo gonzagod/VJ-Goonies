@@ -56,7 +56,7 @@ Scene::~Scene()
 	if (player != NULL)
 		delete player;
 	/*if (skull1 != NULL)
-		delete skull1;*/
+	delete skull1;*/
 }
 
 
@@ -65,10 +65,13 @@ void Scene::init()
 	initShaders();
 	map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
+	firstSkullLevel = 0;
+	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
+
 	skullsScene1[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	skullsScene1[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
 	skullsScene1[0].setTileMap(map);
-	
+
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	msx->setPosition(glm::vec2(INIT_MSX_X_TILES * map->getTileSize(), INIT_MSX_Y_TILES * map->getTileSize()));
@@ -81,7 +84,7 @@ void Scene::init()
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()-8));
+	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize() - 8));
 	player->setTileMap(map);
 
 	goon = new pjLoadingScreen();
@@ -97,21 +100,21 @@ void Scene::init()
 
 	for (int i = 0; i < 6; ++i) {
 		puntuation[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16*(i+4), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 16));
+		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (i + 4), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 16));
 		puntuation[i].setTileMap(map);
 	}
 	for (int i = 6; i < 12; ++i) {
 		puntuation[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (i-2), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+		puntuation[i].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (i - 2), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
 		puntuation[i].setTileMap(map);
 	}
-		puntuation[12].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		puntuation[12].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (27), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
-		puntuation[12].setTileMap(map);
+	puntuation[12].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	puntuation[12].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (27), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+	puntuation[12].setTileMap(map);
 
-		puntuation[13].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		puntuation[13].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (30), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
-		puntuation[13].setTileMap(map);
+	puntuation[13].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	puntuation[13].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (30), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
+	puntuation[13].setTileMap(map);
 
 	evil = new pjLoadingScreen();
 	evil->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -140,16 +143,16 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	/*if (Game::instance().getKey(49)) {
-		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
 	if (Game::instance().getKey(49)) {
-		map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
 
 	if (level <= 2 && Game::instance().getKey(32)) {
-		estat = 22;
-		level = 2;
-	}*/	
+	estat = 22;
+	level = 2;
+	}*/
 	switch (level) {
 	case(0):
 		msx->update(deltaTime, 0, estat);
@@ -157,18 +160,18 @@ void Scene::update(int deltaTime)
 		lletres->update(deltaTime, 6, estat);
 		break;
 	case(1):
-		konami->update(deltaTime,2,estat);
+		konami->update(deltaTime, 2, estat);
 		break;
 	case(2):
 		if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		if (estat >= 4) goon->update(deltaTime, 3, estat);
-		if (estat >= 6 && estat <= 11) goonie[estat-6].update(deltaTime, 4, estat);
+		if (estat >= 6 && estat <= 11) goonie[estat - 6].update(deltaTime, 4, estat);
 		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
-		if (estat == 22 || estat == 23) playStart->update(deltaTime,7,estat);
+		if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
 		break;
 	default:
-		for (int i = skullsPerScreen[level-1]; i < skullsPerScreen[level]; ++i) {
+		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene1[i].update(deltaTime);
 		}
 
@@ -180,6 +183,26 @@ void Scene::update(int deltaTime)
 		}
 		int p = addPoints(1);
 		player->update(deltaTime);
+
+		bool attack_side = true; //True = LEFT ||False = Right
+		int enemy = 0;
+		bool player_attacking = player->isAttacking(attack_side);
+		bool hit = false;
+		bool hit_side = true; //True = LEFT ||False = Right
+		if (player_attacking) {
+			_RPT1(0, "attack_side = %d\n", attack_side);
+			hit = colision_with_enemies(attack_side, enemy, 8, hit_side);
+		}
+		else hit = colision_with_enemies(attack_side, enemy, 0, hit_side);
+		if (hit) {
+			if (player_attacking && attack_side == hit_side) {
+				skullsScene1[enemy].die();
+			}
+			else {
+				bool enemy_hit = player->got_hit();
+				_RPT2(0, "enemy_hit = %d , side = %d\n", enemy_hit, hit_side);
+			}
+		}
 	}
 }
 
@@ -197,53 +220,56 @@ void Scene::render()
 
 	switch (level)
 	{
-		case(0):
-			msx->render();
-			msx2->render();
-			lletres->render();
-			break;
-		case(1):
-			konami->render();
-			break;
-		case(2):
-			if (estat >= 5 && estat <= 21) goon->render();
-			if (estat >= 6 && estat <= 11) {
-				for (int i = 0; i < estat-5; ++i) {
-					goonie[i].render();
-				}
+	case(0):
+		msx->render();
+		msx2->render();
+		lletres->render();
+		break;
+	case(1):
+		konami->render();
+		break;
+	case(2):
+		if (estat >= 5 && estat <= 21) goon->render();
+		if (estat >= 6 && estat <= 11) {
+			for (int i = 0; i < estat - 5; ++i) {
+				goonie[i].render();
 			}
-			else if (estat >= 12 && estat <= 13) {
-				for (int i = 0; i < 6; ++i) {
-					goonie[i].render();
-				}
-			}		
+		}
+		else if (estat >= 12 && estat <= 13) {
+			for (int i = 0; i < 6; ++i) {
+				goonie[i].render();
+			}
+		}
 
-			else if (estat >= 14 && estat <= 18) {
-				for (int i = 5; i > estat - 14; --i) {
-					goonie[i].render();
-				}
+		else if (estat >= 14 && estat <= 18) {
+			for (int i = 5; i > estat - 14; --i) {
+				goonie[i].render();
 			}
-				
-			if (estat >= 12 && estat <= 21) evil->render();
-			if (estat == 22 || estat == 23) playStart->render();
-			break;
-		default:
-			for (int i = skullsPerScreen[level - 1]; i < skullsPerScreen[level]; ++i) {
-				skullsScene1[i].render();
-			}
-			break;
+		}
+
+		if (estat >= 12 && estat <= 21) evil->render();
+		if (estat == 22 || estat == 23) playStart->render();
+		break;
+	default:
+		break;
 	}
 	if (level >= 3) {
 		for (int i = 0; i < 14; ++i) {
 			puntuation[i].render();
 		}
 		player->render();
+
+		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+			skullsScene1[i].render();
+		}
 	}
 }
 
 int Scene::nextScreen()
 {
 	++level;
+	firstSkullLevel += maxSkullLevel;
+	maxSkullLevel += skullsPerScreen[level];
 	updateScene();
 	return level;
 }
@@ -251,12 +277,16 @@ int Scene::nextScreen()
 int Scene::prevScreen()
 {
 	--level;
+	firstSkullLevel -= skullsPerScreen[level];
+	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	updateScene();
 	return level;
 }
 
 int Scene::goToScreen(int x) {
 	level = x;
+	firstSkullLevel -= skullsPerScreen[level];
+	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	updateScene();
 	return level;
 }
@@ -279,64 +309,73 @@ void Scene::updateScene()
 
 	switch (level)
 	{
-		case(0):
-			map = TileMap::createTileMap("levels/msx.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(1):
-			map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(2):
-			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(3):
-			map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(4):
-			map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(5):
-			map = TileMap::createTileMap("levels/Scene3.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(6):
-			map = TileMap::createTileMap("levels/Scene4.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(7):
-			map = TileMap::createTileMap("levels/Scene5.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(8):
-			map = TileMap::createTileMap("levels/Scene6.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(9):
-			map = TileMap::createTileMap("levels/Scene7.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(10):
-			map = TileMap::createTileMap("levels/Scene8.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(11):
-			map = TileMap::createTileMap("levels/Scene9.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(12):
-			map = TileMap::createTileMap("levels/Scene10.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(13):
-			map = TileMap::createTileMap("levels/Scene11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(14):
-			map = TileMap::createTileMap("levels/Scene12.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(15):
-			map = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(16):
-			map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		case(17):
-			map = TileMap::createTileMap("levels/Scene15.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			break;
-		default:
-			break;
+	case(0):
+		map = TileMap::createTileMap("levels/msx.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(1):
+		map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(2):
+		map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(3):
+		map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(4):
+		map = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(5):
+		map = TileMap::createTileMap("levels/Scene3.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(6):
+		map = TileMap::createTileMap("levels/Scene4.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(7):
+		map = TileMap::createTileMap("levels/Scene5.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(8):
+		map = TileMap::createTileMap("levels/Scene6.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(9):
+		map = TileMap::createTileMap("levels/Scene7.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(10):
+		map = TileMap::createTileMap("levels/Scene8.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(11):
+		map = TileMap::createTileMap("levels/Scene9.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(12):
+		map = TileMap::createTileMap("levels/Scene10.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(13):
+		map = TileMap::createTileMap("levels/Scene11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(14):
+		map = TileMap::createTileMap("levels/Scene12.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(15):
+		map = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(16):
+		map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	case(17):
+		map = TileMap::createTileMap("levels/Scene15.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		break;
+	default:
+		break;
 	}
-	if (level >=3) player->setTileMap(map);
+	if (level >= 3) {
+		player->setTileMap(map);
+		if (level > 3) {
+			for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+				skullsScene1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				skullsScene1[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
+				skullsScene1[i].setTileMap(map);
+			}
+		}
+	}
 }
 
 void Scene::initShaders()
@@ -369,5 +408,24 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-
-
+bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side)
+{
+	int x_left = 0;
+	int x_right = 0;
+	if (attack_side) x_left = attack_dist;
+	else x_right = attack_dist;
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+		glm::ivec2 SkullPos = skullsScene1[i].getPosition();
+		enemy = i;
+		if (skullsScene1[i].isAlive()) {
+			if (PlayerPos.y >(SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
+				if (PlayerPos.x >(SkullPos.x - (16 + x_right)) && PlayerPos.x < (SkullPos.x + (16 + x_left))) {
+					hit_side = SkullPos.x < PlayerPos.x;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
