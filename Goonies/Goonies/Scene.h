@@ -47,8 +47,6 @@ private:
 	pjLoadingScreen *playStart;
 	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
-	static const int num_skulls_Scene1 = 3;
-	Skull* skullsScene1 = new Skull[num_skulls_Scene1];
 	ShaderProgram texProgram;
 	float currentTime;
 	int estat;
@@ -56,8 +54,6 @@ private:
 	int level;
 	int punts;
 	string levelmap;
-	int initSkullsPos[num_skulls_Scene1][2] = { { 19,14 },{ 5,8 },{ 21,4 } };
-	int skullsPerScreen[6] = { 0,0,0,1,2,0 };
 	int firstSkullLevel, maxSkullLevel;
 };
 

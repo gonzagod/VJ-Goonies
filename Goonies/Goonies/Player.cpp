@@ -360,18 +360,18 @@ void Player::update(int deltaTime)
 
 	if (map->nextScreen(posPlayer, glm::ivec2(32, 32))) {
 		int level = Game::instance().nextScreen();
-		if (posPlayer.x < 464) {
+		if (posPlayer.x < 544) {
 			posPlayer.y = 64;
 		}
-		else posPlayer.x = 16;
+		else posPlayer.x = 96;
 	}
 
 	if (map->prevScreen(posPlayer, glm::ivec2(32, 32))) {
 		int level = Game::instance().prevScreen();
-		if (posPlayer.x > 80) {
+		if (posPlayer.x > 160) {
 			posPlayer.y = 320;
 		}
-		else posPlayer.x = 468;
+		else posPlayer.x = 548;
 	}
 
 	if (map->portal(posPlayer, glm::ivec2(32, 32))) {
@@ -380,52 +380,52 @@ void Player::update(int deltaTime)
 		switch (num) {
 		case 1:
 			level = Game::instance().goToScreen(6);
-			posPlayer.x = 416;
+			posPlayer.x = 496;
 			posPlayer.y = 176;
 			break;
 		case 2:
 			level = Game::instance().goToScreen(9);
-			posPlayer.x = 128;
+			posPlayer.x = 108;
 			posPlayer.y = 176;
 			break;
 		case 3:
 			level = Game::instance().goToScreen(13);
-			posPlayer.x = 96;
+			posPlayer.x = 176;
 			posPlayer.y = 144;
 			break;
 		case 4:
 			level = Game::instance().goToScreen(15);
-			posPlayer.x = 400;
+			posPlayer.x = 480;
 			posPlayer.y = 112;
 			break;
 		case 5:
 			level = Game::instance().goToScreen(12);
-			posPlayer.x = 416;
+			posPlayer.x = 496;
 			posPlayer.y = 144;
 			break;
 		case 6:
 			level = Game::instance().goToScreen(5);
-			posPlayer.x = 240;
+			posPlayer.x = 320;
 			posPlayer.y = 112;
 			break;
 		case 7:
 			level = Game::instance().goToScreen(5);
-			posPlayer.x = 416;
+			posPlayer.x = 496;
 			posPlayer.y = 112;
 			break;
 		case 8:
 			level = Game::instance().goToScreen(11);
-			posPlayer.x = 320;
+			posPlayer.x = 400;
 			posPlayer.y = 176;
 			break;
 		case 9:
 			level = Game::instance().goToScreen(14);
-			posPlayer.x = 288;
+			posPlayer.x = 368;
 			posPlayer.y = 304;
 			break;
 		case 10:
 			level = Game::instance().goToScreen(8);
-			posPlayer.x = 256;
+			posPlayer.x = 336;
 			posPlayer.y = 80;
 			break;
 		default:

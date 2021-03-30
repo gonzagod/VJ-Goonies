@@ -358,6 +358,28 @@ bool TileMap::prevScreen(const glm::ivec2& pos, const glm::ivec2& size) const
 	return false;
 }
 
+bool TileMap::skullsobreterra(const glm::ivec2 & pos, const glm::ivec2 & size, bool side) const
+{
+	int x0 = 0, x1 = 0, y;
+	if (side) { //TRUE = moving right | FALSE = moving left
+		x0 = (pos.x + 30) / tileSize;
+		x1 = (pos.x + 38) / tileSize;
+	}
+	else
+	{
+		x0 = (pos.x - 8) / tileSize;
+		x1 = (pos.x ) / tileSize;
+	}
+	y = (pos.y + 16) / tileSize;
+	for (int x = x0; x <= x1; x++) {
+		if ((map[y * mapSize.x + x] == 1 ||
+			 map[y * mapSize.x + x] == 2) || 
+			(map[y * mapSize.x + x] >= 7 && map[y * mapSize.x + x] <= 37 && map[y * mapSize.x + x] != 32))
+			return true;
+	}
+	return false;
+}
+
 
 bool TileMap::portal(const glm::ivec2& pos, const glm::ivec2& size) const
 {

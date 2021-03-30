@@ -46,15 +46,15 @@ void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Skull::update(int deltaTime)
 {
 	sprite->update(deltaTime);
-	if (sprite->animation() == RESPAWN && cont_spawn > 100) sprite->changeAnimation(MOVE_LEFT);
+	if (sprite->animation() == RESPAWN && cont_spawn > 75) sprite->changeAnimation(MOVE_LEFT);
 	else if (sprite->animation() == RESPAWN) ++cont_spawn;
 	else if (sprite->animation() == MOVE_RIGHT) {
-		if (map->collisionMoveRight(posSkull, glm::ivec2(32, 32))) sprite->changeAnimation(MOVE_LEFT);
-		else posSkull.x += 2;
+		if (map->collisionMoveRight(posSkull, glm::ivec2(16, 16)) || !map->skullsobreterra(posSkull, glm::ivec2(16, 16), true)) sprite->changeAnimation(MOVE_LEFT);
+		else posSkull.x += 3;
 	}
 	else if (sprite->animation() == MOVE_LEFT) {
-		if (map->collisionMoveLeft(posSkull, glm::ivec2(32, 32))) sprite->changeAnimation(MOVE_RIGHT);
-		else posSkull.x -= 2;
+		if (map->collisionMoveLeft(posSkull, glm::ivec2(16, 16)) || !map->skullsobreterra(posSkull, glm::ivec2(16, 16), false)) sprite->changeAnimation(MOVE_RIGHT);
+		else posSkull.x -= 3;
 	}
 
 	if (cont_dying == 16) {

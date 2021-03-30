@@ -43,6 +43,7 @@ public:
 	int quinPortal(const glm::ivec2&pos, const glm::ivec2& size) const;
 	bool nextScreen(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool prevScreen(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool skullsobreterra(const glm::ivec2& pos, const glm::ivec2& size, bool side) const;
 
 
 private:

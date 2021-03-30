@@ -147,8 +147,8 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		case 0:
 			if (estat == MSX) {
 				if (sprite->animation() != MSX_FONS) sprite->changeAnimation(MSX_FONS);
-				posPJ.x += 8;
-				if (posPJ.x == 128) {
+				posPJ.x += 16;
+				if (posPJ.x == 208) {
 					waiting = true;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					estat = MSX2;
@@ -171,15 +171,15 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		case 1:
 			if (estat == MSX) {
 				if (sprite->animation() != MSX_LLETRES) sprite->changeAnimation(MSX_LLETRES);
-				posPJ.x -= 8;
+				posPJ.x -= 16;
 			}
 			break;
 
 		case 2:
 			if (estat == KONAMI) {
 				if (sprite->animation() != KONAMI_UP) sprite->changeAnimation(KONAMI_UP);
-				posPJ.y -= 2;
-				if (posPJ.y == 156) {
+				posPJ.y -= 4;
+				if (posPJ.y == 140) {
 					waiting = true;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					estat = KONAMI2;
@@ -212,16 +212,16 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			}
 			if (estat == GOON) {
 				if (sprite->animation() != MOVE_RIGHT_GOON) sprite->changeAnimation(MOVE_RIGHT_GOON);
-				posPJ.x += 4;
-				if (posPJ.x == 360) estat = GOONIE1;
+				posPJ.x += 5;
+				if (posPJ.x >= 430) estat = GOONIE1;
 			}
 			else if (estat >= STUN_GOON && estat < EVIL_LAUGH) {
 				if (sprite->animation() != STUN) sprite->changeAnimation(STUN);
 			}
 			else if (estat == EVIL_LAUGH) {
 				if (sprite->animation() != MOVE_LEFT_GOON) sprite->changeAnimation(MOVE_LEFT_GOON);
-				posPJ.x -= 4;
-				if (posPJ.x == 100) {
+				posPJ.x -= 5;
+				if (posPJ.x <= 102) {
 					endwait = clock() + 4 * CLOCKS_PER_SEC;
 					estat = PLAY_START;
 				}
@@ -231,8 +231,8 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 
 		case 4:
 			if (sprite->animation() != MOVE_RIGHT_GOONIE) sprite->changeAnimation(MOVE_RIGHT_GOONIE);
-			posPJ.x += 4;
-			if (posPJ.x == (320 - (estat - 6) * 32)) {
+			posPJ.x += 5;
+			if (posPJ.x >= (390 - (estat - 6) * 35)) {
 				++estat;
 				sprite->changeAnimation(IDLE_GOONIE);
 			}
@@ -241,13 +241,13 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			if (estat >= EVIL && estat < GOONIE6_GONE) {
 				if (estat == EVIL) estat = STUN_GOON;
 				if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
-				posPJ.x -= 2;
-				if (posPJ.x == 320) estat = GOONIE1_GONE;
-				if (posPJ.x == 288) estat = GOONIE2_GONE;
-				if (posPJ.x == 256) estat = GOONIE3_GONE;
-				if (posPJ.x == 224) estat = GOONIE4_GONE;
-				if (posPJ.x == 192) estat = GOONIE5_GONE;
-				if (posPJ.x == 160) {
+				posPJ.x -= 3;
+				if (posPJ.x <= 390) estat = GOONIE1_GONE;
+				if (posPJ.x <= 355) estat = GOONIE2_GONE;
+				if (posPJ.x <= 320) estat = GOONIE3_GONE;
+				if (posPJ.x <= 285) estat = GOONIE4_GONE;
+				if (posPJ.x <= 250) estat = GOONIE5_GONE;
+				if (posPJ.x <= 225) {
 					waiting = true;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					estat = GOONIE6_GONE;
@@ -266,15 +266,15 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			}
 			else if (estat == EVIL_LAUGH) {
 				if (sprite->animation() != MOVE_LEFT_EVIL) sprite->changeAnimation(MOVE_LEFT_EVIL);
-				posPJ.x -= 2;
-				if (posPJ.x == 100) posPJ.x -= 500;
+				posPJ.x -= 3;
+				if (posPJ.x <= 100) posPJ.x -= 500;
 			}
 			break;
 		
 		case 6:
 			if (estat == MSX2) {
 				sprite->changeAnimation(LLETRES0);
-				posPJ.x = 136;
+				posPJ.x = 208;
 				posPJ.y = 272;
 			}
 			break;
@@ -282,7 +282,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 		case 7:
 			if (estat == PLAY_START) {
 				if (!waiting) {
-					posPJ.x = 216;
+					posPJ.x = 296;
 					posPJ.y = 272;
 					endwait = clock() + 2 * CLOCKS_PER_SEC;
 					waiting = true;

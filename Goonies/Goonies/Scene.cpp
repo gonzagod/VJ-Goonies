@@ -6,19 +6,19 @@
 #include <crtdbg.h> 
 
 
-#define SCREEN_X 32
-#define SCREEN_Y 16
+#define SCREEN_X 0
+#define SCREEN_Y 0
 
 
 
-#define INIT_PLAYER_X_TILES 12.5
+#define INIT_PLAYER_X_TILES 17.5
 #define INIT_PLAYER_Y_TILES 11
 
-#define INIT_MSX_X_TILES -7
-#define INIT_MSX2_X_TILES 23
+#define INIT_MSX_X_TILES -15
+#define INIT_MSX2_X_TILES 40
 #define INIT_MSX_Y_TILES 4
 
-#define INIT_SKULL_X_TILES 19
+#define INIT_SKULL_X_TILES 24
 #define INIT_SKULL_Y_TILES 14
 
 #define GOONIE_INIT_X_TILES 8
@@ -27,18 +27,26 @@
 #define GOON_INIT_X_TILES 8
 #define GOON_INIT_Y_TILES 13
 
-#define EVIL_INIT_X_TILES 23
+#define EVIL_INIT_X_TILES 28
 #define EVIL_INIT_Y_TILES 13
 
-#define KONAMI_INIT_X_TILES 12
+#define KONAMI_INIT_X_TILES 17
 #define KONAMI_INIT_Y_TILES 14
 
 #define LLETRES_INIT_X_TILES -20
 #define LLETRES_INIT_Y_TILES -20
 
-#define PUNTUATION_INIT_X_TILES 0
+#define PUNTUATION_INIT_X_TILES 5
 #define PUNTUATION_INIT_Y_TILES 0
 
+static const int num_skulls_Scene = 21;
+Skull* skullsScene = new Skull[num_skulls_Scene];
+int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
+int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7  },{ 25,13 },{ 17,17 },
+										   { 18,9  },{ 18,19 },{ 16,5  },{ 26,11 },
+										   {  8,5  },{ 20,17 },
+										   { 10,13 },{ 14,19 },{ 25,19 },
+										   { 22,15 },{  6,17 },{ 17,11 },{ 20,17 },{  8,9 },{ 11,21 } };
 
 Scene::Scene()
 {
@@ -59,18 +67,16 @@ Scene::~Scene()
 	delete skull1;*/
 }
 
-
 void Scene::init()
 {
 	initShaders();
 	map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-
 	firstSkullLevel = 0;
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 
-	skullsScene1[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	skullsScene1[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
-	skullsScene1[0].setTileMap(map);
+	skullsScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	skullsScene[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
+	skullsScene[0].setTileMap(map);
 
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -137,6 +143,7 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+	int i = goToScreen(5);
 }
 
 void Scene::update(int deltaTime)
@@ -172,7 +179,7 @@ void Scene::update(int deltaTime)
 		break;
 	default:
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-			skullsScene1[i].update(deltaTime);
+			skullsScene[i].update(deltaTime);
 		}
 
 		break;
@@ -196,11 +203,10 @@ void Scene::update(int deltaTime)
 		else hit = colision_with_enemies(attack_side, enemy, 0, hit_side);
 		if (hit) {
 			if (player_attacking && attack_side == hit_side) {
-				skullsScene1[enemy].die();
+				skullsScene[enemy].die();
 			}
 			else {
 				bool enemy_hit = player->got_hit();
-				_RPT2(0, "enemy_hit = %d , side = %d\n", enemy_hit, hit_side);
 			}
 		}
 	}
@@ -260,7 +266,7 @@ void Scene::render()
 		player->render();
 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-			skullsScene1[i].render();
+			skullsScene[i].render();
 		}
 	}
 }
@@ -268,8 +274,10 @@ void Scene::render()
 int Scene::nextScreen()
 {
 	++level;
-	firstSkullLevel += maxSkullLevel;
+	firstSkullLevel = maxSkullLevel;
 	maxSkullLevel += skullsPerScreen[level];
+	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
+	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
 	return level;
 }
@@ -279,14 +287,23 @@ int Scene::prevScreen()
 	--level;
 	firstSkullLevel -= skullsPerScreen[level];
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
+	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
+	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
 	return level;
 }
 
 int Scene::goToScreen(int x) {
 	level = x;
-	firstSkullLevel -= skullsPerScreen[level];
+	if (level == 0) firstSkullLevel = 0;
+	else {
+		int sumSkulls = 0;
+		for (int i = 0; i < level; ++i) sumSkulls += skullsPerScreen[i];
+		firstSkullLevel = sumSkulls;
+	}
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
+	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
+	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
 	return level;
 }
@@ -300,12 +317,6 @@ int Scene::addPoints(int points)
 
 void Scene::updateScene()
 {
-
-	for (int i = 1; i < skullsPerScreen[level - 1] + 1; ++i) {
-		skullsScene1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		skullsScene1[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
-		skullsScene1[i].setTileMap(map);
-	}
 
 	switch (level)
 	{
@@ -368,12 +379,10 @@ void Scene::updateScene()
 	}
 	if (level >= 3) {
 		player->setTileMap(map);
-		if (level > 3) {
-			for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-				skullsScene1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-				skullsScene1[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
-				skullsScene1[i].setTileMap(map);
-			}
+		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+			skullsScene[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+			skullsScene[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
+			skullsScene[i].setTileMap(map);
 		}
 	}
 }
@@ -416,9 +425,9 @@ bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist,
 	else x_right = attack_dist;
 	glm::ivec2 PlayerPos = player->getPosition();
 	for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-		glm::ivec2 SkullPos = skullsScene1[i].getPosition();
+		glm::ivec2 SkullPos = skullsScene[i].getPosition();
 		enemy = i;
-		if (skullsScene1[i].isAlive()) {
+		if (skullsScene[i].isAlive()) {
 			if (PlayerPos.y >(SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
 				if (PlayerPos.x >(SkullPos.x - (16 + x_right)) && PlayerPos.x < (SkullPos.x + (16 + x_left))) {
 					hit_side = SkullPos.x < PlayerPos.x;
