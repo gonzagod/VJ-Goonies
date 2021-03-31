@@ -39,6 +39,12 @@
 #define PUNTUATION_INIT_X_TILES 5
 #define PUNTUATION_INIT_Y_TILES 0
 
+#define HEALTHBAR_INIT_X_TILES 20
+#define HEALTHBAR_INIT_Y_TILES 1
+
+#define EXPBAR_INIT_X_TILES 20
+#define EXPBAR_INIT_Y_TILES 2
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
@@ -55,6 +61,8 @@ Scene::Scene()
 	// skull1 = NULL;
 	level = 0;
 	estat = 0;
+	health = 20;
+	exp = 0;
 }
 
 Scene::~Scene()
@@ -122,6 +130,16 @@ void Scene::init()
 	puntuation[13].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (30), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
 	puntuation[13].setTileMap(map);
 
+	healthBar = new Bars();
+	healthBar->initHealthBar(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	healthBar->setPosition(glm::vec2(HEALTHBAR_INIT_X_TILES * map->getTileSize(), HEALTHBAR_INIT_Y_TILES * map->getTileSize()));
+	healthBar->setTileMap(map);
+
+	expBar = new Bars();
+	expBar->initExpBar(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	expBar->setPosition(glm::vec2(EXPBAR_INIT_X_TILES * map->getTileSize(), EXPBAR_INIT_Y_TILES * map->getTileSize()));
+	expBar->setTileMap(map);
+
 	evil = new pjLoadingScreen();
 	evil->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	evil->setPosition(glm::vec2(EVIL_INIT_X_TILES * map->getTileSize(), EVIL_INIT_Y_TILES * map->getTileSize()));
@@ -143,23 +161,32 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	int i = goToScreen(5);
+	int i = goToScreen(3);
+}
+
+void Scene::restartGame() {
+	level = 3;
+	health = 20;
+	exp = 0;
+	punts = 0;
+	init();
 }
 
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	if (punts > maxPunts) maxPunts = punts;
 	/*if (Game::instance().getKey(49)) {
 	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
 	if (Game::instance().getKey(49)) {
 	map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	}
-
-	if (level <= 2 && Game::instance().getKey(32)) {
+	*/
+	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
 	estat = 22;
 	level = 2;
-	}*/
+	}
 	switch (level) {
 	case(0):
 		msx->update(deltaTime, 0, estat);
@@ -185,10 +212,14 @@ void Scene::update(int deltaTime)
 		break;
 	}
 	if (level >= 3) {
-		for (int i = 0; i < 14; ++i) {
+		for (int i = 0; i < 8; ++i) {
+			puntuation[i].update(deltaTime, i, maxPunts, level);
+		}
+		for (int i = 8; i < 14; ++i) {
 			puntuation[i].update(deltaTime, i, punts, level);
 		}
-		int p = addPoints(1);
+		healthBar->update(deltaTime, health);
+		expBar->update(deltaTime, exp);
 		player->update(deltaTime);
 
 		bool attack_side = true; //True = LEFT ||False = Right
@@ -263,6 +294,8 @@ void Scene::render()
 		for (int i = 0; i < 14; ++i) {
 			puntuation[i].render();
 		}
+		healthBar->render();
+		expBar->render();
 		player->render();
 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
@@ -312,6 +345,25 @@ int Scene::addPoints(int points)
 {
 	punts += points;
 	return punts;
+}
+
+int Scene::modifyHP(int healthPoints) {
+	health += healthPoints;
+	return health;
+}
+
+int Scene::modifyExp(int expPoints) {
+	exp += expPoints;
+	if (exp >= 20) {
+		exp = exp % 20;
+		modifyHP(4);
+	}
+	return exp;
+}
+
+bool Scene::noHealth() {
+	if (health <= 0) return true;
+	else return false;
 }
 
 

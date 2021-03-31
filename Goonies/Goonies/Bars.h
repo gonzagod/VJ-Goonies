@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _PUNTUACIO_INCLUDE
-#define _PUNTUACIO_INCLUDE
+#ifndef _BARS_INCLUDE
+#define _BARS_INCLUDE
 
 #include "Sprite.h"
 #include "TileMap.h"
@@ -9,12 +9,13 @@
 
 
 
-class Puntuacio
+class Bars
 {
 
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-	void update(int deltaTime, int numPersonatge, int points, int level);
+	void initHealthBar(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
+	void initExpBar(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
+	void update(int deltaTime, int health);
 	void render();
 
 	void setTileMap(TileMap* tileMap);
@@ -24,7 +25,6 @@ private:
 	glm::ivec2 tileMapDispl, posPJ;
 	int startX, startY;
 	int puntuacio;
-	int puntuacioMaxima;
 	clock_t endwait;
 	Texture spritesheet;
 	Sprite *sprite;

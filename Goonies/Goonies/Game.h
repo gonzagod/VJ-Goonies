@@ -38,6 +38,12 @@ public:
 	int prevScreen();
 	int goToScreen(int level);
 	int addPoints(int points);
+	int modifyHP(int healthPoints);
+	int modifyExp(int expPoints);
+
+	bool noHealth();
+
+	void restartGame();
 
 	// Input callback methods
 	void keyPressed(int key);
@@ -54,6 +60,7 @@ public:
 private:
 	bool bPlay;                       // Continue to play game?
 	int points;
+	int higherPuntuation;
 	Scene scene;
 	bool keys[256], specialKeys[256]; // Store key states so that 
 									  // we can have access at any time

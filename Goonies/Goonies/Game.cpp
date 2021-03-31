@@ -36,6 +36,25 @@ int Game::addPoints(int points) {
 	return scene.addPoints(points);
 }
 
+int Game::modifyHP(int healthPoints) {
+	return scene.modifyHP(healthPoints);
+}
+
+int Game::modifyExp(int expPoints) {
+	return scene.modifyExp(expPoints);
+}
+
+bool Game::noHealth() {
+	return scene.noHealth();
+}
+
+void Game::restartGame() {
+	if (points > higherPuntuation) higherPuntuation = points;
+	points = 0;
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	scene.restartGame();
+}
+
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

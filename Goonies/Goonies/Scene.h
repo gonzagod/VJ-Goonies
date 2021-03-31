@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "pjLoadingScreen.h"
 #include "Puntuacio.h"
+#include "Bars.h"
 #include "Skull.h"
 
 
@@ -26,10 +27,17 @@ public:
 	void update(int deltaTime);
 	void render();
 	void updateScene();
+	void restartGame();
 	int nextScreen();
 	int prevScreen();
 	int goToScreen(int x);
 	int addPoints(int points);
+	int modifyHP(int healthPoints);
+	int modifyExp(int expPoints);
+
+	bool noHealth();
+
+
 
 private:
 	void initShaders();
@@ -45,6 +53,8 @@ private:
 	pjLoadingScreen *msx2;
 	pjLoadingScreen *lletres;
 	pjLoadingScreen *playStart;
+	Bars* healthBar;
+	Bars* expBar;
 	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
 	ShaderProgram texProgram;
@@ -53,6 +63,9 @@ private:
 	glm::mat4 projection;
 	int level;
 	int punts;
+	int maxPunts;
+	int health;
+	int exp;
 	string levelmap;
 	int firstSkullLevel, maxSkullLevel;
 };
