@@ -161,7 +161,7 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	int i = goToScreen(3);
+	//int i = goToScreen(7);
 }
 
 void Scene::restartGame() {
