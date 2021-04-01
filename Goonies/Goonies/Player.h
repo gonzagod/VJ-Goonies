@@ -29,8 +29,7 @@ private:
 	bool bJumping, bAttacking, bFalling, bClimbing, jump_colision;
 	bool movingR, movingL, up_key_released, damaged, invencible, space_key_released;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jump_force, jump_force_moving, startY, hit_cont, attack_cont;
-	double jump_velocity;
+	int jump_cont, startY, hit_cont, attack_cont, player_speed, falling_cont, falling_add, falling_seq;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

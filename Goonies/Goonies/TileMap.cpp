@@ -165,14 +165,8 @@ bool TileMap::collisionMoveLeft(const glm::ivec2& pos, const glm::ivec2& size) c
 	y0 = pos.y / tileSize;
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for (int y = y0; y <= y1; y++) {
-		if (map[y * mapSize.x + x] == 50 ||
-			map[y * mapSize.x + x] == 52 ||
-			map[y * mapSize.x + x] == 54 ||
-			map[y * mapSize.x + x] == 55 ||
-			map[y * mapSize.x + x] == 56 ||
-			map[y * mapSize.x + x] == 66 ||
-			map[y * mapSize.x + x] == 68 ||
-			map[y * mapSize.x + x] == 70 ||
+		if ((map[y * mapSize.x + x] >= 49 && map[y * mapSize.x + x] <= 56) ||
+			(map[y * mapSize.x + x] >= 65 && map[y * mapSize.x + x] <= 70) ||
 			map[y * mapSize.x + x] == 14   //Am
 			) {
 			return true;
@@ -188,14 +182,8 @@ bool TileMap::collisionMoveRight(const glm::ivec2& pos, const glm::ivec2& size) 
 	y0 = pos.y / tileSize;
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for (int y = y0; y <= y1; y++) {
-		if (map[y * mapSize.x + x] == 49 ||
-			map[y * mapSize.x + x] == 51 ||
-			map[y * mapSize.x + x] == 53 ||
-			map[y * mapSize.x + x] == 54 ||
-			map[y * mapSize.x + x] == 55 ||
-			map[y * mapSize.x + x] == 65 ||
-			map[y * mapSize.x + x] == 67 ||
-			map[y * mapSize.x + x] == 69 ||
+		if ((map[y * mapSize.x + x] >= 49 && map[y * mapSize.x + x] <= 56) ||
+			(map[y * mapSize.x + x] >= 65 && map[y * mapSize.x + x] <= 70) ||
 			map[y * mapSize.x + x] == 13   //Am
 			)
 			return true;
@@ -208,7 +196,7 @@ bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) con
 	int x0, x1, y;
 
 	x0 = (pos.x + 8) / tileSize;
-	x1 = (pos.x + 24) / tileSize;
+	x1 = (pos.x + 22) / tileSize;
 	y = (pos.y + 16) / tileSize;
 	for (int x = x0; x <= x1; x++) {
 		if (map[y * mapSize.x + x] >= 1 && map[y * mapSize.x + x] <= 37 && map[y * mapSize.x + x] != 32)
@@ -269,27 +257,6 @@ bool TileMap::finalPartOfPlantDescending(const glm::ivec2& pos, const glm::ivec2
 	else return false;
 }
 
-
-/* bool TileMap::attackFoundTargetRight(const glm::ivec2& pos, const glm::ivec2& size) const
-{
-	int x, y;
-	x = (pos.x + 16) / tileSize;
-	y = (pos.y) / tileSize;
-	if (map[y * mapSize.x + x] == 69  //Ee
-		) return true;
-	else return false;
-}
-
-bool TileMap::attackFoundTargetLeft(const glm::ivec2& pos, const glm::ivec2& size) const
-{
-	int x, y;
-	x = (pos.x - 16) / tileSize;
-	y = (pos.y) / tileSize;
-	if (map[y * mapSize.x + x] == 69  //Ee
-		) return true;
-	else return false;
-} */
-
 bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
 {
 	int x0, x1, y;
@@ -317,7 +284,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size) con
 	int x0, x1, y;
 
 	x0 = (pos.x + 8) / tileSize;
-	x1 = (pos.x + 24) / tileSize;
+	x1 = (pos.x + 22) / tileSize;
 	y = pos.y / tileSize;
 	for (int x = x0; x <= x1; x++)
 	{
