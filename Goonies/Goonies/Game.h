@@ -40,8 +40,12 @@ public:
 	int addPoints(int points);
 	int modifyHP(int healthPoints);
 	int modifyExp(int expPoints);
-
+	bool addKey();
+	bool removeKey();
 	bool noHealth();
+	bool keyStatus();
+
+	int addGoonies();
 
 	void restartGame();
 

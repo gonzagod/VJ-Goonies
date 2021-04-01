@@ -125,7 +125,12 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Bars.h" />
+    <ClInclude Include="Door.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Goonie.h" />
+    <ClInclude Include="GooniePoints.h" />
+    <ClInclude Include="Key.h" />
+    <ClInclude Include="Padlock.h" />
     <ClInclude Include="pjLoadingScreen.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Puntuacio.h" />
@@ -140,8 +145,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bars.cpp" />
+    <ClCompile Include="Door.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Gonnie.cpp" />
+    <ClCompile Include="GooniePoints.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Key.cpp" />
+    <ClCompile Include="Padlock.cpp" />
     <ClCompile Include="pjLoadingScreen.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Puntuacio.cpp" />

@@ -44,6 +44,22 @@ int Game::modifyExp(int expPoints) {
 	return scene.modifyExp(expPoints);
 }
 
+int Game::addGoonies() {
+	return scene.addGoonies();
+}
+
+bool Game::addKey() {
+	return scene.addKey();
+}
+
+bool Game::removeKey() {
+	return scene.removeKey();
+}
+
+bool Game::keyStatus() {
+	return scene.keyStatus();
+}
+
 bool Game::noHealth() {
 	return scene.noHealth();
 }

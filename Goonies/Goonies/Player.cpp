@@ -465,7 +465,7 @@ glm::ivec2 Player::getPosition()
 bool Player::got_hit()
 {
 	if (!invencible) {
-		Game::instance().modifyHP(-2);
+		Game::instance().modifyHP(0);
 		if (Game::instance().noHealth()) {
 		Game::instance().restartGame();
 		}

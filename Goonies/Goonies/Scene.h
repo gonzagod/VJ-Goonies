@@ -9,6 +9,11 @@
 #include "pjLoadingScreen.h"
 #include "Puntuacio.h"
 #include "Bars.h"
+#include "Key.h"
+#include "Padlock.h"
+#include "Door.h"
+#include "Goonie.h"
+#include "GooniePoints.h"
 #include "Skull.h"
 
 
@@ -34,14 +39,20 @@ public:
 	int addPoints(int points);
 	int modifyHP(int healthPoints);
 	int modifyExp(int expPoints);
+	int addGoonies();
 
 	bool noHealth();
-
+	bool addKey();
+	bool removeKey();
+	bool keyStatus();
 
 
 private:
 	void initShaders();
 	bool colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side);
+	bool collision_with_keys();
+	bool collision_with_padlocks();
+	bool collision_with_objects_door();
 
 private:
 	TileMap *map;
@@ -55,8 +66,10 @@ private:
 	pjLoadingScreen *playStart;
 	Bars* healthBar;
 	Bars* expBar;
+	Key* playerKey;
 	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
+	GooniePoints* gooniePoints;
 	ShaderProgram texProgram;
 	float currentTime;
 	int estat;
@@ -66,8 +79,15 @@ private:
 	int maxPunts;
 	int health;
 	int exp;
+	int gooniesRescued;
+	bool key;
 	string levelmap;
 	int firstSkullLevel, maxSkullLevel;
+	int firstKeyLevel, maxKeyLevel;
+	int firstPadlockLevel, maxPadlockLevel;
+	int firstDoorLevel, maxDoorLevel;
+	int firstObjectLevel, maxObjectLevel;
+	int x = 3;
 };
 
 

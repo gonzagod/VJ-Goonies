@@ -45,6 +45,12 @@
 #define EXPBAR_INIT_X_TILES 20
 #define EXPBAR_INIT_Y_TILES 2
 
+#define KEY_INIT_X_TILES 30
+#define KEY_INIT_Y_TILES 24
+
+#define GOONIE_POINTS_X_TILES 32
+#define GOONIE_POINTS_Y_TILES 23
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
@@ -54,11 +60,31 @@ int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7 
 										   { 10,13 },{ 14,19 },{ 25,19 },
 										   { 22,15 },{  6,17 },{ 17,11 },{ 20,17 },{  8,9 },{ 11,21 } };
 
+static const int num_keys_Scene = 14;
+Key* keyScene = new Key[num_keys_Scene];
+int keysPerScreen[18]  = { 0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,2 };
+int initKeysPos[num_keys_Scene][3] = { {16,17,1},{30,7,1},{14,17,1},{23,5,1}, {35,19,1}, {22,5,1}, {14,5,1}, {27,13,1}, {9,7,1}, {21,5,1}, {19,9,1}, {14,17,1}, {15,5,1}, {6,9,1} };
+
+static const int num_padlocks_Scene = 14;
+Padlock* padlockScene = new Padlock[num_padlocks_Scene];
+int padlocksPerScreen[18] = { 0,0,0,1,0,2,1,1,0,0,2,0,2,0,2,0,1,2 };
+int initPadlocksPos[num_padlocks_Scene][3] = { {27,17,1},{32,13,1},{32,12,1},{7,11,1},{25,19,1},{15,11,1},{15,10,1},{21,17,1},{21,16,1},{32,5,1},{32,4,1},{24,17,1},{24,9,1},{24,8,1} };
+
+static const int num_door_Scene = 9;
+Door* doorScene = new Door[num_door_Scene];
+int doorPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
+int DoorPos[num_door_Scene][3] = { {28,15,1},{33,11,1},{8,9,1 },{ 26,17,1 },{ 16,9,1 },{ 22,15,1 },{ 33,3,1 },{ 25,15,1 },{ 25,7,1 } };
+
+static const int num_objectes_porta_Scene = 9;
+Goonie* objectesScene = new Goonie[num_objectes_porta_Scene];
+int objectesPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
+int objectPos[num_objectes_porta_Scene][3] = { { 29,17,1 },{ 34,13,1 },{ 9,11,1 },{ 27,19,1 },{ 17,11,1 },{ 23,17,1 },{ 34,5,1 },{ 26,17,1 },{ 26,9,1 } };
+
 Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
-	// skull1 = NULL;
+	key = false;
 	level = 0;
 	estat = 0;
 	health = 20;
@@ -71,20 +97,47 @@ Scene::~Scene()
 		delete map;
 	if (player != NULL)
 		delete player;
-	/*if (skull1 != NULL)
-	delete skull1;*/
 }
 
 void Scene::init()
 {
 	initShaders();
 	map = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	
 	firstSkullLevel = 0;
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 
 	skullsScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	skullsScene[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
 	skullsScene[0].setTileMap(map);
+
+	firstKeyLevel = 0;
+	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
+	keyScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	keyScene[0].setPosition(glm::vec2(initKeysPos[0][0] * map->getTileSize(), initKeysPos[0][1] * map->getTileSize()));
+	keyScene[0].setTileMap(map);
+
+	firstPadlockLevel = 0;
+	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
+
+	padlockScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	padlockScene[0].setPosition(glm::vec2(initPadlocksPos[0][0] * map->getTileSize(), initPadlocksPos[0][1] * map->getTileSize()));
+	padlockScene[0].setTileMap(map);
+
+	firstDoorLevel = 0;
+	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
+
+	doorScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	doorScene[0].setPosition(glm::vec2(DoorPos[0][0] * map->getTileSize(), DoorPos[0][1] * map->getTileSize()));
+	doorScene[0].setTileMap(map);
+
+	firstObjectLevel = 0;
+	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
+
+	objectesScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	objectesScene[0].setPosition(glm::vec2(objectPos[0][0] * map->getTileSize(), objectPos[0][1] * map->getTileSize()));
+	objectesScene[0].setTileMap(map);
 
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -130,6 +183,11 @@ void Scene::init()
 	puntuation[13].setPosition(glm::vec2(PUNTUATION_INIT_X_TILES * map->getTileSize() + 16 * (30), PUNTUATION_INIT_Y_TILES * map->getTileSize() + 32));
 	puntuation[13].setTileMap(map);
 
+	gooniePoints = new GooniePoints();
+	gooniePoints->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	gooniePoints->setPosition(glm::vec2(GOONIE_POINTS_X_TILES* map->getTileSize() + 2, GOONIE_POINTS_Y_TILES * map->getTileSize()));
+	gooniePoints->setTileMap(map);
+
 	healthBar = new Bars();
 	healthBar->initHealthBar(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	healthBar->setPosition(glm::vec2(HEALTHBAR_INIT_X_TILES * map->getTileSize(), HEALTHBAR_INIT_Y_TILES * map->getTileSize()));
@@ -139,6 +197,12 @@ void Scene::init()
 	expBar->initExpBar(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	expBar->setPosition(glm::vec2(EXPBAR_INIT_X_TILES * map->getTileSize(), EXPBAR_INIT_Y_TILES * map->getTileSize()));
 	expBar->setTileMap(map);
+
+	playerKey = new Key();
+	playerKey->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	playerKey->setPosition(glm::ivec2(KEY_INIT_X_TILES * map->getTileSize(), KEY_INIT_Y_TILES * map->getTileSize()));
+	playerKey->setTileMap(map);
+
 
 	evil = new pjLoadingScreen();
 	evil->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -166,6 +230,7 @@ void Scene::init()
 
 void Scene::restartGame() {
 	level = 3;
+	key = false;
 	health = 20;
 	exp = 0;
 	punts = 0;
@@ -176,13 +241,30 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
-	/*if (Game::instance().getKey(49)) {
-	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	if (Game::instance().getKey(48)) {
+	goToScreen(11);
 	}
 	if (Game::instance().getKey(49)) {
-	map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		goToScreen(12);
 	}
-	*/
+	if (Game::instance().getKey(50)) {
+		goToScreen(13);
+	}
+	if (Game::instance().getKey(51)) {
+		goToScreen(14);
+	}
+	if (Game::instance().getKey(52)) {
+		goToScreen(15);
+	}
+	if (Game::instance().getKey(53)) {
+		goToScreen(16);
+	}
+	if (Game::instance().getKey(54)) {
+		goToScreen(17);
+	}
+	if (Game::instance().getKey(55)) {
+		goToScreen(3);
+	}
 	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
 	estat = 22;
 	level = 2;
@@ -208,7 +290,41 @@ void Scene::update(int deltaTime)
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].update(deltaTime);
 		}
+		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
+			keyScene[j].update(deltaTime,0);
+		}
+		for (int k = firstPadlockLevel; k < maxPadlockLevel; ++k) {
+			padlockScene[k].update(deltaTime);
+		}
+		for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
+			_RPT1(0, "DoorLevel = %d\n", l);
+			if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
+			else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
+			else doorScene[l].update(deltaTime,0);
+		}
 
+		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
+			switch (m) {
+			case 0:
+				objectesScene[m].update(deltaTime, 0);
+				break;
+			case 3:
+				objectesScene[m].update(deltaTime, 1);
+				break;
+			case 4: 
+				objectesScene[m].update(deltaTime, 4);
+			case 13:
+				objectesScene[m].update(deltaTime, 2);
+				break;
+			case 14:
+				objectesScene[m].update(deltaTime, 5);
+				break;
+			default:
+				objectesScene[m].update(deltaTime, 3);
+				break;
+			}
+			
+		}
 		break;
 	}
 	if (level >= 3) {
@@ -221,6 +337,8 @@ void Scene::update(int deltaTime)
 		healthBar->update(deltaTime, health);
 		expBar->update(deltaTime, exp);
 		player->update(deltaTime);
+		playerKey->update(deltaTime,1);
+		gooniePoints->update(deltaTime, gooniesRescued);
 
 		bool attack_side = true; //True = LEFT ||False = Right
 		int enemy = 0;
@@ -240,6 +358,9 @@ void Scene::update(int deltaTime)
 				bool enemy_hit = player->got_hit();
 			}
 		}
+		bool colisio = collision_with_keys();
+		colisio = collision_with_padlocks();
+		colisio = collision_with_objects_door();
 	}
 }
 
@@ -296,11 +417,26 @@ void Scene::render()
 		}
 		healthBar->render();
 		expBar->render();
-		player->render();
-
+		playerKey->render(1);
+		gooniePoints->render();
+		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
+			keyScene[j].render(0);
+		}
+		for (int k = firstPadlockLevel; k < maxPadlockLevel; ++k) {
+			padlockScene[k].render();
+		}
+		for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
+			doorScene[l].render();
+		}
+		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
+			_RPT1(0, "gugu = %d\n", firstObjectLevel);
+			objectesScene[m].render();
+		}
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].render();
 		}
+		player->render();
+		
 	}
 }
 
@@ -309,6 +445,14 @@ int Scene::nextScreen()
 	++level;
 	firstSkullLevel = maxSkullLevel;
 	maxSkullLevel += skullsPerScreen[level];
+	firstKeyLevel = maxKeyLevel;
+	maxKeyLevel += keysPerScreen[level];
+	firstPadlockLevel = maxPadlockLevel;
+	maxPadlockLevel += padlocksPerScreen[level];
+	firstDoorLevel = maxDoorLevel;
+	maxDoorLevel += doorPerScreen[level];
+	firstObjectLevel = maxObjectLevel;
+	maxObjectLevel += objectesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -320,6 +464,14 @@ int Scene::prevScreen()
 	--level;
 	firstSkullLevel -= skullsPerScreen[level];
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
+	firstKeyLevel -= keysPerScreen[level];
+	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
+	firstPadlockLevel -= padlocksPerScreen[level];
+	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
+	firstDoorLevel -= doorPerScreen[level];
+	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
+	firstObjectLevel -= objectesPerScreen[level];
+	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -334,7 +486,36 @@ int Scene::goToScreen(int x) {
 		for (int i = 0; i < level; ++i) sumSkulls += skullsPerScreen[i];
 		firstSkullLevel = sumSkulls;
 	}
+	if (level == 0) firstKeyLevel = 0;
+	else {
+		int numKeys = 0;
+		for (int j = 0; j < level; ++j) numKeys += keysPerScreen[j];
+		firstKeyLevel = numKeys;
+	}
+	
+	if (level == 0) firstPadlockLevel = 0;
+	else {
+		int numPadlocks = 0;
+		for (int k = 0; k < level; ++k) numPadlocks += padlocksPerScreen[k];
+		firstPadlockLevel = numPadlocks;
+	}
+	if (level == 0) firstDoorLevel = 0;
+	else {
+		int numDoors = 0;
+		for (int l = 0; l < level; ++l) numDoors += doorPerScreen[l];
+		firstDoorLevel = numDoors;
+	}
+	if (level == 0) firstObjectLevel = 0;
+	else {
+		int numObjectes = 0;
+		for (int m = 0; m < level; ++m) numObjectes += objectesPerScreen[m];
+		firstObjectLevel = numObjectes;
+	}
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
+	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
+	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
+	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
+	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -349,6 +530,7 @@ int Scene::addPoints(int points)
 
 int Scene::modifyHP(int healthPoints) {
 	health += healthPoints;
+	if (health > 20) health = 20;
 	return health;
 }
 
@@ -361,11 +543,29 @@ int Scene::modifyExp(int expPoints) {
 	return exp;
 }
 
+int Scene::addGoonies() {
+	++gooniesRescued;
+	return gooniesRescued;
+}
+
 bool Scene::noHealth() {
 	if (health <= 0) return true;
 	else return false;
 }
 
+bool Scene::addKey() {
+	key = true;
+	return key;
+}
+
+bool Scene::removeKey() {
+	key = false;
+	return key;
+}
+
+bool Scene::keyStatus() {
+	return key;
+}
 
 void Scene::updateScene()
 {
@@ -436,6 +636,36 @@ void Scene::updateScene()
 			skullsScene[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
 			skullsScene[i].setTileMap(map);
 		}
+		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
+			if (initKeysPos[j][2] == 1) {
+				keyScene[j].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				keyScene[j].setPosition(glm::vec2(initKeysPos[j][0] * map->getTileSize(), initKeysPos[j][1] * map->getTileSize()));
+				keyScene[j].setTileMap(map);
+			}
+		}
+		for (int k = firstPadlockLevel; k < maxPadlockLevel; ++k) {
+			if (initPadlocksPos[k][2] == 1) {
+				padlockScene[k].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				padlockScene[k].setPosition(glm::vec2(initPadlocksPos[k][0] * map->getTileSize(), initPadlocksPos[k][1] * map->getTileSize()));
+				padlockScene[k].setTileMap(map);
+			}
+		}
+
+		for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
+			if (DoorPos[l][2] == 1) {
+				doorScene[l].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				doorScene[l].setPosition(glm::vec2(DoorPos[l][0]* map->getTileSize(), DoorPos[l][1] * map->getTileSize()));
+				doorScene[l].setTileMap(map);
+			}
+		}
+		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
+			if (objectPos[m][2] == 1) {
+				objectesScene[m].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				objectesScene[m].setPosition(glm::vec2(objectPos[m][0] * map->getTileSize(), objectPos[m][1] * map->getTileSize()));
+				objectesScene[m].setTileMap(map);
+				if (DoorPos[m][2] == 0) objectesScene[m].appear();
+			}
+		}
 	}
 }
 
@@ -485,6 +715,81 @@ bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist,
 					hit_side = SkullPos.x < PlayerPos.x;
 					return true;
 				}
+			}
+		}
+	}
+	return false;
+}
+
+
+bool Scene::collision_with_keys()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstKeyLevel; i < maxKeyLevel; ++i) {
+		glm::ivec2 KeyPos = keyScene[i].getPosition();
+		int keys = i;
+		if (keyScene[i].isAlive()) {
+			if ((PlayerPos.x >= KeyPos.x - 16 && PlayerPos.x <= KeyPos.x + 16) && (PlayerPos.y >= KeyPos.y - 16 && PlayerPos.y <= KeyPos.y + 16)) {
+				initKeysPos[i][2] = 0;
+				keyScene[i].collect();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Scene::collision_with_padlocks()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstPadlockLevel; i < maxPadlockLevel; ++i) {
+		glm::ivec2 PadlockPos = padlockScene[i].getPosition();
+		int padlock = i;
+		int numDoor = -1;
+		for (int j = 0; j <= level; ++j) {
+			numDoor += doorPerScreen[j];
+		}
+		int numpadlock = padlocksPerScreen[level];
+		_RPT1(0, "Porta = %d\n", numDoor);
+		if (padlockScene[i].isAlive() && Game::instance().keyStatus()) {
+			if ((PlayerPos.x >= PadlockPos.x - 32 && PlayerPos.x <= PadlockPos.x + 32) && (PlayerPos.y >= PadlockPos.y - 16 && PlayerPos.y <= PadlockPos.y + 16)) {
+				initPadlocksPos[i][2] = 0;
+				padlockScene[i].collect();
+				if (numpadlock == 2) {
+					if (initPadlocksPos[firstPadlockLevel][2] == 0 && initPadlocksPos[maxPadlockLevel - 1][2] == 0)
+					{
+						doorScene[numDoor].open();
+						objectesScene[numDoor].appear();
+						DoorPos[numDoor][2] = 0;
+					}
+				}
+				else if (initPadlocksPos[i][2] == 0) {
+					doorScene[numDoor].open();
+					objectesScene[numDoor].appear();
+					DoorPos[numDoor][2] = 0;
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Scene::collision_with_objects_door()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstObjectLevel; i < maxObjectLevel; ++i) {
+		glm::ivec2 PosObjecte = objectesScene[i].getPosition();
+		int keys = i;
+		int numObject = -1;
+		for (int j = 0; j <= level; ++j) {
+			numObject += objectesPerScreen[j];
+		}
+		if (objectesScene[i].isAlive()) {
+			if ((PlayerPos.x >= PosObjecte.x - 16 && PlayerPos.x <= PosObjecte.x + 16) && (PlayerPos.y >= PosObjecte.y - 16 && PlayerPos.y <= PosObjecte.y + 16)) {
+				objectPos[numObject][2] = 0;
+				objectesScene[i].rescue();
+				return true;
 			}
 		}
 	}
