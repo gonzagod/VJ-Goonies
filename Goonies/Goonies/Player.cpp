@@ -277,8 +277,8 @@ void Player::update(int deltaTime)
 			bClimbing = false;
 			up_key_released = false;
 			//Perquè estigui a una posició múltiple de 16.
-			int miss = posPlayer.y % 16;
-			posPlayer.y -= 32 - miss;
+			//int miss = posPlayer.y % 16;
+			//posPlayer.y -= 8;
 			if (last_anim_before_climb) sprite->changeAnimation(STAND_RIGHT);
 			else  sprite->changeAnimation(STAND_LEFT);
 		}
