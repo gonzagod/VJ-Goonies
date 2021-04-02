@@ -22,12 +22,22 @@ public:
 	void setPosition(const glm::vec2 &pos);
 	glm::ivec2 getPosition();
 
+	void powerupHyperShoes();
+	void powerupGrayRaincoat();
+	void powerupYellowRaincoat();
+	void powerupBlueSpellbook();
+	void powerupHelmet();
+
 	bool got_hit();
+	bool got_hit_by_water();
+	bool got_hit_by_stalactite();
+	bool got_hit_by_steam();
 	bool isAttacking(bool& side);
 
 private:
 	bool bJumping, bAttacking, bFalling, bClimbing, jump_colision;
 	bool movingR, movingL, up_key_released, damaged, invencible, space_key_released;
+	bool HyperShoes, Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jump_force, jump_force_moving, startY, hit_cont, attack_cont;
 	double jump_velocity;

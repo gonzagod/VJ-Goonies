@@ -47,6 +47,13 @@ public:
 
 	int addGoonies();
 
+	//Powerups
+	void powerupHelmet();
+	void powerupGrayRaincoat();
+	void powerupHyperShoes();
+	void powerupBlueSpellbook();
+	void powerupYellowRaincoat();
+
 	void restartGame();
 
 	// Input callback methods

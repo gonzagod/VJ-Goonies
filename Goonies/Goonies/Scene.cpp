@@ -51,6 +51,9 @@
 #define GOONIE_POINTS_X_TILES 32
 #define GOONIE_POINTS_Y_TILES 23
 
+#define POWERUP_X_TILES 7
+#define POWERUP_Y_TILES 23
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
@@ -73,12 +76,33 @@ int initPadlocksPos[num_padlocks_Scene][3] = { {27,17,1},{32,13,1},{32,12,1},{7,
 static const int num_door_Scene = 9;
 Door* doorScene = new Door[num_door_Scene];
 int doorPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
-int DoorPos[num_door_Scene][3] = { {28,15,1},{33,11,1},{8,9,1 },{ 26,17,1 },{ 16,9,1 },{ 22,15,1 },{ 33,3,1 },{ 25,15,1 },{ 25,7,1 } };
+int DoorPos[num_door_Scene][3] = { {28,15,1},{33,11,1},
+									{8,9,1 },{ 26,17,1 },
+									{ 16,9,1 },
+									{ 22,15,1 },{ 33,3,1 },
+									{ 25,15,1 },{ 25,7,1 } };
 
 static const int num_objectes_porta_Scene = 9;
 Goonie* objectesScene = new Goonie[num_objectes_porta_Scene];
 int objectesPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
 int objectPos[num_objectes_porta_Scene][3] = { { 29,17,1 },{ 34,13,1 },{ 9,11,1 },{ 27,19,1 },{ 17,11,1 },{ 23,17,1 },{ 34,5,1 },{ 26,17,1 },{ 26,9,1 } };
+
+static const int num_power_ups = 5;
+PowerUps* powerupsScene = new PowerUps[num_power_ups];
+int powerUpsPerScreen[18] = { 0,0,0,1,0,0,1,0,0,1,1,0,0,0,1,0,0,0 };
+int powerupsPos[num_power_ups][3] = { {14,11,1},{16,5,1},{17,5,1},{11,11,1}, {15,9,1} };
+
+static const int num_water_drop = 20;
+WaterDrop* waterdropScene = new WaterDrop[num_water_drop];
+int waterDropsPerScreen[18] = { 0,0,0,2,1,1,0,0,1,1,1,2,1,0,3,2,2,3 };
+int initwaterdropsPos[num_water_drop][2] = { {19,14},{31,8},{15,4},{27,10},
+											 {11,8},
+											 {15,8},{23,8},{31,8},{23,14},
+											 {7,10},{11,16},{27,12},{31,16},
+											 {23,4},{11,14},{23,8},{23,14},{31,12},{27,16},{15,8} };
+
+Steam* steam = new Steam[6];
+int steamPos[6][2] = { {16,8},{16,16},{ 32,16 },{19,8},{19,16}, {27,16} };
 
 Scene::Scene()
 {
@@ -89,6 +113,11 @@ Scene::Scene()
 	estat = 0;
 	health = 20;
 	exp = 0;
+	HyperShoes = false;
+	GrayRaincoat = false;
+	YellowRaincoat = false;
+	Helmet = false;
+	BlueSpellbook = false;
 }
 
 Scene::~Scene()
@@ -138,6 +167,32 @@ void Scene::init()
 	objectesScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	objectesScene[0].setPosition(glm::vec2(objectPos[0][0] * map->getTileSize(), objectPos[0][1] * map->getTileSize()));
 	objectesScene[0].setTileMap(map);
+
+	firstPowerUpLevel = 0;
+	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
+
+	powerupsScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	powerupsScene[0].setPosition(glm::vec2(powerupsPos[0][0] * map->getTileSize(), powerupsPos[0][1] * map->getTileSize()));
+	powerupsScene[0].setTileMap(map);
+
+	firstWaterDropLevel = 0;
+	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
+
+	waterdropScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	waterdropScene[0].setPosition(glm::vec2(initwaterdropsPos[0][0] * map->getTileSize(), initwaterdropsPos[0][1] * map->getTileSize()));
+	waterdropScene[0].setTileMap(map);
+
+	for (int i = 0; i < 5; ++i) {
+		viewpu[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		viewpu[i].setPosition(glm::vec2(POWERUP_X_TILES * map->getTileSize() + 32*i, POWERUP_Y_TILES * map->getTileSize()));
+		viewpu[i].setTileMap(map);
+	}
+
+	for (int i = 0; i < 6; ++i) {
+		steam[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		steam[i].setPosition(glm::vec2(steamPos[i][0] * map->getTileSize(), steamPos[i][1] * map->getTileSize()));
+		steam[i].setTileMap(map);
+	}
 
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -234,6 +289,11 @@ void Scene::restartGame() {
 	health = 20;
 	exp = 0;
 	punts = 0;
+	HyperShoes = false;
+	GrayRaincoat = false;
+	YellowRaincoat = false;
+	Helmet = false;
+	BlueSpellbook = false;
 	init();
 }
 
@@ -242,7 +302,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-	goToScreen(11);
+		powerupHyperShoes();
 	}
 	if (Game::instance().getKey(49)) {
 		goToScreen(12);
@@ -286,6 +346,14 @@ void Scene::update(int deltaTime)
 		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
 		if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
 		break;
+	case(12):
+		for (int i = 0; i < 3; ++i) {
+			steam[i].update(deltaTime, 0);
+		}
+		for (int i = 3; i < 6; ++i) {
+			steam[i].update(deltaTime, 1);
+		}
+		break;
 	default:
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].update(deltaTime);
@@ -308,15 +376,16 @@ void Scene::update(int deltaTime)
 			case 0:
 				objectesScene[m].update(deltaTime, 0);
 				break;
-			case 3:
+			case 2:
 				objectesScene[m].update(deltaTime, 1);
 				break;
-			case 4: 
+			case 3: 
 				objectesScene[m].update(deltaTime, 4);
-			case 13:
+				break;
+			case 7:
 				objectesScene[m].update(deltaTime, 2);
 				break;
-			case 14:
+			case 8:
 				objectesScene[m].update(deltaTime, 5);
 				break;
 			default:
@@ -324,6 +393,12 @@ void Scene::update(int deltaTime)
 				break;
 			}
 			
+		}
+		for (int n = firstPowerUpLevel; n < maxPowerUpLevel; ++n) {
+			powerupsScene[n].update(deltaTime);
+		}
+		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
+			waterdropScene[o].update(deltaTime);
 		}
 		break;
 	}
@@ -339,6 +414,26 @@ void Scene::update(int deltaTime)
 		player->update(deltaTime);
 		playerKey->update(deltaTime,1);
 		gooniePoints->update(deltaTime, gooniesRescued);
+
+		for (int i = 0; i < 5; ++i) {
+			switch (i) {
+			case 0:
+				if (GrayRaincoat) viewpu[i].update(deltaTime, 0);
+				break;
+			case 1:
+				if (Helmet) viewpu[i].update(deltaTime, 1);
+				break;
+			case 2:
+				if (HyperShoes) viewpu[i].update(deltaTime, 2);
+				break;
+			case 3:
+				if (YellowRaincoat) viewpu[i].update(deltaTime, 3);
+				break;
+			case 4:
+				if (BlueSpellbook) viewpu[i].update(deltaTime, 4);
+				break;
+			}
+		}
 
 		bool attack_side = true; //True = LEFT ||False = Right
 		int enemy = 0;
@@ -361,6 +456,9 @@ void Scene::update(int deltaTime)
 		bool colisio = collision_with_keys();
 		colisio = collision_with_padlocks();
 		colisio = collision_with_objects_door();
+		colisio = collision_with_powerups();
+		colisio = collision_with_waterdrops();
+		colisio = collision_with_steam();
 	}
 }
 
@@ -408,6 +506,14 @@ void Scene::render()
 		if (estat >= 12 && estat <= 21) evil->render();
 		if (estat == 22 || estat == 23) playStart->render();
 		break;
+	case(12):
+		for (int i = 0; i < 3; ++i) {
+			steam[i].render();
+		}
+		for (int i = 3; i < 6; ++i) {
+			steam[i].render();
+		}
+		break;
 	default:
 		break;
 	}
@@ -429,11 +535,36 @@ void Scene::render()
 			doorScene[l].render();
 		}
 		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
-			_RPT1(0, "gugu = %d\n", firstObjectLevel);
 			objectesScene[m].render();
+		}
+		for (int n = firstPowerUpLevel; n < maxPowerUpLevel; ++n) {
+			powerupsScene[n].render();
+		}
+		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
+			waterdropScene[o].render();
 		}
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].render();
+		}
+
+		for (int i = 0; i < 5; ++i) {
+			switch (i) {
+			case 0:
+				if (GrayRaincoat) viewpu[i].render();
+				break;
+			case 1:
+				if (Helmet) viewpu[i].render();
+				break;
+			case 2:
+				if (HyperShoes) viewpu[i].render();
+				break;
+			case 3:
+				if (YellowRaincoat) viewpu[i].render();
+				break;
+			case 4:
+				if (BlueSpellbook) viewpu[i].render();
+				break;
+			}
 		}
 		player->render();
 		
@@ -453,6 +584,10 @@ int Scene::nextScreen()
 	maxDoorLevel += doorPerScreen[level];
 	firstObjectLevel = maxObjectLevel;
 	maxObjectLevel += objectesPerScreen[level];
+	firstPowerUpLevel = maxPowerUpLevel;
+	maxPowerUpLevel += powerUpsPerScreen[level];
+	firstWaterDropLevel = maxWaterDropLevel;
+	maxWaterDropLevel += waterDropsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -472,6 +607,10 @@ int Scene::prevScreen()
 	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
 	firstObjectLevel -= objectesPerScreen[level];
 	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
+	firstPowerUpLevel -= powerUpsPerScreen[level];
+	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
+	firstWaterDropLevel -= waterDropsPerScreen[level];
+	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -511,11 +650,25 @@ int Scene::goToScreen(int x) {
 		for (int m = 0; m < level; ++m) numObjectes += objectesPerScreen[m];
 		firstObjectLevel = numObjectes;
 	}
+	if (level == 0) firstPowerUpLevel = 0;
+	else {
+		int numPowerUp = 0;
+		for (int n = 0; n < level; ++n) numPowerUp += powerUpsPerScreen[n];
+		firstPowerUpLevel = numPowerUp;
+	}
+	if (level == 0) firstWaterDropLevel = 0;
+	else {
+		int numWaterDrops = 0;
+		for (int o = 0; o < level; ++o) numWaterDrops += waterDropsPerScreen[o];
+		firstWaterDropLevel = numWaterDrops;
+	}
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
 	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
 	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
 	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
+	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
+	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -565,6 +718,31 @@ bool Scene::removeKey() {
 
 bool Scene::keyStatus() {
 	return key;
+}
+
+void Scene::powerupHelmet() {
+	player->powerupHelmet();
+	Helmet = true;
+}
+
+void Scene::powerupBlueSpellbook() {
+	player->powerupBlueSpellbook();
+	BlueSpellbook = true;
+}
+
+void Scene::powerupGrayRaincoat() {
+	player->powerupGrayRaincoat();
+	GrayRaincoat = true;
+}
+
+void Scene::powerupHyperShoes() {
+	player->powerupHyperShoes();
+	HyperShoes = true;
+}
+
+void Scene::powerupYellowRaincoat() {
+	player->powerupYellowRaincoat();
+	YellowRaincoat = true;
 }
 
 void Scene::updateScene()
@@ -666,6 +844,19 @@ void Scene::updateScene()
 				if (DoorPos[m][2] == 0) objectesScene[m].appear();
 			}
 		}
+		for (int n = firstPowerUpLevel; n < maxPowerUpLevel; ++n) {
+			if (powerupsPos[n][2] == 1) {
+				powerupsScene[n].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				powerupsScene[n].setPosition(glm::vec2(powerupsPos[n][0] * map->getTileSize(), powerupsPos[n][1] * map->getTileSize()));
+				powerupsScene[n].setTileMap(map);
+				if (!powerupsScene[n].catched()) powerupsScene[n].appear();
+			}
+		}
+		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
+			waterdropScene[o].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+			waterdropScene[o].setPosition(glm::vec2(initwaterdropsPos[o][0] * map->getTileSize() + 2, initwaterdropsPos[o][1] * map->getTileSize()));
+			waterdropScene[o].setTileMap(map);
+		}
 	}
 }
 
@@ -732,6 +923,30 @@ bool Scene::collision_with_keys()
 			if ((PlayerPos.x >= KeyPos.x - 16 && PlayerPos.x <= KeyPos.x + 16) && (PlayerPos.y >= KeyPos.y - 16 && PlayerPos.y <= KeyPos.y + 16)) {
 				initKeysPos[i][2] = 0;
 				keyScene[i].collect();
+				switch (i) {
+				case 0:
+					powerupsScene[0].appear();
+					powerupsPos[0][2] = 0;
+					break;
+				case 3:
+					powerupsScene[1].appear();
+					powerupsPos[1][2] = 0;
+					break;
+				case 6:
+					powerupsScene[2].appear();
+					powerupsPos[2][2] = 0;
+					break;
+				case 7:
+					powerupsScene[3].appear();
+					powerupsPos[3][2] = 0;
+					break;
+				case 11:
+					powerupsScene[4].appear();
+					powerupsPos[4][2] = 0;
+					break;
+				default:
+					break;
+				}
 				return true;
 			}
 		}
@@ -745,14 +960,14 @@ bool Scene::collision_with_padlocks()
 	for (int i = firstPadlockLevel; i < maxPadlockLevel; ++i) {
 		glm::ivec2 PadlockPos = padlockScene[i].getPosition();
 		int padlock = i;
-		int numDoor = -1;
-		for (int j = 0; j <= level; ++j) {
+		int numDoor = 0;
+		for (int j = 0; j < level; ++j) {
 			numDoor += doorPerScreen[j];
 		}
 		int numpadlock = padlocksPerScreen[level];
 		_RPT1(0, "Porta = %d\n", numDoor);
 		if (padlockScene[i].isAlive() && Game::instance().keyStatus()) {
-			if ((PlayerPos.x >= PadlockPos.x - 32 && PlayerPos.x <= PadlockPos.x + 32) && (PlayerPos.y >= PadlockPos.y - 16 && PlayerPos.y <= PadlockPos.y + 16)) {
+			if ((PlayerPos.x >= PadlockPos.x - 4 && PlayerPos.x <= PadlockPos.x + 4) && (PlayerPos.y >= PadlockPos.y - 16 && PlayerPos.y <= PadlockPos.y + 16)) {
 				initPadlocksPos[i][2] = 0;
 				padlockScene[i].collect();
 				if (numpadlock == 2) {
@@ -780,15 +995,56 @@ bool Scene::collision_with_objects_door()
 	glm::ivec2 PlayerPos = player->getPosition();
 	for (int i = firstObjectLevel; i < maxObjectLevel; ++i) {
 		glm::ivec2 PosObjecte = objectesScene[i].getPosition();
-		int keys = i;
-		int numObject = -1;
-		for (int j = 0; j <= level; ++j) {
-			numObject += objectesPerScreen[j];
-		}
 		if (objectesScene[i].isAlive()) {
 			if ((PlayerPos.x >= PosObjecte.x - 16 && PlayerPos.x <= PosObjecte.x + 16) && (PlayerPos.y >= PosObjecte.y - 16 && PlayerPos.y <= PosObjecte.y + 16)) {
-				objectPos[numObject][2] = 0;
+				objectPos[i][2] = 0;
 				objectesScene[i].rescue();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Scene::collision_with_powerups()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstPowerUpLevel; i < maxPowerUpLevel; ++i) {
+		glm::ivec2 PosObjecte = powerupsScene[i].getPosition();
+		if (powerupsScene[i].isAlive()) {
+			if ((PlayerPos.x >= PosObjecte.x - 16 && PlayerPos.x <= PosObjecte.x + 16) && (PlayerPos.y >= PosObjecte.y - 16 && PlayerPos.y <= PosObjecte.y + 16)) {
+				powerupsPos[i][2] = 0;
+				powerupsScene[i].collect(i);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Scene::collision_with_waterdrops()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstWaterDropLevel; i < maxWaterDropLevel; ++i) {
+		glm::ivec2 WaterDropPos = waterdropScene[i].getPosition();
+		if (waterdropScene[i].isAlive()) {
+			if ((PlayerPos.x >= WaterDropPos.x - 16 && PlayerPos.x <= WaterDropPos.x) && (PlayerPos.y >= WaterDropPos.y - 12 && PlayerPos.y <= WaterDropPos.y + 12)) {
+				waterdropScene[i].collision();
+				player->got_hit_by_water();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Scene::collision_with_steam()
+{
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = 0; i < 6; ++i) {
+		if (steam[i].isDangerous()) {
+			if ((PlayerPos.x >= steamPos[i][0]*16 - 16 && PlayerPos.x <= steamPos[i][0] * 16 + 16) && (PlayerPos.y >= steamPos[i][1] * 16 - 16 && PlayerPos.y <= steamPos[i][1] * 16 + 16)) {
+				player->got_hit_by_steam();
 				return true;
 			}
 		}

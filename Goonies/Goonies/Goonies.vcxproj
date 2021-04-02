@@ -133,6 +133,7 @@
     <ClInclude Include="Padlock.h" />
     <ClInclude Include="pjLoadingScreen.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUps.h" />
     <ClInclude Include="Puntuacio.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
@@ -140,8 +141,11 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Skull.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Steam.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
+    <ClInclude Include="ViewPowerUp.h" />
+    <ClInclude Include="WaterDrop.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bars.cpp" />
@@ -154,14 +158,18 @@
     <ClCompile Include="Padlock.cpp" />
     <ClCompile Include="pjLoadingScreen.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PowerUps.cpp" />
     <ClCompile Include="Puntuacio.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Skull.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Steam.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />
+    <ClCompile Include="ViewPowerUp.cpp" />
+    <ClCompile Include="WaterDrop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Goonies.rc" />

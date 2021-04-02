@@ -14,6 +14,10 @@
 #include "Door.h"
 #include "Goonie.h"
 #include "GooniePoints.h"
+#include "PowerUps.h"
+#include "ViewPowerUp.h"
+#include "WaterDrop.h"
+#include "Steam.h"
 #include "Skull.h"
 
 
@@ -46,6 +50,12 @@ public:
 	bool removeKey();
 	bool keyStatus();
 
+	void powerupHelmet();
+	void powerupGrayRaincoat();
+	void powerupHyperShoes();
+	void powerupBlueSpellbook();
+	void powerupYellowRaincoat();
+
 
 private:
 	void initShaders();
@@ -53,6 +63,9 @@ private:
 	bool collision_with_keys();
 	bool collision_with_padlocks();
 	bool collision_with_objects_door();
+	bool collision_with_powerups();
+	bool collision_with_waterdrops();
+	bool collision_with_steam();
 
 private:
 	TileMap *map;
@@ -71,6 +84,7 @@ private:
 	Player *player;
 	GooniePoints* gooniePoints;
 	ShaderProgram texProgram;
+	ViewPowerUp* viewpu = new ViewPowerUp[5];
 	float currentTime;
 	int estat;
 	glm::mat4 projection;
@@ -87,7 +101,10 @@ private:
 	int firstPadlockLevel, maxPadlockLevel;
 	int firstDoorLevel, maxDoorLevel;
 	int firstObjectLevel, maxObjectLevel;
+	int firstPowerUpLevel, maxPowerUpLevel;
+	int firstWaterDropLevel, maxWaterDropLevel;
 	int x = 3;
+	bool Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat, HyperShoes;
 };
 
 

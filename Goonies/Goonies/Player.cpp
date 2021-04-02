@@ -35,6 +35,11 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	attack_cont = 0;
 	invencible = false;
 	space_key_released = true;
+	HyperShoes = false;
+	YellowRaincoat = false;
+	GrayRaincoat = false;
+	Helmet = false;
+	BlueSpellbook = false;
 
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -167,7 +172,8 @@ void Player::update(int deltaTime)
 			{
 				bClimbing = true;
 				last_anim_before_climb = false;
-				posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+				if (HyperShoes) posPlayer.y -= 4;
+				else posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 				sprite->changeAnimation(CLIMB_ANIM1);
 			}
 			else {
@@ -183,7 +189,8 @@ void Player::update(int deltaTime)
 		//Si no colisionem amb la paret, avancem
 		if (!map->collisionMoveLeft(posPlayer, glm::ivec2(16, 32)) && !bClimbing)
 		{
-			posPlayer.x -= 2; //Moviment menys fluit però més similar al joc real.
+			if (HyperShoes) posPlayer.x -= 4;
+			else posPlayer.x -= 2; //Moviment menys fluit però més similar al joc real.
 		}
 	}
 
@@ -198,7 +205,8 @@ void Player::update(int deltaTime)
 			{
 				bClimbing = true;
 				last_anim_before_climb = true;
-				posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+				if (HyperShoes) posPlayer.y -= 4;
+				else posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 				sprite->changeAnimation(CLIMB_ANIM1);
 			}
 			else {
@@ -214,7 +222,8 @@ void Player::update(int deltaTime)
 		//Si no colisionem amb la paret, avancem
 		if (!map->collisionMoveRight(posPlayer, glm::ivec2(16, 32)) && !bClimbing)
 		{
-			posPlayer.x += 2; //Moviment menys fluit però més similar al joc real.
+			if (HyperShoes) posPlayer.x += 4;
+			else posPlayer.x += 2; //Moviment menys fluit però més similar al joc real.
 		}
 		/*else {
 		_RPTF0(0, "choca ");
@@ -235,7 +244,8 @@ void Player::update(int deltaTime)
 			bClimbing = true;
 			if (sprite->animation() == MOVE_LEFT || sprite->animation() == STAND_LEFT) last_anim_before_climb = false;
 			else last_anim_before_climb = true;
-			posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+			if (HyperShoes) posPlayer.y -= 4;
+			else posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 			sprite->changeAnimation(CLIMB_ANIM1);
 		}
 		//Si arribem al final de la planta, instantàment arribem al nivell de sobre
@@ -253,7 +263,8 @@ void Player::update(int deltaTime)
 		//En cas que encara quedi planta per pujar, simplement pujem
 		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)) && !bJumping)
 		{
-			posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
+			if (HyperShoes) posPlayer.y -= 4;
+			else posPlayer.y -= 2; //Moviment menys fluit però més similar al joc real.
 		}
 		else if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bClimbing) {
 			up_key_released = false;
@@ -281,7 +292,8 @@ void Player::update(int deltaTime)
 		//Si ja estavem a una enredadera seguirem baixant.
 		else if (bClimbing && map->climbingPlant(posPlayer, glm::ivec2(32, 32)) && !bJumping)
 		{
-			posPlayer.y += 2; //Moviment menys fluit però més similar al joc real.
+			if (HyperShoes) posPlayer.y += 4;
+			else posPlayer.y += 2; //Moviment menys fluit però més similar al joc real.
 		}
 
 		//Si es el final d'una enredadera, simplement quedarem de peu
@@ -315,17 +327,20 @@ void Player::update(int deltaTime)
 		if (jump_velocity >= -jump_force)
 		{
 			if (!map->collisionMoveUp(posPlayer, glm::ivec2(16, 32))) {
-				posPlayer.y -= 2;
+				if (HyperShoes) posPlayer.y -= 4;
+				else posPlayer.y -= 2;
 			}
 			else jump_velocity = -jump_force;
 		}
 		else
 		{
-			posPlayer.y += 2;
+			if (HyperShoes) posPlayer.y += 4;
+			else posPlayer.y += 2;
 		}
 		if (movingR) {
 			if (!map->collisionMoveRight(posPlayer, glm::ivec2(16, 32))) {
-				posPlayer.x += 2;
+				if (HyperShoes) posPlayer.x += 4;
+				else posPlayer.x += 2;
 			}
 			else {
 				movingR = false;
@@ -335,7 +350,8 @@ void Player::update(int deltaTime)
 		}
 		else if (movingL) {
 			if (!map->collisionMoveLeft(posPlayer, glm::ivec2(16, 32))) {
-				posPlayer.x -= 2;
+				if (HyperShoes) posPlayer.x -= 4;
+				else posPlayer.x -= 2;
 			}
 			else {
 				movingL = false;
@@ -371,6 +387,7 @@ void Player::update(int deltaTime)
 		if (posPlayer.x > 160) {
 			posPlayer.y = 320;
 		}
+		else if (posPlayer.y < 120) posPlayer.y = 320;
 		else posPlayer.x = 548;
 	}
 
@@ -465,9 +482,48 @@ glm::ivec2 Player::getPosition()
 bool Player::got_hit()
 {
 	if (!invencible) {
-		Game::instance().modifyHP(0);
+		if (BlueSpellbook) {
+			Game::instance().modifyHP(0);
+		}
+		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
 		Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+
+bool Player::got_hit_by_water()
+{
+	if (!invencible) {
+		if (GrayRaincoat) {
+			Game::instance().modifyHP(0);
+		}
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+bool Player::got_hit_by_steam()
+{
+	if (!invencible) {
+		if (YellowRaincoat) {
+			Game::instance().modifyHP(0);
+		}
+		
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
 		}
 		damaged = true;
 		invencible = true;
@@ -494,4 +550,25 @@ void Player::dmg_sprite_manager()
 bool Player::isAttacking(bool& side) {
 	side = sprite->animation() == ATTACK_LEFT;
 	return bAttacking;
+}
+
+
+void Player::powerupHyperShoes() {
+	HyperShoes = true;
+}
+
+void Player::powerupGrayRaincoat() {
+	GrayRaincoat = true;
+}
+
+void Player::powerupBlueSpellbook() {
+	BlueSpellbook = true;
+}
+
+void Player::powerupHelmet() {
+	Helmet = true;
+}
+
+void Player::powerupYellowRaincoat() {
+	YellowRaincoat = true;
 }

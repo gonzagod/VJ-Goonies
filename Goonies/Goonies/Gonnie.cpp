@@ -36,7 +36,6 @@ void Goonie::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->setAnimationSpeed(GOONIE3, 8);
 	sprite->addKeyframe(GOONIE3, glm::vec2(0.25f, 0.5f));
 
-	sprite->changeAnimation(POCIO1);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
 }
