@@ -44,6 +44,7 @@ public:
 	bool nextScreen(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool prevScreen(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool skullsobreterra(const glm::ivec2& pos, const glm::ivec2& size, bool side) const;
+	bool noHiHaTerra(const glm::ivec2 pos, const glm::ivec2 pos2);
 
 
 private:

@@ -18,6 +18,7 @@
 #include "ViewPowerUp.h"
 #include "WaterDrop.h"
 #include "Steam.h"
+#include "Stalactites.h"
 #include "Skull.h"
 
 
@@ -66,6 +67,10 @@ private:
 	bool collision_with_powerups();
 	bool collision_with_waterdrops();
 	bool collision_with_steam();
+	bool collision_with_stalactites();
+
+	void activateStalactites();
+	
 
 private:
 	TileMap *map;
@@ -103,6 +108,7 @@ private:
 	int firstObjectLevel, maxObjectLevel;
 	int firstPowerUpLevel, maxPowerUpLevel;
 	int firstWaterDropLevel, maxWaterDropLevel;
+	int firstStalactiteLevel, maxStalactiteLevel;
 	int x = 3;
 	bool Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat, HyperShoes;
 };

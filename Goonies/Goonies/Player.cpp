@@ -387,7 +387,7 @@ void Player::update(int deltaTime)
 		if (posPlayer.x > 160) {
 			posPlayer.y = 320;
 		}
-		else if (posPlayer.y < 120) posPlayer.y = 320;
+		else if (bClimbing && posPlayer.y < 120) posPlayer.y = 320;
 		else posPlayer.x = 548;
 	}
 
@@ -521,6 +521,25 @@ bool Player::got_hit_by_steam()
 			Game::instance().modifyHP(0);
 		}
 		
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+
+bool Player::got_hit_by_stalactite()
+{
+	if (!invencible) {
+		if (Helmet) {
+			Game::instance().modifyHP(0);
+		}
+
 		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
 			Game::instance().restartGame();

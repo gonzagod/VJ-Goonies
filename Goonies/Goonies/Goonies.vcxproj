@@ -141,6 +141,7 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Skull.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Stalactites.h" />
     <ClInclude Include="Steam.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Skull.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Stalactites.cpp" />
     <ClCompile Include="Steam.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />

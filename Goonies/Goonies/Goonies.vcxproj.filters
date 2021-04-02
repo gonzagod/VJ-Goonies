@@ -84,6 +84,9 @@
     <ClInclude Include="Steam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Stalactites.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Steam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stalactites.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

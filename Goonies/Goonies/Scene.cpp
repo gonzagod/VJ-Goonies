@@ -104,6 +104,11 @@ int initwaterdropsPos[num_water_drop][2] = { {19,14},{31,8},{15,4},{27,10},
 Steam* steam = new Steam[6];
 int steamPos[6][2] = { {16,8},{16,16},{ 32,16 },{19,8},{19,16}, {27,16} };
 
+static const int num_stalactites = 10;
+Stalactites* stalactitesScene = new Stalactites[num_stalactites];
+int stalactitesPerScreen[18] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0 };
+int initStalactitesPos[num_stalactites][3] = { {20,8,1},{20,12,1},{32,16,1},{32,8,1},{8,4,1},{8,8,1},{20,4,1},{8,16,1},{12,4,1},{13,8,1} };
+
 Scene::Scene()
 {
 	map = NULL;
@@ -181,6 +186,13 @@ void Scene::init()
 	waterdropScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	waterdropScene[0].setPosition(glm::vec2(initwaterdropsPos[0][0] * map->getTileSize(), initwaterdropsPos[0][1] * map->getTileSize()));
 	waterdropScene[0].setTileMap(map);
+
+	firstStalactiteLevel = 0;
+	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
+
+	stalactitesScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	stalactitesScene[0].setPosition(glm::vec2(initStalactitesPos[0][0] * map->getTileSize(), initStalactitesPos[0][1] * map->getTileSize()));
+	stalactitesScene[0].setTileMap(map);
 
 	for (int i = 0; i < 5; ++i) {
 		viewpu[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -346,14 +358,6 @@ void Scene::update(int deltaTime)
 		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
 		if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
 		break;
-	case(12):
-		for (int i = 0; i < 3; ++i) {
-			steam[i].update(deltaTime, 0);
-		}
-		for (int i = 3; i < 6; ++i) {
-			steam[i].update(deltaTime, 1);
-		}
-		break;
 	default:
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].update(deltaTime);
@@ -373,6 +377,7 @@ void Scene::update(int deltaTime)
 
 		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
 			switch (m) {
+				_RPT1(0, "ObjectLevel = %d\n", m);
 			case 0:
 				objectesScene[m].update(deltaTime, 0);
 				break;
@@ -400,6 +405,37 @@ void Scene::update(int deltaTime)
 		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
 			waterdropScene[o].update(deltaTime);
 		}
+		for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
+			switch(p){
+			case 1:
+				stalactitesScene[p].update(deltaTime, 1);
+				break;
+			case 2:
+				stalactitesScene[p].update(deltaTime, 1);
+				break;
+			case 8:
+				stalactitesScene[p].update(deltaTime, 2);
+				break;
+			case 9:
+				stalactitesScene[p].update(deltaTime, 2);
+				break;
+			default:
+				stalactitesScene[p].update(deltaTime, 0);
+				break;
+			}
+		}
+		break;
+	}
+	switch (level) {
+	case(12):
+		for (int i = 0; i < 3; ++i) {
+			steam[i].update(deltaTime, 0);
+		}
+		for (int i = 3; i < 6; ++i) {
+			steam[i].update(deltaTime, 1);
+		}
+		break;
+	default:
 		break;
 	}
 	if (level >= 3) {
@@ -459,6 +495,8 @@ void Scene::update(int deltaTime)
 		colisio = collision_with_powerups();
 		colisio = collision_with_waterdrops();
 		colisio = collision_with_steam();
+		colisio = collision_with_stalactites();
+		activateStalactites();
 	}
 }
 
@@ -543,6 +581,9 @@ void Scene::render()
 		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
 			waterdropScene[o].render();
 		}
+		for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
+			stalactitesScene[p].render();
+		}
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].render();
 		}
@@ -588,6 +629,8 @@ int Scene::nextScreen()
 	maxPowerUpLevel += powerUpsPerScreen[level];
 	firstWaterDropLevel = maxWaterDropLevel;
 	maxWaterDropLevel += waterDropsPerScreen[level];
+	firstStalactiteLevel = maxStalactiteLevel;
+	maxStalactiteLevel += stalactitesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -611,6 +654,8 @@ int Scene::prevScreen()
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	firstWaterDropLevel -= waterDropsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
+	firstStalactiteLevel -= stalactitesPerScreen[level];
+	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -662,6 +707,12 @@ int Scene::goToScreen(int x) {
 		for (int o = 0; o < level; ++o) numWaterDrops += waterDropsPerScreen[o];
 		firstWaterDropLevel = numWaterDrops;
 	}
+	if (level == 0) firstStalactiteLevel = 0;
+	else {
+		int numStalactite = 0;
+		for (int p = 0; p < level; ++p) numStalactite += stalactitesPerScreen[p];
+		firstStalactiteLevel = numStalactite;
+	}
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
 	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
@@ -669,6 +720,7 @@ int Scene::goToScreen(int x) {
 	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
+	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene();
@@ -857,6 +909,14 @@ void Scene::updateScene()
 			waterdropScene[o].setPosition(glm::vec2(initwaterdropsPos[o][0] * map->getTileSize() + 2, initwaterdropsPos[o][1] * map->getTileSize()));
 			waterdropScene[o].setTileMap(map);
 		}
+
+		for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
+			if (initStalactitesPos[p][2] == 1) {
+				stalactitesScene[p].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				stalactitesScene[p].setPosition(glm::vec2(initStalactitesPos[p][0] * map->getTileSize(), initStalactitesPos[p][1] * map->getTileSize()));
+				stalactitesScene[p].setTileMap(map);
+			}
+		}
 	}
 }
 
@@ -940,7 +1000,7 @@ bool Scene::collision_with_keys()
 					powerupsScene[3].appear();
 					powerupsPos[3][2] = 0;
 					break;
-				case 11:
+				case 10:
 					powerupsScene[4].appear();
 					powerupsPos[4][2] = 0;
 					break;
@@ -965,9 +1025,8 @@ bool Scene::collision_with_padlocks()
 			numDoor += doorPerScreen[j];
 		}
 		int numpadlock = padlocksPerScreen[level];
-		_RPT1(0, "Porta = %d\n", numDoor);
 		if (padlockScene[i].isAlive() && Game::instance().keyStatus()) {
-			if ((PlayerPos.x >= PadlockPos.x - 4 && PlayerPos.x <= PadlockPos.x + 4) && (PlayerPos.y >= PadlockPos.y - 16 && PlayerPos.y <= PadlockPos.y + 16)) {
+			if ((PlayerPos.x >= PadlockPos.x - 8 && PlayerPos.x <= PadlockPos.x + 8) && (PlayerPos.y >= PadlockPos.y - 16 && PlayerPos.y <= PadlockPos.y + 16)) {
 				initPadlocksPos[i][2] = 0;
 				padlockScene[i].collect();
 				if (numpadlock == 2) {
@@ -1045,6 +1104,31 @@ bool Scene::collision_with_steam()
 		if (steam[i].isDangerous()) {
 			if ((PlayerPos.x >= steamPos[i][0]*16 - 16 && PlayerPos.x <= steamPos[i][0] * 16 + 16) && (PlayerPos.y >= steamPos[i][1] * 16 - 16 && PlayerPos.y <= steamPos[i][1] * 16 + 16)) {
 				player->got_hit_by_steam();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void Scene::activateStalactites() {
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstStalactiteLevel; i < maxStalactiteLevel; ++i) {
+		glm::ivec2 StalactitePos = stalactitesScene[i].getPosition();
+		if ((PlayerPos.x >= StalactitePos.x - 16 && PlayerPos.x <= StalactitePos.x + 16) && map->noHiHaTerra(PlayerPos,StalactitePos)) {
+			stalactitesScene[i].activate();
+			initStalactitesPos[i][2] = 0;
+		}
+	}
+}
+
+bool Scene::collision_with_stalactites() {
+	glm::ivec2 PlayerPos = player->getPosition();
+	for (int i = firstStalactiteLevel; i < maxStalactiteLevel; ++i) {
+		glm::ivec2 StalactitePos = stalactitesScene[i].getPosition();
+		if (stalactitesScene[i].isDangerous()) {
+			if ((PlayerPos.x >= StalactitePos.x - 12 && PlayerPos.x <= StalactitePos.x + 12) && (PlayerPos.y >= StalactitePos.y && PlayerPos.y <= StalactitePos.y)) {
+				player->got_hit_by_stalactite();
 				return true;
 			}
 		}

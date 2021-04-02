@@ -218,6 +218,19 @@ bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) con
 }
 
 
+bool TileMap::noHiHaTerra(const glm::ivec2 pos, const glm::ivec2 pos2) 
+{
+	if (pos.y < pos2.y) return false;
+	int x = (pos.x)/ tileSize;
+	int y = (pos.y) / tileSize;
+	int y1 = (pos2.y) / tileSize;
+	for (y; y >= y1; y--) {
+		if (map[y * mapSize.x + x] >= 1 && map[y * mapSize.x + x] <= 37 && map[y * mapSize.x + x] != 32)
+			return false;
+	}
+	return true;
+}
+
 bool TileMap::climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x, y;
