@@ -126,10 +126,16 @@
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Bars.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Door.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Goonie.h" />
+    <ClInclude Include="GooniePoints.h" />
+    <ClInclude Include="Key.h" />
+    <ClInclude Include="Padlock.h" />
     <ClInclude Include="pjLoadingScreen.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUps.h" />
     <ClInclude Include="Puntuacio.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
@@ -137,25 +143,40 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Skull.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Stalactites.h" />
+    <ClInclude Include="Steam.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TileMap.h" />
+    <ClInclude Include="ViewPowerUp.h" />
+    <ClInclude Include="WaterDrop.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bars.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Door.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Gonnie.cpp" />
+    <ClCompile Include="GooniePoints.cpp" />
+    <ClCompile Include="Key.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Padlock.cpp" />
     <ClCompile Include="pjLoadingScreen.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PowerUps.cpp" />
     <ClCompile Include="Puntuacio.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Skull.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Stalactites.cpp" />
+    <ClCompile Include="Steam.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TileMap.cpp" />
+    <ClCompile Include="ViewPowerUp.cpp" />
+    <ClCompile Include="WaterDrop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Goonies.rc" />
