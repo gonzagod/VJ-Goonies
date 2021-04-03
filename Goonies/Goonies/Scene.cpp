@@ -45,6 +45,9 @@
 #define EXPBAR_INIT_X_TILES 20
 #define EXPBAR_INIT_Y_TILES 2
 
+#define INIT_ENEMY_X_TILES 34
+#define INIT_ENEMY_Y_TILES 11
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
@@ -53,6 +56,7 @@ int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7 
 										   {  8,5  },{ 20,17 },
 										   { 10,13 },{ 14,19 },{ 25,19 },
 										   { 22,15 },{  6,17 },{ 17,11 },{ 20,17 },{  8,9 },{ 11,21 } };
+int enemyPositions[4][2] = { {34,11}, {10,11}, {22,9}, {24,11} };
 
 Scene::Scene()
 {
@@ -86,6 +90,14 @@ void Scene::init()
 	skullsScene[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
 	skullsScene[0].setTileMap(map);
 
+	enemy = new Enemy();
+	enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	enemy->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
+	enemy->setTileMap(map);
+
+	bullet = new Bullet();
+	bullet->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
 	msx = new pjLoadingScreen();
 	msx->initMsx(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	msx->setPosition(glm::vec2(INIT_MSX_X_TILES * map->getTileSize(), INIT_MSX_Y_TILES * map->getTileSize()));
@@ -98,7 +110,7 @@ void Scene::init()
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize() - 8));
+	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
 
 	goon = new pjLoadingScreen();
@@ -161,7 +173,7 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	//int i = goToScreen(7);
+	int i = goToScreen(3);
 }
 
 void Scene::restartGame() {
@@ -176,13 +188,6 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
-	/*if (Game::instance().getKey(49)) {
-	map = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	}
-	if (Game::instance().getKey(49)) {
-	map = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	}
-	*/
 	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
 	estat = 22;
 	level = 2;
@@ -221,23 +226,48 @@ void Scene::update(int deltaTime)
 		healthBar->update(deltaTime, health);
 		expBar->update(deltaTime, exp);
 		player->update(deltaTime);
+		glm::ivec2 PlayerPos = getPlayerPosition();
+		enemy->setPlayerPos(PlayerPos, level);
+		int enemy_level = enemy->getLevelEnemy();
+		setEnemyMap(enemy_level);
+		enemy->update(deltaTime);
+		glm::ivec2 EnemyPos = enemy->getPosition();
+		if (enemy->isShot()) {
+			bool b_dir = enemy->getBulletDir();
+			bullet->setTileMap(map);
+			if (b_dir) bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y+4));
+			else bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y+4));
+			bullet->setDirection(b_dir);
+		}
+
+		if (bullet->is_Alive()) bullet->update(deltaTime);
 
 		bool attack_side = true; //True = LEFT ||False = Right
-		int enemy = 0;
+		int num_enemy = 0;
 		bool player_attacking = player->isAttacking(attack_side);
 		bool hit = false;
 		bool hit_side = true; //True = LEFT ||False = Right
 		if (player_attacking) {
 			_RPT1(0, "attack_side = %d\n", attack_side);
-			hit = colision_with_enemies(attack_side, enemy, 8, hit_side);
+			hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
 		}
-		else hit = colision_with_enemies(attack_side, enemy, 0, hit_side);
+		else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
 		if (hit) {
-			if (player_attacking && attack_side == hit_side) {
-				skullsScene[enemy].die();
+			if (num_enemy == 22) {
+				bool bullet_hit = player->got_hit();
+				if (bullet_hit) bullet->player_hit();
 			}
 			else {
-				bool enemy_hit = player->got_hit();
+				if (player_attacking && attack_side == hit_side) {
+					if (num_enemy < 21) skullsScene[num_enemy].die();
+					else if (num_enemy == 21) enemy->get_damage();
+				}
+				else {
+					bool fratelli_hit = false;
+					if (num_enemy < 21) bool enemy_hit = player->got_hit();
+					else if (num_enemy == 21 && enemy->can_dmg()) fratelli_hit = player->got_hit();
+					if (fratelli_hit) enemy->collided_player();
+				}
 			}
 		}
 	}
@@ -297,6 +327,9 @@ void Scene::render()
 		healthBar->render();
 		expBar->render();
 		player->render();
+		int enemyLevel = enemy->getLevelEnemy();
+		if(enemyLevel == level && enemy->is_Alive()) enemy->render();
+		if (bullet->is_Alive()) bullet->render();
 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].render();
@@ -311,7 +344,7 @@ int Scene::nextScreen()
 	maxSkullLevel += skullsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
-	updateScene();
+	updateScene(false);
 	return level;
 }
 
@@ -322,7 +355,7 @@ int Scene::prevScreen()
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
-	updateScene();
+	updateScene(false);
 	return level;
 }
 
@@ -337,7 +370,7 @@ int Scene::goToScreen(int x) {
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
 	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
-	updateScene();
+	updateScene(true);
 	return level;
 }
 
@@ -367,7 +400,7 @@ bool Scene::noHealth() {
 }
 
 
-void Scene::updateScene()
+void Scene::updateScene(bool portal)
 {
 
 	switch (level)
@@ -431,11 +464,24 @@ void Scene::updateScene()
 	}
 	if (level >= 3) {
 		player->setTileMap(map);
+		 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			skullsScene[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
 			skullsScene[i].setTileMap(map);
 		}
+
+		if (portal && (level == 3 || level == 6 || level == 12 || level == 15)) {
+			enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+			enemy->setLevelEnemy(level);
+			glm::ivec2 newEnemyPos;
+			int array_pos = level / 3 - 1;
+			if (level > 6) --array_pos;
+			enemy->setPosition(glm::vec2(enemyPositions[array_pos][0] * map->getTileSize(), enemyPositions[array_pos][1] * map->getTileSize()));
+		}
+
+		int enemyLevel = enemy->getLevelEnemy();
+		setEnemyMap(enemyLevel);
 	}
 }
 
@@ -469,7 +515,7 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side)
+bool Scene::colision_with_enemies(bool attack_side, int& num_enemy, int attack_dist, bool& hit_side)
 {
 	int x_left = 0;
 	int x_right = 0;
@@ -478,7 +524,7 @@ bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist,
 	glm::ivec2 PlayerPos = player->getPosition();
 	for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 		glm::ivec2 SkullPos = skullsScene[i].getPosition();
-		enemy = i;
+		num_enemy = i;
 		if (skullsScene[i].isAlive()) {
 			if (PlayerPos.y >(SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
 				if (PlayerPos.x >(SkullPos.x - (16 + x_right)) && PlayerPos.x < (SkullPos.x + (16 + x_left))) {
@@ -488,5 +534,118 @@ bool Scene::colision_with_enemies(bool attack_side, int& enemy, int attack_dist,
 			}
 		}
 	}
+	int enemy_level = enemy->getLevelEnemy();
+	if (level == enemy_level) {
+		glm::ivec2 posEnemy = enemy->getPosition();
+		if (!enemy->is_Stun()) {
+			if (PlayerPos.y >(posEnemy.y - 16) && PlayerPos.y < (posEnemy.y + 32)) {
+				if (PlayerPos.x >(posEnemy.x - (16 + x_right)) && PlayerPos.x < (posEnemy.x + (16 + x_left))) {
+					hit_side = posEnemy.x < PlayerPos.x;
+					num_enemy = 21;
+					return true;
+				}
+			}
+		}
+	}
+
+	glm::ivec2 posBullet = bullet->getPosition();
+	if (bullet->is_Alive()) {
+		if (PlayerPos.y > (posBullet.y - 16) && PlayerPos.y < (posBullet.y + 32)) {
+			if (PlayerPos.x > (posBullet.x - (16 + x_right)) && PlayerPos.x < (posBullet.x + (16 + x_left))) {
+				num_enemy = 22;
+				return true;
+			}
+		}
+	}
+
 	return false;
+}
+
+glm::ivec2 Scene::getPlayerPosition()
+{
+	glm::ivec2 playerPos = player->getPosition();
+	int enemyLevel = enemy->getLevelEnemy();
+	if (level != enemyLevel) {
+		if (level > enemyLevel) {
+			if ((level >= 3 && level <= 5) || (level >= 9 && level <= 11)) playerPos.x = 1000;
+			else if ((level >= 6 && level <= 8) || (level >= 15 && level <= 17)) playerPos.y = 1000;
+			else if (level >= 12 && level <= 14) {
+				if (enemyLevel == 12) playerPos.y = 1000;
+				else if (enemyLevel == 13) playerPos.x = 1000;
+			}
+		}
+		else if (level < enemyLevel) {
+			if ((level >= 3 && level <= 5) || (level >= 9 && level <= 11)) playerPos.x = 0;
+			else if ((level >= 6 && level <= 8) || (level >= 15 && level <= 17)) playerPos.y = 0;
+			else if (level >= 12 && level <= 14) {
+				if (enemyLevel == 13) playerPos.y = 0;
+				else if (enemyLevel == 14) playerPos.x = 0;
+			}
+		}
+	}
+	return playerPos;
+}
+
+void Scene::setEnemyMap(int enemy_level) {
+	switch (enemy_level)
+	{
+	case(0):
+		map_enemy = TileMap::createTileMap("levels/msx.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(1):
+		map_enemy = TileMap::createTileMap("levels/FonsBlau.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(2):
+		map_enemy = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(3):
+		map_enemy = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(4):
+		map_enemy = TileMap::createTileMap("levels/Scene2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(5):
+		map_enemy = TileMap::createTileMap("levels/Scene3.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(6):
+		map_enemy = TileMap::createTileMap("levels/Scene4.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(7):
+		map_enemy = TileMap::createTileMap("levels/Scene5.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(8):
+		map_enemy = TileMap::createTileMap("levels/Scene6.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(9):
+		map_enemy = TileMap::createTileMap("levels/Scene7.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(10):
+		map_enemy = TileMap::createTileMap("levels/Scene8.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(11):
+		map_enemy = TileMap::createTileMap("levels/Scene9.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(12):
+		map_enemy = TileMap::createTileMap("levels/Scene10.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(13):
+		map_enemy = TileMap::createTileMap("levels/Scene11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(14):
+		map_enemy = TileMap::createTileMap("levels/Scene12.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(15):
+		map_enemy = TileMap::createTileMap("levels/Scene13.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(16):
+		map_enemy = TileMap::createTileMap("levels/Scene14.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	case(17):
+		map_enemy = TileMap::createTileMap("levels/Scene15.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	default:
+		map_enemy = TileMap::createTileMap("levels/Scene1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram2);
+		break;
+	}
+	enemy->setTileMap(map_enemy);
 }

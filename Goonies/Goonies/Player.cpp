@@ -6,11 +6,6 @@
 #include "Game.h"
 #include <crtdbg.h>
 
-
-#define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 96
-#define FALL_STEP 4
-
 #define SPACEBAR 32
 
 int jumping_array[24] = {8,6,6,4,4,4,2,2,2,2,0,0,0,0};
@@ -43,7 +38,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
-	//Creem un vector de 12 posicions, amb els diferents moviments del personatge.
+	//Creem un vector de 14 posicions, amb els diferents moviments del personatge.
 	sprite->setNumberAnimations(14);
 
 	sprite->setAnimationSpeed(STAND_LEFT, 8);
@@ -124,9 +119,10 @@ void Player::update(int deltaTime)
 		falling_add = 2;
 		falling_cont = 4;
 		falling_seq = 0;
-
-		int offsetPos_y = posPlayer.y % 16;
-		if (offsetPos_y > 3) posPlayer.y -= offsetPos_y;
+		if (!bClimbing) {
+			int offsetPos_y = posPlayer.y % 16;
+			if (offsetPos_y >= 3) posPlayer.y -= offsetPos_y;
+		}
 	}
 
 	//Damage taken
@@ -277,8 +273,8 @@ void Player::update(int deltaTime)
 			bClimbing = false;
 			up_key_released = false;
 			//Perquè estigui a una posició múltiple de 16.
-			//int miss = posPlayer.y % 16;
-			//posPlayer.y -= 8;
+			int miss = posPlayer.y % 16;
+			posPlayer.y -= 8;
 			if (last_anim_before_climb) sprite->changeAnimation(STAND_RIGHT);
 			else  sprite->changeAnimation(STAND_LEFT);
 		}
@@ -524,7 +520,9 @@ void Player::update(int deltaTime)
 
 void Player::render()
 {
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y - 4)));
 	sprite->render();
+
 }
 
 void Player::setTileMap(TileMap *tileMap)
@@ -559,17 +557,10 @@ bool Player::got_hit()
 
 void Player::dmg_sprite_manager()
 {
-	if (hit_cont % 2) {
-		spritesheet.loadFromFile("images/Goon_128_hit_B.png", TEXTURE_PIXEL_FORMAT_RGBA);
-		sprite->changeSpriteSheet(&spritesheet);
-		++hit_cont;
-	}
-	else
-	{
-		spritesheet.loadFromFile("images/Goon_128_hit_W.png", TEXTURE_PIXEL_FORMAT_RGBA);
-		sprite->changeSpriteSheet(&spritesheet);
-		++hit_cont;
-	}
+	if (hit_cont % 2) spritesheet.loadFromFile("images/Goon_128_hit_B.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	else spritesheet.loadFromFile("images/Goon_128_hit_W.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite->changeSpriteSheet(&spritesheet);
+	++hit_cont;
 }
 
 bool Player::isAttacking(bool& side) {

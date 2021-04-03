@@ -125,6 +125,8 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Bars.h" />
+    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pjLoadingScreen.h" />
     <ClInclude Include="Player.h" />
@@ -140,6 +142,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bars.cpp" />
+    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pjLoadingScreen.cpp" />

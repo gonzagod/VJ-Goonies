@@ -10,6 +10,7 @@
 #include "Puntuacio.h"
 #include "Bars.h"
 #include "Skull.h"
+#include "Enemy.h"
 
 
 // Scene contains all the entities of our game.
@@ -26,7 +27,7 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
-	void updateScene();
+	void updateScene(bool portal);
 	void restartGame();
 	int nextScreen();
 	int prevScreen();
@@ -36,15 +37,17 @@ public:
 	int modifyExp(int expPoints);
 
 	bool noHealth();
+	glm::ivec2 getPlayerPosition();
 
 
 
 private:
 	void initShaders();
 	bool colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side);
+	void setEnemyMap(int enemy_level);
 
 private:
-	TileMap *map;
+	TileMap *map, *map_enemy;
 	pjLoadingScreen *goon;
 	pjLoadingScreen* goonie = new pjLoadingScreen[6];
 	pjLoadingScreen *evil;
@@ -55,9 +58,11 @@ private:
 	pjLoadingScreen *playStart;
 	Bars* healthBar;
 	Bars* expBar;
+	Bullet *bullet;
 	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
-	ShaderProgram texProgram;
+	Enemy *enemy;
+	ShaderProgram texProgram, texProgram2;
 	float currentTime;
 	int estat;
 	glm::mat4 projection;
