@@ -118,6 +118,7 @@ Scene::Scene()
 	estat = 0;
 	health = 20;
 	exp = 0;
+	god = false;
 	HyperShoes = false;
 	GrayRaincoat = false;
 	YellowRaincoat = false;
@@ -297,6 +298,7 @@ void Scene::init()
 
 void Scene::restartGame() {
 	level = 3;
+	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	key = false;
 	health = 20;
 	exp = 0;
@@ -306,7 +308,6 @@ void Scene::restartGame() {
 	YellowRaincoat = false;
 	Helmet = false;
 	BlueSpellbook = false;
-	init();
 }
 
 void Scene::update(int deltaTime)
@@ -314,129 +315,135 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		powerupHyperShoes();
+		powerupHelmet();
 	}
 	if (Game::instance().getKey(49)) {
-		goToScreen(12);
+		powerupHyperShoes();
 	}
 	if (Game::instance().getKey(50)) {
-		goToScreen(13);
+		powerupGrayRaincoat();
 	}
 	if (Game::instance().getKey(51)) {
-		goToScreen(14);
+		powerupBlueSpellbook();
 	}
 	if (Game::instance().getKey(52)) {
-		goToScreen(15);
+		powerupYellowRaincoat();
 	}
-	if (Game::instance().getKey(53)) {
-		goToScreen(16);
+	if (Game::instance().getKey(103)) { //g
+		godMode();
 	}
-	if (Game::instance().getKey(54)) {
-		goToScreen(17);
+	if (Game::instance().getKey(104)) { //h
+		if (level >= 3 && level < 18) nextScreen();
 	}
-	if (Game::instance().getKey(55)) {
-		goToScreen(3);
+	if (Game::instance().getKey(105)) { //i
+		if (level > 4) prevScreen();
 	}
 	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
 	estat = 22;
 	level = 2;
 	}
-	switch (level) {
-	case(0):
-		msx->update(deltaTime, 0, estat);
-		msx2->update(deltaTime, 1, estat);
-		lletres->update(deltaTime, 6, estat);
-		break;
-	case(1):
-		konami->update(deltaTime, 2, estat);
-		break;
-	case(2):
-		if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-		if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-		if (estat >= 4) goon->update(deltaTime, 3, estat);
-		if (estat >= 6 && estat <= 11) goonie[estat - 6].update(deltaTime, 4, estat);
-		if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
-		if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
-		break;
-	default:
-		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-			skullsScene[i].update(deltaTime);
-		}
-		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
-			keyScene[j].update(deltaTime,0);
-		}
-		for (int k = firstPadlockLevel; k < maxPadlockLevel; ++k) {
-			padlockScene[k].update(deltaTime);
-		}
-		for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
-			_RPT1(0, "DoorLevel = %d\n", l);
-			if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
-			else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
-			else doorScene[l].update(deltaTime,0);
-		}
+	if (!portalStatus()) {
+		switch (level) {
+		case(0):
+			msx->update(deltaTime, 0, estat);
+			msx2->update(deltaTime, 1, estat);
+			lletres->update(deltaTime, 6, estat);
+			break;
+		case(1):
+			konami->update(deltaTime, 2, estat);
+			break;
+		case(2):
+			if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			if (estat >= 4) goon->update(deltaTime, 3, estat);
+			if (estat >= 6 && estat <= 11) goonie[estat - 6].update(deltaTime, 4, estat);
+			if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
+			if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
+			break;
+		default:
+			if (!portalStatus()) {
+				for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+					skullsScene[i].update(deltaTime);
+				}
+			}
+			for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
+				keyScene[j].update(deltaTime, 0);
+			}
+			for (int k = firstPadlockLevel; k < maxPadlockLevel; ++k) {
+				padlockScene[k].update(deltaTime);
+			}
+			for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
+				_RPT1(0, "DoorLevel = %d\n", l);
+				if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
+				else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
+				else doorScene[l].update(deltaTime, 0);
+			}
 
-		for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
-			switch (m) {
-				_RPT1(0, "ObjectLevel = %d\n", m);
-			case 0:
-				objectesScene[m].update(deltaTime, 0);
-				break;
-			case 2:
-				objectesScene[m].update(deltaTime, 1);
-				break;
-			case 3: 
-				objectesScene[m].update(deltaTime, 4);
-				break;
-			case 7:
-				objectesScene[m].update(deltaTime, 2);
-				break;
-			case 8:
-				objectesScene[m].update(deltaTime, 5);
-				break;
-			default:
-				objectesScene[m].update(deltaTime, 3);
-				break;
+			for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
+				switch (m) {
+					_RPT1(0, "ObjectLevel = %d\n", m);
+				case 0:
+					objectesScene[m].update(deltaTime, 0);
+					break;
+				case 2:
+					objectesScene[m].update(deltaTime, 1);
+					break;
+				case 3:
+					objectesScene[m].update(deltaTime, 4);
+					break;
+				case 7:
+					objectesScene[m].update(deltaTime, 2);
+					break;
+				case 8:
+					objectesScene[m].update(deltaTime, 5);
+					break;
+				default:
+					objectesScene[m].update(deltaTime, 3);
+					break;
+				}
+
 			}
-			
-		}
-		for (int n = firstPowerUpLevel; n < maxPowerUpLevel; ++n) {
-			powerupsScene[n].update(deltaTime);
-		}
-		for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
-			waterdropScene[o].update(deltaTime);
-		}
-		for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
-			switch(p){
-			case 1:
-				stalactitesScene[p].update(deltaTime, 1);
-				break;
-			case 2:
-				stalactitesScene[p].update(deltaTime, 1);
-				break;
-			case 8:
-				stalactitesScene[p].update(deltaTime, 2);
-				break;
-			case 9:
-				stalactitesScene[p].update(deltaTime, 2);
-				break;
-			default:
-				stalactitesScene[p].update(deltaTime, 0);
-				break;
+			for (int n = firstPowerUpLevel; n < maxPowerUpLevel; ++n) {
+				powerupsScene[n].update(deltaTime);
 			}
+			for (int o = firstWaterDropLevel; o < maxWaterDropLevel; ++o) {
+				waterdropScene[o].update(deltaTime);
+			}
+			for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
+				switch (p) {
+				case 1:
+					stalactitesScene[p].update(deltaTime, 1);
+					break;
+				case 2:
+					stalactitesScene[p].update(deltaTime, 1);
+					break;
+				case 8:
+					stalactitesScene[p].update(deltaTime, 2);
+					break;
+				case 9:
+					stalactitesScene[p].update(deltaTime, 2);
+					break;
+				default:
+					stalactitesScene[p].update(deltaTime, 0);
+					break;
+				}
+			}
+			break;
 		}
-		break;
 	}
-	switch (level) {
-	case(12):
-		for (int i = 0; i < 3; ++i) {
-			steam[i].update(deltaTime, 0);
+	if (!portalStatus()) {
+		switch (level) {
+		case(12):
+			for (int i = 0; i < 3; ++i) {
+				steam[i].update(deltaTime, 0);
+			}
+			for (int i = 3; i < 6; ++i) {
+				steam[i].update(deltaTime, 1);
+			}
+			break;
+		default:
+			break;
 		}
-		for (int i = 3; i < 6; ++i) {
-			steam[i].update(deltaTime, 1);
-		}
-		break;
-	default:
-		break;
 	}
 	if (level >= 3) {
 		for (int i = 0; i < 8; ++i) {
@@ -584,8 +591,10 @@ void Scene::render()
 		for (int p = firstStalactiteLevel; p < maxStalactiteLevel; ++p) {
 			stalactitesScene[p].render();
 		}
-		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
-			skullsScene[i].render();
+		if (!portalStatus()) {
+			for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
+				skullsScene[i].render();
+			}
 		}
 
 		for (int i = 0; i < 5; ++i) {
@@ -608,7 +617,6 @@ void Scene::render()
 			}
 		}
 		player->render();
-		
 	}
 }
 
@@ -629,6 +637,9 @@ int Scene::nextScreen()
 	maxPowerUpLevel += powerUpsPerScreen[level];
 	firstWaterDropLevel = maxWaterDropLevel;
 	maxWaterDropLevel += waterDropsPerScreen[level];
+	for (int i = firstStalactiteLevel; i < maxStalactiteLevel; ++i) {
+		if (initStalactitesPos[i][2] == 0) stalactitesScene[i].disappear();
+	}
 	firstStalactiteLevel = maxStalactiteLevel;
 	maxStalactiteLevel += stalactitesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
@@ -654,6 +665,9 @@ int Scene::prevScreen()
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	firstWaterDropLevel -= waterDropsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
+	for (int i = firstStalactiteLevel; i < maxStalactiteLevel; ++i) {
+		if (initStalactitesPos[i][2] == 0) stalactitesScene[i].disappear();
+	}
 	firstStalactiteLevel -= stalactitesPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
 	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
@@ -750,6 +764,7 @@ int Scene::modifyExp(int expPoints) {
 
 int Scene::addGoonies() {
 	++gooniesRescued;
+	addPoints(2000);
 	return gooniesRescued;
 }
 
@@ -759,6 +774,7 @@ bool Scene::noHealth() {
 }
 
 bool Scene::addKey() {
+	addPoints(200);
 	key = true;
 	return key;
 }
@@ -770,6 +786,12 @@ bool Scene::removeKey() {
 
 bool Scene::keyStatus() {
 	return key;
+}
+
+bool Scene::portalStatus() {
+	if (player->portalStatus()) return true;
+	else return false;
+	
 }
 
 void Scene::powerupHelmet() {
@@ -795,6 +817,11 @@ void Scene::powerupHyperShoes() {
 void Scene::powerupYellowRaincoat() {
 	player->powerupYellowRaincoat();
 	YellowRaincoat = true;
+}
+
+void Scene::godMode() {
+	player->godMode();
+	god = true;
 }
 
 void Scene::updateScene()

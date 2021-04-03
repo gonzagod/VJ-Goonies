@@ -120,6 +120,10 @@ void Stalactites::activate() {
 	activated = true;
 }
 
+void Stalactites::disappear() {
+	alive = false;
+}
+
 
 bool Stalactites::isDangerous() {
 	if (sprite->animation() > 2) return true;

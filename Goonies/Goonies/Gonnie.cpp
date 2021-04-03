@@ -77,6 +77,7 @@ glm::ivec2 Goonie::getPosition()
 void Goonie::rescue() {
 	if (sprite->animation() < 3) {
 		Game::instance().modifyHP(4);
+		Game::instance().addPoints(500);
 	}
 	else {
 		Game::instance().addGoonies();

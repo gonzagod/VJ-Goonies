@@ -50,6 +50,7 @@ public:
 	bool addKey();
 	bool removeKey();
 	bool keyStatus();
+	bool portalStatus();
 
 	void powerupHelmet();
 	void powerupGrayRaincoat();
@@ -57,6 +58,7 @@ public:
 	void powerupBlueSpellbook();
 	void powerupYellowRaincoat();
 
+	void godMode();
 
 private:
 	void initShaders();
@@ -100,6 +102,7 @@ private:
 	int exp;
 	int gooniesRescued;
 	bool key;
+	bool isInPortal;
 	string levelmap;
 	int firstSkullLevel, maxSkullLevel;
 	int firstKeyLevel, maxKeyLevel;
@@ -111,6 +114,7 @@ private:
 	int firstStalactiteLevel, maxStalactiteLevel;
 	int x = 3;
 	bool Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat, HyperShoes;
+	bool god;
 };
 
 

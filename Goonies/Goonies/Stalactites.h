@@ -18,6 +18,7 @@ public:
 	void render();
 
 	void activate();
+	void disappear();
 	bool isDangerous();
 	glm::ivec2 getPosition();
 

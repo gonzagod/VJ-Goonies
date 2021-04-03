@@ -27,17 +27,21 @@ public:
 	void powerupYellowRaincoat();
 	void powerupBlueSpellbook();
 	void powerupHelmet();
+	void godMode();
 
 	bool got_hit();
 	bool got_hit_by_water();
 	bool got_hit_by_stalactite();
 	bool got_hit_by_steam();
 	bool isAttacking(bool& side);
+	bool portalStatus();
 
 private:
 	bool bJumping, bAttacking, bFalling, bClimbing, jump_colision;
 	bool movingR, movingL, up_key_released, damaged, invencible, space_key_released;
 	bool HyperShoes, Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat;
+	bool isGodMode, isInPortal;
+	int cont;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jump_force, jump_force_moving, startY, hit_cont, attack_cont;
 	double jump_velocity;
