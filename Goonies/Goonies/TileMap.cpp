@@ -205,6 +205,18 @@ bool TileMap::esticSobreTerra(const glm::ivec2& pos, const glm::ivec2& size) con
 	return false;
 }
 
+bool TileMap::noHiHaTerra(const glm::ivec2 pos, const glm::ivec2 pos2)
+{
+	if (pos.y < pos2.y) return false;
+	int x = (pos.x) / tileSize;
+	int y = (pos.y) / tileSize;
+	int y1 = (pos2.y) / tileSize;
+	for (y; y >= y1; y--) {
+		if (map[y * mapSize.x + x] >= 1 && map[y * mapSize.x + x] <= 37 && map[y * mapSize.x + x] != 32)
+			return false;
+	}
+	return true;
+}
 
 bool TileMap::climbingPlant(const glm::ivec2& pos, const glm::ivec2& size) const
 {
@@ -224,7 +236,7 @@ bool TileMap::descendingPlant(const glm::ivec2& pos, const glm::ivec2& size) con
 	y = (pos.y + 16) / tileSize;
 	y1 = (pos.y + 32) / tileSize;
 	if (map[y1 * mapSize.x + x] == 31 && //Bo
-		(map[y * mapSize.x + x] == 1	||	map[y1 * mapSize.x + x] == 7) // Aa o Ag
+		(map[y * mapSize.x + x] == 1 || map[y1 * mapSize.x + x] == 20 || map[y1 * mapSize.x + x] == 7) // Aa o Ag
 		) return true;
 	else return false;
 }
@@ -236,7 +248,9 @@ bool TileMap::finalPartOfPlantClimbing(const glm::ivec2& pos, const glm::ivec2& 
 	y = (pos.y + 16) / tileSize;
 	y1 = (pos.y) / tileSize;
 	if (map[y * mapSize.x + x] == 31 &&  //Bo
-		(map[y1 * mapSize.x + x] == 1 || map[y1 * mapSize.x + x] == 2	|| map[y1 * mapSize.x + x] == 26 || map[y1 * mapSize.x + x ] == 27 || map[y1 * mapSize.x + x] == 7 ) // Aa  o Ab o Ag o Bj o Bk
+		(map[y1 * mapSize.x + x] == 1 || map[y1 * mapSize.x + x] == 2 ||
+		 map[y1 * mapSize.x + x] == 20 || map[y1 * mapSize.x + x] == 26 ||
+		 map[y1 * mapSize.x + x ] == 27 || map[y1 * mapSize.x + x] == 7 ) // Aa  o Ab o Ag o Bj o Bk
 		) {
 		*posX = x*tileSize - 8;
 		return true;
@@ -348,31 +362,42 @@ bool TileMap::skullsobreterra(const glm::ivec2 & pos, const glm::ivec2 & size, b
 }
 
 
-bool TileMap::portal(const glm::ivec2& pos, const glm::ivec2& size) const
+bool TileMap::portal(const glm::ivec2& pos, const glm::ivec2& size, int* posX, int* posY) const
 {
-	int x, y;
-	x = (pos.x + 16) / tileSize;
+	int x0, x1, y;
+	x0 = (pos.x) / tileSize;
+	x1 = (pos.x + 16) / tileSize;
 	y = (pos.y) / tileSize;
-	if (map[y * mapSize.x + x] >= 240 && //Pa
-		map[y * mapSize.x + x] <= 250	//Pb
-		) return true;
-	else return false;
+	for (int x = x0; x <= x1; ++x) {
+		if (map[y * mapSize.x + x] >= 240 && //Pa
+			map[y * mapSize.x + x] <= 250	//Pb
+			) {
+			*posX = x * 16 - 8;
+			*posY = y * 16 - 8;
+			return true;
+		}
+
+	}
+	return false;
 }
 
 int TileMap::quinPortal(const glm::ivec2& pos, const glm::ivec2& size) const
 {
-	int x, y;
-	x = (pos.x + 16) / tileSize;
-	y = (pos.y) / tileSize;
-	if (map[y * mapSize.x + x] == 241) return 1;
-	else if (map[y * mapSize.x + x] == 242) return 2;
-	else if (map[y * mapSize.x + x] == 243) return 3;
-	else if (map[y * mapSize.x + x] == 244) return 4;
-	else if (map[y * mapSize.x + x] == 245) return 5;
-	else if (map[y * mapSize.x + x] == 246) return 6;
-	else if (map[y * mapSize.x + x] == 247) return 7;
-	else if (map[y * mapSize.x + x] == 248) return 8;
-	else if (map[y * mapSize.x + x] == 249) return 9;
-	else if (map[y * mapSize.x + x] == 250) return 10;
-	else return 0;
+	int x0, x1, y;
+	x0 = (pos.x - 16) / tileSize;
+	x1 = (pos.x + 16) / tileSize;
+	y = (pos.y + 8) / tileSize;
+	for (int x = x0; x <= x1; ++x) {
+		if (map[y * mapSize.x + x] == 241) return 1;
+		else if (map[y * mapSize.x + x] == 242) return 2;
+		else if (map[y * mapSize.x + x] == 243) return 3;
+		else if (map[y * mapSize.x + x] == 244) return 4;
+		else if (map[y * mapSize.x + x] == 245) return 5;
+		else if (map[y * mapSize.x + x] == 246) return 6;
+		else if (map[y * mapSize.x + x] == 247) return 7;
+		else if (map[y * mapSize.x + x] == 248) return 8;
+		else if (map[y * mapSize.x + x] == 249) return 9;
+		else if (map[y * mapSize.x + x] == 250) return 10;
+	}
+	return 0;
 }

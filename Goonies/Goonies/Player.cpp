@@ -12,7 +12,8 @@ int jumping_array[24] = {8,6,6,4,4,4,2,2,2,2,0,0,0,0};
 
 enum PlayerAnims
 {
-	STAND_RIGHT, STAND_LEFT, MOVE_LEFT, MOVE_RIGHT, JUMP_LEFT, JUMP_RIGHT, ATTACK_LEFT, ATTACK_RIGHT, CLIMB, DEAD, CLIMB_ANIM1, CLIMB_ANIM2, ATTACK_AIR_LEFT, ATTACK_AIR_RIGHT,
+	STAND_RIGHT, STAND_LEFT, MOVE_LEFT, MOVE_RIGHT, JUMP_LEFT, JUMP_RIGHT, ATTACK_LEFT,
+	ATTACK_RIGHT, CLIMB, DEAD, CLIMB_ANIM1, CLIMB_ANIM2, ATTACK_AIR_LEFT, ATTACK_AIR_RIGHT, PORTAL
 };
 
 bool last_anim_before_climb = true; //true -> STAND_RIGHT || false -> STAND_LEFT
@@ -34,64 +35,72 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	falling_add = 2;
 	falling_cont = 4;
 	falling_seq = 0;
+	HyperShoes = false;
+	YellowRaincoat = false;
+	GrayRaincoat = false;
+	Helmet = false;
+	BlueSpellbook = false;
+	isGodMode = false;
+	isInPortal = false;
 
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.2, 0.25), &spritesheet, &shaderProgram);
 	//Creem un vector de 14 posicions, amb els diferents moviments del personatge.
-	sprite->setNumberAnimations(14);
+	sprite->setNumberAnimations(15);
 
 	sprite->setAnimationSpeed(STAND_LEFT, 8);
-	sprite->addKeyframe(STAND_LEFT, glm::vec2(0.25f, 0.5f));
+	sprite->addKeyframe(STAND_LEFT, glm::vec2(0.2f, 0.5f));
 
 	sprite->setAnimationSpeed(STAND_RIGHT, 8);
-	sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.5f, 0.f));
+	sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.4f, 0.f));
 
 	sprite->setAnimationSpeed(MOVE_LEFT, 8);
 	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.75f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.25f, 0.5f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.5f, 0.5f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.25f, 0.5f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.5f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.4f, 0.5f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.5f));
 
 	sprite->setAnimationSpeed(MOVE_RIGHT, 8);
 	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.5f));
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.5f, 0.f));
+	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.4f, 0.f));
 	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.25f));
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.5f, 0.f));
+	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.4f, 0.f));
 
 	sprite->setAnimationSpeed(JUMP_LEFT, 8);
-	sprite->addKeyframe(JUMP_LEFT, glm::vec2(0.25f, 0.75f));
+	sprite->addKeyframe(JUMP_LEFT, glm::vec2(0.2f, 0.75f));
 
 	sprite->setAnimationSpeed(JUMP_RIGHT, 8);
-	sprite->addKeyframe(JUMP_RIGHT, glm::vec2(0.25f, 0.25f));
-
-	//sprite->setAnimationSpeed(DEAD, 8);
-	//sprite->addKeyframe(DEAD, glm::vec2(0.f, 0.6f));
-	//sprite->addKeyframe(DEAD, glm::vec2(0.2f, 0.6f));
-	//sprite->addKeyframe(DEAD, glm::vec2(0.4f, 0.6f));
+	sprite->addKeyframe(JUMP_RIGHT, glm::vec2(0.2f, 0.25f));
 
 	sprite->setAnimationSpeed(ATTACK_LEFT, 8);
-	sprite->addKeyframe(ATTACK_LEFT, glm::vec2(0.5f, 0.75f));
+	sprite->addKeyframe(ATTACK_LEFT, glm::vec2(0.4f, 0.75f));
 
 	sprite->setAnimationSpeed(ATTACK_RIGHT, 8);
-	sprite->addKeyframe(ATTACK_RIGHT, glm::vec2(0.5f, 0.25f));
+	sprite->addKeyframe(ATTACK_RIGHT, glm::vec2(0.4f, 0.25f));
 
 	sprite->setAnimationSpeed(CLIMB, 8);
 	sprite->addKeyframe(CLIMB, glm::vec2(0.f, 0.f));
-	sprite->addKeyframe(CLIMB, glm::vec2(0.25f, 0.f));
+	sprite->addKeyframe(CLIMB, glm::vec2(0.2f, 0.f));
 
 	sprite->setAnimationSpeed(CLIMB_ANIM1, 8);
 	sprite->addKeyframe(CLIMB_ANIM1, glm::vec2(0.f, 0.f));
 
 	sprite->setAnimationSpeed(CLIMB_ANIM2, 8);
-	sprite->addKeyframe(CLIMB_ANIM2, glm::vec2(0.25f, 0.f));
+	sprite->addKeyframe(CLIMB_ANIM2, glm::vec2(0.2f, 0.f));
 
 	sprite->setAnimationSpeed(ATTACK_AIR_LEFT, 8);
-	sprite->addKeyframe(ATTACK_AIR_LEFT, glm::vec2(0.75f, 0.25f));
+	sprite->addKeyframe(ATTACK_AIR_LEFT, glm::vec2(0.8f, 0.25f));
 
 	sprite->setAnimationSpeed(ATTACK_AIR_RIGHT, 8);
-	sprite->addKeyframe(ATTACK_AIR_RIGHT, glm::vec2(0.75f, 0.f));
+	sprite->addKeyframe(ATTACK_AIR_RIGHT, glm::vec2(0.8f, 0.f));
 
+	sprite->setAnimationSpeed(PORTAL, 8);
+	sprite->addKeyframe(PORTAL, glm::vec2(0.4f, 0.f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.25f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.5f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.75f));
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -164,9 +173,11 @@ void Player::update(int deltaTime)
 	{
 		bFalling = true;
 	}
-
-	//Si fem servir la tecla barra espaciadora, el personatge atacarà
-
+	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && map->portal(posPlayer, glm::ivec2(32, 32), &posPlayer.x, &posPlayer.y)) {
+		isInPortal = true;
+		cont = 0;
+		sprite->changeAnimation(PORTAL);
+	}
 
 	//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
 	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
@@ -399,7 +410,7 @@ void Player::update(int deltaTime)
 	}
 
 	//En cas de no estar sobre una tile de moviment, caurem.
-	if (bFalling && !bJumping && !bClimbing)
+	if (bFalling && !bJumping && !bClimbing && !isInPortal)
 	{
 		posPlayer.y += falling_add;
 		++falling_seq;
@@ -443,65 +454,74 @@ void Player::update(int deltaTime)
 		if (posPlayer.x > 160) {
 			posPlayer.y = 320;
 		}
+		else if (bClimbing && posPlayer.y < 120) posPlayer.y = 320;
 		else posPlayer.x = 548;
 	}
 
-	if (map->portal(posPlayer, glm::ivec2(32, 32))) {
-		int num = map->quinPortal(posPlayer, glm::ivec2(32, 32));
-		int level = 0;
-		switch (num) {
-		case 1:
-			level = Game::instance().goToScreen(6);
-			posPlayer.x = 496;
-			posPlayer.y = 176;
-			break;
-		case 2:
-			level = Game::instance().goToScreen(9);
-			posPlayer.x = 108;
-			posPlayer.y = 176;
-			break;
-		case 3:
-			level = Game::instance().goToScreen(13);
-			posPlayer.x = 176;
-			posPlayer.y = 144;
-			break;
-		case 4:
-			level = Game::instance().goToScreen(15);
-			posPlayer.x = 480;
-			posPlayer.y = 112;
-			break;
-		case 5:
-			level = Game::instance().goToScreen(12);
-			posPlayer.x = 496;
-			posPlayer.y = 144;
-			break;
-		case 6:
-			level = Game::instance().goToScreen(5);
-			posPlayer.x = 320;
-			posPlayer.y = 112;
-			break;
-		case 7:
-			level = Game::instance().goToScreen(5);
-			posPlayer.x = 496;
-			posPlayer.y = 112;
-			break;
-		case 8:
-			level = Game::instance().goToScreen(11);
-			posPlayer.x = 400;
-			posPlayer.y = 176;
-			break;
-		case 9:
-			level = Game::instance().goToScreen(14);
-			posPlayer.x = 368;
-			posPlayer.y = 304;
-			break;
-		case 10:
-			level = Game::instance().goToScreen(8);
-			posPlayer.x = 336;
-			posPlayer.y = 80;
-			break;
-		default:
-			break;
+	if (isInPortal) {
+		if (cont > 16) {
+			isInPortal = false;
+			sprite->changeAnimation(STAND_RIGHT);
+			int num = map->quinPortal(posPlayer, glm::ivec2(32, 32));
+			int level = 0;
+			switch (num) {
+			case 1:
+				level = Game::instance().goToScreen(6);
+				posPlayer.x = 472;
+				posPlayer.y = 176;
+				break;
+			case 2:
+				level = Game::instance().goToScreen(9);
+				posPlayer.x = 188;
+				posPlayer.y = 176;
+				break;
+			case 3:
+				level = Game::instance().goToScreen(13);
+				posPlayer.x = 152;
+				posPlayer.y = 144;
+				break;
+			case 4:
+				level = Game::instance().goToScreen(15);
+				posPlayer.x = 456;
+				posPlayer.y = 112;
+				break;
+			case 5:
+				level = Game::instance().goToScreen(12);
+				posPlayer.x = 472;
+				posPlayer.y = 144;
+				break;
+			case 6:
+				level = Game::instance().goToScreen(5);
+				posPlayer.x = 296;
+				posPlayer.y = 112;
+				break;
+			case 7:
+				level = Game::instance().goToScreen(5);
+				posPlayer.x = 472;
+				posPlayer.y = 112;
+				break;
+			case 8:
+				level = Game::instance().goToScreen(11);
+				posPlayer.x = 376;
+				posPlayer.y = 176;
+				break;
+			case 9:
+				level = Game::instance().goToScreen(14);
+				posPlayer.x = 344;
+				posPlayer.y = 304;
+				break;
+			case 10:
+				level = Game::instance().goToScreen(8);
+				posPlayer.x = 312;
+				posPlayer.y = 80;
+				break;
+			default:
+				break;
+			}
+		}
+		else {
+			cont++;
+			posPlayer.x += 1;
 		}
 
 	}
@@ -544,9 +564,67 @@ glm::ivec2 Player::getPosition()
 bool Player::got_hit()
 {
 	if (!invencible) {
-		Game::instance().modifyHP(-2);
+		if (BlueSpellbook || isGodMode) {
+			Game::instance().modifyHP(0);
+		}
+		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
-		Game::instance().restartGame();
+			Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+
+bool Player::got_hit_by_water()
+{
+	if (!invencible) {
+		if (GrayRaincoat || isGodMode) {
+			Game::instance().modifyHP(0);
+		}
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+bool Player::got_hit_by_steam()
+{
+	if (!invencible) {
+		if (YellowRaincoat || isGodMode) {
+			Game::instance().modifyHP(0);
+		}
+
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
+		}
+		damaged = true;
+		invencible = true;
+		return true;
+	}
+	return false;
+}
+
+
+bool Player::got_hit_by_stalactite()
+{
+	if (!invencible) {
+		if (Helmet || isGodMode) {
+			Game::instance().modifyHP(0);
+		}
+
+		else Game::instance().modifyHP(-2);
+		if (Game::instance().noHealth()) {
+			Game::instance().restartGame();
 		}
 		damaged = true;
 		invencible = true;
@@ -566,4 +644,34 @@ void Player::dmg_sprite_manager()
 bool Player::isAttacking(bool& side) {
 	side = (sprite->animation() == ATTACK_LEFT || sprite->animation() == ATTACK_AIR_LEFT);
 	return bAttacking;
+}
+
+bool Player::portalStatus() {
+	return isInPortal;
+}
+
+
+void Player::powerupHyperShoes() {
+	HyperShoes = true;
+	player_speed = 4;
+}
+
+void Player::powerupGrayRaincoat() {
+	GrayRaincoat = true;
+}
+
+void Player::powerupBlueSpellbook() {
+	BlueSpellbook = true;
+}
+
+void Player::powerupHelmet() {
+	Helmet = true;
+}
+
+void Player::powerupYellowRaincoat() {
+	YellowRaincoat = true;
+}
+
+void Player::godMode() {
+	isGodMode = true;
 }

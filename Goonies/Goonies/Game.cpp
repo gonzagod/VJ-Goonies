@@ -44,9 +44,46 @@ int Game::modifyExp(int expPoints) {
 	return scene.modifyExp(expPoints);
 }
 
+int Game::addGoonies() {
+	return scene.addGoonies();
+}
+
+bool Game::addKey() {
+	return scene.addKey();
+}
+
+bool Game::removeKey() {
+	return scene.removeKey();
+}
+
+bool Game::keyStatus() {
+	return scene.keyStatus();
+}
+
 bool Game::noHealth() {
 	return scene.noHealth();
 }
+
+void Game::powerupHelmet() {
+	scene.powerupHelmet();
+}
+
+void Game::powerupGrayRaincoat() {
+	scene.powerupGrayRaincoat();
+}
+
+void Game::powerupHyperShoes() {
+	scene.powerupHyperShoes();
+}
+
+void Game::powerupYellowRaincoat() {
+	scene.powerupYellowRaincoat();
+}
+
+void Game::powerupBlueSpellbook() {
+	scene.powerupBlueSpellbook();
+}
+
 
 void Game::restartGame() {
 	if (points > higherPuntuation) higherPuntuation = points;
