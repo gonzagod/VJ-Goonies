@@ -17,8 +17,9 @@ void GooniePoints::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	sprite->setNumberAnimations(7);
 
 	for (int i = 0; i < 7; ++i) {
-		sprite->setAnimationSpeed(i, 8);
+		sprite->setAnimationSpeed(i, 4);
 		sprite->addKeyframe(i, glm::vec2(0.f, 0.75f -i*0.125f));
+		if (i == 6) sprite->addKeyframe(i, glm::vec2(0.f, 0.75f));
 	}
 
 	sprite->changeAnimation(0);
@@ -29,7 +30,7 @@ void GooniePoints::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 
 
 void GooniePoints::update(int deltaTime, int gooniePoints) {
-	sprite->changeAnimation(gooniePoints);
+	if (sprite->animation() != gooniePoints) sprite->changeAnimation(gooniePoints);
 	sprite->update(deltaTime);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
 }

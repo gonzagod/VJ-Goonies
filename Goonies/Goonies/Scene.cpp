@@ -122,6 +122,7 @@ Scene::Scene()
 	punts = 0;
 	health = 20;
 	exp = 0;
+	gooniesRescued = 0;
 	god = false;
 	isInPortal = false;
 	isDying = false;
@@ -349,7 +350,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		gameOver(0);
+		addGoonies();
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
