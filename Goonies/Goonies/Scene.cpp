@@ -306,17 +306,9 @@ void Scene::init()
 }
 
 void Scene::restartGame() {
-	level = 3;
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-	key = false;
-	health = 20;
-	exp = 0;
-	punts = 0;
-	HyperShoes = false;
-	GrayRaincoat = false;
-	YellowRaincoat = false;
-	Helmet = false;
-	BlueSpellbook = false;
+	konami->initKonami(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	estat = 2;
+	Game::instance().goToScreen(1);
 }
 
 void Scene::update(int deltaTime)
@@ -348,6 +340,7 @@ void Scene::update(int deltaTime)
 		if (level > 4) prevScreen();
 	}
 	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
+	control = 0;
 	estat = 22;
 	level = 2;
 	}
@@ -362,12 +355,38 @@ void Scene::update(int deltaTime)
 			konami->update(deltaTime, 2, estat);
 			break;
 		case(2):
-			if (estat == 5) 			map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-			if (estat == 22)			map = TileMap::createTileMap("levels/LoadingScreen2.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			if (estat == 5) {
+				control = 0;
+				map = TileMap::createTileMap("levels/LoadingScreen.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			}
+			if (estat == 22) {
+				if (control == 0) {
+					control = 1;
+					map = TileMap::createTileMap("levels/LoadingScreen3.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+				}
+			}
 			if (estat >= 4) goon->update(deltaTime, 3, estat);
 			if (estat >= 6 && estat <= 11) goonie[estat - 6].update(deltaTime, 4, estat);
 			if (estat >= 12 && estat <= 21) evil->update(deltaTime, 5, estat);
 			if (estat == 22 || estat == 23) playStart->update(deltaTime, 7, estat);
+			break;
+		case (18):
+			if (estat == 24) {
+				if (control == 1) {
+					control = 0;
+					map = TileMap::createTileMap("levels/Instructions.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+				}
+				playStart->update(deltaTime, 7, estat);
+			}
+			break;
+		case (19):
+			if (estat == 25) {
+				if (control == 1) {
+					control = 0;
+					map = TileMap::createTileMap("levels/Credits.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+				}
+				playStart->update(deltaTime, 7, estat);
+			}
 			break;
 		default:
 			if (!portalStatus()) {
@@ -454,7 +473,7 @@ void Scene::update(int deltaTime)
 			break;
 		}
 	}
-	if (level >= 3) {
+	if (level >= 3 && level <= 17) {
 		for (int i = 0; i < 8; ++i) {
 			puntuation[i].update(deltaTime, i, maxPunts, level);
 		}
@@ -598,7 +617,7 @@ void Scene::render()
 		break;
 
 	}
-	if (level >= 3) {
+	if (level >= 3 && level <= 17) {
 		for (int i = 0; i < 14; ++i) {
 			puntuation[i].render();
 		}

@@ -30,6 +30,7 @@ private:
 	bool moved;
 	bool waiting = false;
 	bool alive;
+	bool key_up_released, key_down_released, spacebar_released;
 	clock_t endwait;
 	Texture spritesheet;
 	Sprite *sprite;

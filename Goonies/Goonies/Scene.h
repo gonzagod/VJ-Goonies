@@ -121,6 +121,7 @@ private:
 	int x = 3;
 	bool Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat, HyperShoes;
 	bool god;
+	int control;
 };
 
 

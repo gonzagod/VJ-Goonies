@@ -22,7 +22,7 @@ enum msxAnimation {
 };
 
 enum estats {
-	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START, PLAY_START2
+	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START, PLAY_START2, PLAY_START3, PLAY_START4
 };
 
 enum lletres {
@@ -30,7 +30,7 @@ enum lletres {
 };
 
 enum PlayStart {
-	PLAYSTART
+	PLAYSTART, PLAYSTART2
 };
 
 
@@ -127,14 +127,17 @@ void pjLoadingScreen::initLletres(const glm::ivec2& tileMapPos, ShaderProgram& s
 }
 
 void pjLoadingScreen::initPlayStart(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
+	key_up_released = true;
+	key_down_released = true;
 	spritesheet.loadFromFile("images/PlayStart.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(80, 8), glm::vec2(1, 0.5), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(1);
+	sprite = Sprite::createSprite(glm::ivec2(8, 16), glm::vec2(0.5, 1), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(2);
 
-	sprite->setAnimationSpeed(PLAYSTART, 8);
+	sprite->setAnimationSpeed(PLAYSTART, 4);
 	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.0f));
-	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.5f));
-	sprite->addKeyframe(PLAYSTART, glm::vec2(0.f, 0.5f));
+
+	sprite->setAnimationSpeed(PLAYSTART2, 4);
+	sprite->addKeyframe(PLAYSTART2, glm::vec2(0.5f, 0.0f));
 
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
@@ -280,21 +283,59 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			break;
 
 		case 7:
+			if (!Game::instance().getKey(32)) spacebar_released = true;
 			if (estat == PLAY_START) {
+				if (!Game::instance().getSpecialKey(GLUT_KEY_UP)) key_up_released = true;
+				if (!Game::instance().getSpecialKey(GLUT_KEY_DOWN)) key_down_released = true;
 				if (!waiting) {
-					posPJ.x = 296;
+					posPJ.x = 400;
 					posPJ.y = 272;
-					endwait = clock() + 2 * CLOCKS_PER_SEC;
+					endwait = clock() + 0.5 * CLOCKS_PER_SEC;
 					waiting = true;
 				}
-
 				else if (waiting && clock() > endwait) {
-					if (Game::instance().getKey(32)) estat = PLAY_START2;
+					if (Game::instance().getSpecialKey(GLUT_KEY_DOWN) && key_down_released) {
+						if (posPJ.y < 304) {
+							key_down_released = false;
+							posPJ.y += 16;
+						}
+					}
+					else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && key_up_released) {
+						if (posPJ.y > 272) {
+							key_up_released = false;
+							posPJ.y -= 16;
+						}
+					}
+					if (posPJ.y == 272 && Game::instance().getKey(32)) estat = PLAY_START2;
+					else if (posPJ.y == 288 && Game::instance().getKey(32) && spacebar_released) {
+						spacebar_released = false;
+						estat = PLAY_START3;
+						int level = Game::instance().goToScreen(18);
+					}
+					else if (posPJ.y == 304 && Game::instance().getKey(32) && spacebar_released) {
+						spacebar_released = false;
+						estat = PLAY_START4;
+						int level = Game::instance().goToScreen(19);
+					}
 				}
 				if (sprite->animation() != PLAYSTART) sprite->changeAnimation(PLAYSTART);
 			}
 			else if (estat == PLAY_START2) {
 				int level = Game::instance().nextScreen();
+			}
+			else if (estat == PLAY_START3) {
+				if (Game::instance().getKey(32) && spacebar_released) {
+					spacebar_released = false;
+					estat = PLAY_START;
+					Game::instance().goToScreen(2);
+				}
+			}
+			else if (estat == PLAY_START4) {
+				if (Game::instance().getKey(32) && spacebar_released) {
+					spacebar_released = false;
+					estat = PLAY_START;
+					Game::instance().goToScreen(2);
+				}
 			}
 			break;
 

@@ -1,0 +1,10 @@
+Controls in Game:
+Left_Arrow: move to left.
+Right_Arrow: move to right.
+Up_Arrow: Permits you to jump, use portals and use creepers.
+Spacebar: Attack.
+Esc: Exit
+Controls in Menu:
+Up_Arrow: move Goonie up. To select options.
+Down_Arrow: move Goonie down. To select options.
+Spacebar: Select.
