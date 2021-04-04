@@ -88,6 +88,14 @@ void Game::gameOver() {
 	scene.gameOver(0);
 }
 
+void Game::gameWin() {
+	scene.gameWin();
+}
+
+int Game::howManyGoonies() {
+	return scene.howManyGoonies();
+}
+
 void Game::restartGame() {
 	if (points > higherPuntuation) higherPuntuation = points;
 	points = 0;

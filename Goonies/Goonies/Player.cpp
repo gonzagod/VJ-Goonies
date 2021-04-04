@@ -178,6 +178,12 @@ void Player::update(int deltaTime)
 		cont = 0;
 		sprite->changeAnimation(PORTAL);
 	}
+	else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && Game::instance().howManyGoonies() >= 6 && map->finalDoor(posPlayer, glm::ivec2(32,32)))  {
+			bool portal = map->finalDoorPos(posPlayer, glm::ivec2(32, 32), &posPlayer.x, &posPlayer.y);
+			isInPortal = true;
+			cont = 0;
+			sprite->changeAnimation(PORTAL);
+	}
 
 	//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
 	else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
@@ -516,6 +522,7 @@ void Player::update(int deltaTime)
 				posPlayer.y = 80;
 				break;
 			default:
+				Game::instance().gameWin();
 				break;
 			}
 		}

@@ -370,13 +370,41 @@ bool TileMap::portal(const glm::ivec2& pos, const glm::ivec2& size, int* posX, i
 	y = (pos.y) / tileSize;
 	for (int x = x0; x <= x1; ++x) {
 		if (map[y * mapSize.x + x] >= 240 && //Pa
-			map[y * mapSize.x + x] <= 250	//Pb
+			map[y * mapSize.x + x] <= 250	//Pk
 			) {
 			*posX = x * 16 - 8;
 			*posY = y * 16 - 8;
 			return true;
 		}
+	}
+	return false;
+}
 
+bool TileMap::finalDoorPos(const glm::ivec2& pos, const glm::ivec2& size, int* posX, int* posY) const
+{
+	int x0, x1, y;
+	x0 = (pos.x ) / tileSize;
+	x1 = (pos.x + 64) / tileSize;
+	y = (pos.y) / tileSize;
+	for (int x = x0; x <= x1; ++x) {
+		if (map[y * mapSize.x + x] == 251) {
+			*posX = x * 16 - 12;
+			*posY = y * 16 - 8;
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool TileMap::finalDoor(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	int x0, x1, y;
+	x0 = (pos.x) / tileSize;
+	x1 = (pos.x +64) / tileSize;
+	y = (pos.y) / tileSize;
+	for (int x = x0; x <= x1; ++x) {
+		if (map[y * mapSize.x + x] == 251) 	return true;
 	}
 	return false;
 }

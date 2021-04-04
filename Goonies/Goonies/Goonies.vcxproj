@@ -128,6 +128,7 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Door.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="FinalDoor.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Goonie.h" />
     <ClInclude Include="GooniePoints.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="FinalDoor.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Gonnie.cpp" />
     <ClCompile Include="GooniePoints.cpp" />

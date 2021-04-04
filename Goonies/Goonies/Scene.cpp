@@ -57,6 +57,9 @@
 #define POWERUP_X_TILES 7
 #define POWERUP_Y_TILES 23
 
+#define FINAL_DOOR_X_TILES 17
+#define FINAL_DOOR_Y_TILES 15
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[21] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2,0,0,0 };
@@ -304,6 +307,10 @@ void Scene::init()
 	playStart->initPlayStart(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	playStart->setPosition(glm::vec2(LLETRES_INIT_X_TILES * map->getTileSize(), LLETRES_INIT_Y_TILES * map->getTileSize()));
 
+	finalDoor = new FinalDoor();
+	finalDoor->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	finalDoor->setPosition(glm::vec2(FINAL_DOOR_X_TILES*map->getTileSize(), FINAL_DOOR_Y_TILES*map->getTileSize() - 1));
+	finalDoor->setTileMap(map);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -324,6 +331,11 @@ void Scene::gameOver(int x) {
 		default:
 			break;
 	}
+}
+
+void Scene::gameWin() {
+	estat = 26;
+	Game::instance().goToScreen(21);
 }
 
 void Scene::restartGame() {
@@ -356,7 +368,7 @@ void Scene::update(int deltaTime)
 		powerupHyperShoes();
 	}
 	if (Game::instance().getKey(50)) {
-		powerupGrayRaincoat();
+		goToScreen(17);
 	}
 	if (Game::instance().getKey(51)) {
 		powerupBlueSpellbook();
@@ -427,6 +439,13 @@ void Scene::update(int deltaTime)
 				map = TileMap::createTileMap("levels/GameOver.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 				playStart->update(deltaTime, 7, estat);
 			}
+			break;
+		case(21):
+			if (estat == 26) {
+				map = TileMap::createTileMap("levels/gameWin.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+				playStart->update(deltaTime, 7, estat);
+			}
+			break;
 		default:
 			if (!portalStatus()) {
 				for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
@@ -514,6 +533,9 @@ void Scene::update(int deltaTime)
 				steam[i].update(deltaTime, 1);
 			}
 			break;
+		case(17):
+			if (gooniesRescued == 6) finalDoor->open();
+			finalDoor->update(deltaTime);
 		default:
 			break;
 		}
@@ -658,6 +680,9 @@ void Scene::render()
 		for (int i = 3; i < 6; ++i) {
 			steam[i].render();
 		}
+		break;
+	case(17):
+		finalDoor->render();
 		break;
 	default:
 		break;
@@ -868,6 +893,10 @@ int Scene::modifyExp(int expPoints) {
 int Scene::addGoonies() {
 	++gooniesRescued;
 	addPoints(2000);
+	return gooniesRescued;
+}
+
+int Scene::howManyGoonies() {
 	return gooniesRescued;
 }
 

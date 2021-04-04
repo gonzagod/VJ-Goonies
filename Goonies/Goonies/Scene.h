@@ -21,6 +21,7 @@
 #include "WaterDrop.h"
 #include "Steam.h"
 #include "Stalactites.h"
+#include "FinalDoor.h"
 #include <windows.h>
 
 
@@ -41,6 +42,7 @@ public:
 	void updateScene(bool portal);
 	void restartGame();
 	void gameOver(int x); 
+	void gameWin();
 	int nextScreen();
 	int prevScreen();
 	int goToScreen(int x);
@@ -48,6 +50,7 @@ public:
 	int modifyHP(int healthPoints);
 	int modifyExp(int expPoints);
 	int addGoonies();
+	int howManyGoonies();
 
 	bool noHealth();
 	bool addKey();
@@ -99,6 +102,7 @@ private:
 	GooniePoints* gooniePoints;
 	ViewPowerUp* viewpu = new ViewPowerUp[5];
 	Enemy *enemy;
+	FinalDoor *finalDoor;
 	ShaderProgram texProgram, texProgram2;
 	float currentTime;
 	int estat;
@@ -108,7 +112,7 @@ private:
 	int maxPunts;
 	int health;
 	int exp;
-	int gooniesRescued;
+	int gooniesRescued = 0;
 	bool key;
 	bool isInPortal;
 	string levelmap;

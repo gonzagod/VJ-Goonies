@@ -45,6 +45,8 @@ public:
 	bool prevScreen(const glm::ivec2& pos, const glm::ivec2& size) const;
 	bool skullsobreterra(const glm::ivec2& pos, const glm::ivec2& size, bool side) const;
 	bool noHiHaTerra(const glm::ivec2 pos, const glm::ivec2 pos2);
+	bool finalDoor(const glm::ivec2&pos, const glm::ivec2& size) const;
+	bool finalDoorPos(const glm::ivec2&pos, const glm::ivec2& size, int* posX, int* posY) const;
 
 
 private:

@@ -56,6 +56,8 @@ public:
 
 	void restartGame();
 	void gameOver();
+	void gameWin();
+	int howManyGoonies();
 
 	// Input callback methods
 	void keyPressed(int key);
