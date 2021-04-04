@@ -57,14 +57,20 @@
 #define POWERUP_X_TILES 7
 #define POWERUP_Y_TILES 23
 
+int debug_level = 3;
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
-int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
+int skullsPerScreen[18] = { 0,0,0, 1,2,3, 0,2,2, 1,0,1, 0,2,1, 2,2,2 };
 int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7  },{ 25,13 },{ 17,17 },
 										   { 18,9  },{ 18,19 },{ 16,5  },{ 26,11 },
 										   {  8,5  },{ 20,17 },
 										   { 10,13 },{ 14,19 },{ 25,19 },
 										   { 22,15 },{  6,17 },{ 17,11 },{ 20,17 },{  8,9 },{ 11,21 } };
+int jumpingSkulls[num_skulls_Scene] = { 0,0,0,0,0,0, 0,0,0,0, 0,1, 0,1,0, 0,0,0,1,0,0 };
+int skullsDistance[num_skulls_Scene][2] = { {6,34}, {5,15}, {13,35}, {16,32}, {21,34}, {6,19},{ 16,34 },
+											{16,34}, {16,24}, {25,34}, {6,19}, {6,34},{ 6,19 },{ 6,35 },
+											{5,34}, {21,34}, {6,19}, {6,28}, {6,34}, {6,26}, {6,34} };
 int enemyPositions[4][2] = { {34,11}, {10,11}, {22,9}, {24,11} };
 static const int num_keys_Scene = 14;
 Key* keyScene = new Key[num_keys_Scene];
@@ -110,7 +116,7 @@ int steamPos[6][2] = { { 16,8 },{ 16,16 },{ 32,16 },{ 19,8 },{ 19,16 },{ 27,16 }
 static const int num_stalactites = 10;
 Stalactites* stalactitesScene = new Stalactites[num_stalactites];
 int stalactitesPerScreen[18] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0 };
-int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 13,8,1 } };
+int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 12,8,1 } };
 
 Scene::Scene()
 {
@@ -144,66 +150,32 @@ void Scene::init()
 	firstSkullLevel = 0;
 	maxSkullLevel = firstSkullLevel + skullsPerScreen[level];
 
-	skullsScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	skullsScene[0].setPosition(glm::vec2(initSkullsPos[0][0] * map->getTileSize(), initSkullsPos[0][1] * map->getTileSize()));
-	skullsScene[0].setTileMap(map);
-
 	enemy = new Enemy();
 	enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	enemy->setPosition(glm::vec2(INIT_ENEMY_X_TILES * map->getTileSize(), INIT_ENEMY_Y_TILES * map->getTileSize()));
-	enemy->setTileMap(map);
 
 	bullet = new Bullet();
 	bullet->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	firstKeyLevel = 0;
 	maxKeyLevel = firstKeyLevel + keysPerScreen[level];
-	keyScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-
-	keyScene[0].setPosition(glm::vec2(initKeysPos[0][0] * map->getTileSize(), initKeysPos[0][1] * map->getTileSize()));
-	keyScene[0].setTileMap(map);
 
 	firstPadlockLevel = 0;
 	maxPadlockLevel = firstPadlockLevel + padlocksPerScreen[level];
 
-	padlockScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	padlockScene[0].setPosition(glm::vec2(initPadlocksPos[0][0] * map->getTileSize(), initPadlocksPos[0][1] * map->getTileSize()));
-	padlockScene[0].setTileMap(map);
-
 	firstDoorLevel = 0;
 	maxDoorLevel = firstDoorLevel + doorPerScreen[level];
-
-	doorScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	doorScene[0].setPosition(glm::vec2(DoorPos[0][0] * map->getTileSize(), DoorPos[0][1] * map->getTileSize()));
-	doorScene[0].setTileMap(map);
 
 	firstObjectLevel = 0;
 	maxObjectLevel = firstObjectLevel + objectesPerScreen[level];
 
-	objectesScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	objectesScene[0].setPosition(glm::vec2(objectPos[0][0] * map->getTileSize(), objectPos[0][1] * map->getTileSize()));
-	objectesScene[0].setTileMap(map);
-
 	firstPowerUpLevel = 0;
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
-
-	powerupsScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	powerupsScene[0].setPosition(glm::vec2(powerupsPos[0][0] * map->getTileSize(), powerupsPos[0][1] * map->getTileSize()));
-	powerupsScene[0].setTileMap(map);
 
 	firstWaterDropLevel = 0;
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 
-	waterdropScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	waterdropScene[0].setPosition(glm::vec2(initwaterdropsPos[0][0] * map->getTileSize(), initwaterdropsPos[0][1] * map->getTileSize()));
-	waterdropScene[0].setTileMap(map);
-
 	firstStalactiteLevel = 0;
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-
-	stalactitesScene[0].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	stalactitesScene[0].setPosition(glm::vec2(initStalactitesPos[0][0] * map->getTileSize(), initStalactitesPos[0][1] * map->getTileSize()));
-	stalactitesScene[0].setTileMap(map);
 
 	for (int i = 0; i < 5; ++i) {
 		viewpu[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -302,7 +274,7 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	//int i = goToScreen(3);
+	int i = goToScreen(debug_level);
 }
 
 void Scene::restartGame() {
@@ -382,7 +354,6 @@ void Scene::update(int deltaTime)
 				padlockScene[k].update(deltaTime);
 			}
 			for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
-				_RPT1(0, "DoorLevel = %d\n", l);
 				if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
 				else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
 				else doorScene[l].update(deltaTime, 0);
@@ -390,7 +361,6 @@ void Scene::update(int deltaTime)
 
 			for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
 				switch (m) {
-					_RPT1(0, "ObjectLevel = %d\n", m);
 				case 0:
 					objectesScene[m].update(deltaTime, 0);
 					break;
@@ -490,7 +460,7 @@ void Scene::update(int deltaTime)
 		glm::ivec2 PlayerPos = getPlayerPosition();
 		enemy->setPlayerPos(PlayerPos, level);
 		int enemy_level = enemy->getLevelEnemy();
-		setEnemyMap(enemy_level);
+		//setEnemyMap(enemy_level);
 		enemy->update(deltaTime);
 		glm::ivec2 EnemyPos = enemy->getPosition();
 		if (enemy->isShot()) {
@@ -509,7 +479,6 @@ void Scene::update(int deltaTime)
 		bool hit = false;
 		bool hit_side = true; //True = LEFT ||False = Right
 		if (player_attacking) {
-			_RPT1(0, "attack_side = %d\n", attack_side);
 			hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
 		}
 		else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
@@ -654,7 +623,7 @@ void Scene::render()
 		}
 		int enemyLevel = enemy->getLevelEnemy();
 		if(enemyLevel == level && enemy->is_Alive()) enemy->render();
-		if (bullet->is_Alive()) bullet->render();
+		if (enemyLevel == level && bullet->is_Alive()) bullet->render();
 		player->render();
 	}
 }
@@ -681,8 +650,6 @@ int Scene::nextScreen()
 	}
 	firstStalactiteLevel = maxStalactiteLevel;
 	maxStalactiteLevel += stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -709,8 +676,6 @@ int Scene::prevScreen()
 	}
 	firstStalactiteLevel -= stalactitesPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -773,8 +738,6 @@ int Scene::goToScreen(int x) {
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(true);
 	return level;
 }
@@ -926,11 +889,16 @@ void Scene::updateScene(bool portal)
 	}
 	if (level >= 3) {
 		player->setTileMap(map);
+		glm::ivec2 playerPos = player->getPosition();
 		 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			skullsScene[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
 			skullsScene[i].setTileMap(map);
+			bool move = playerPos.x > initSkullsPos[i][0];
+			skullsScene[i].setFirstMove(playerPos.x > initSkullsPos[i][0] * map->getTileSize());
+			skullsScene[i].setJumper(jumpingSkulls[i]);
+			skullsScene[i].setDistance(skullsDistance[i][0] * map->getTileSize(), skullsDistance[i][1] * map->getTileSize());
 		}
 
 		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
@@ -985,7 +953,7 @@ void Scene::updateScene(bool portal)
 			}
 		}
 
-		if (portal && (level == 3 || level == 6 || level == 12 || level == 15)) {
+		if (level == 3 || (portal && (level == 6 || level == 12 || level == 15))) {
 			enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			enemy->setLevelEnemy(level);
 			glm::ivec2 newEnemyPos;
@@ -1039,7 +1007,7 @@ bool Scene::colision_with_enemies(bool attack_side, int& num_enemy, int attack_d
 	for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 		glm::ivec2 SkullPos = skullsScene[i].getPosition();
 		num_enemy = i;
-		if (skullsScene[i].isAlive()) {
+		if (skullsScene[i].isAlive() && skullsScene[i].isReady()) {
 			if (PlayerPos.y >(SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
 				if (PlayerPos.x >(SkullPos.x - (16 + x_right)) && PlayerPos.x < (SkullPos.x + (16 + x_left))) {
 					hit_side = SkullPos.x < PlayerPos.x;
@@ -1325,4 +1293,9 @@ bool Scene::collision_with_stalactites() {
 		}
 	}
 	return false;
+}
+
+void Scene::updateEnemyMap() {
+	int enemy_level = enemy->getLevelEnemy();
+	setEnemyMap(enemy_level);
 }

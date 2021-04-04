@@ -20,15 +20,19 @@ public:
 	glm::ivec2 getPosition();
 	void die();
 	bool isAlive();
+	bool isReady();
+	void setFirstMove(bool side);
+	void setJumper(bool jump);
+	void setDistance(int min, int max);
 
 private:
 	glm::ivec2 tileMapDispl, posSkull;
-	int startX, startY;
+	int startX, startY, max_x, min_x;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-	bool alive, dying;
-	int cont_spawn, cont_dying;
+	bool alive, dying, ready, first_move, jumper;
+	int cont_spawn, cont_dying, jumping_cont;
 };
 
 #endif

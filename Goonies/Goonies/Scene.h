@@ -62,7 +62,7 @@ public:
 	void godMode();
 	glm::ivec2 getPlayerPosition();
 
-
+	void updateEnemyMap();
 
 private:
 	void initShaders();

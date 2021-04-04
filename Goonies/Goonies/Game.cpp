@@ -142,6 +142,11 @@ bool Game::getSpecialKey(int key) const
 	return specialKeys[key];
 }
 
+void Game::updateEnemyMap()
+{
+	scene.updateEnemyMap();
+}
+
 
 
 
