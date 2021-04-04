@@ -60,7 +60,7 @@
 #define FINAL_DOOR_X_TILES 17
 #define FINAL_DOOR_Y_TILES 15
 
-int debug_level = 4;
+int debug_level = 16;
 bool debug = false;
 
 static const int num_skulls_Scene = 21;
@@ -120,7 +120,7 @@ int steamPos[6][2] = { { 16,8 },{ 16,16 },{ 32,16 },{ 19,8 },{ 19,16 },{ 27,16 }
 static const int num_stalactites = 10;
 Stalactites* stalactitesScene = new Stalactites[num_stalactites];
 int stalactitesPerScreen[21] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0,0,0,0 };
-int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 13,8,1 } };
+int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 12,8,1 } };
 
 Cascade* Cascade1 = new Cascade[15];
 Cascade* Cascade2 = new Cascade[11];
