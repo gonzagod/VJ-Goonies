@@ -59,7 +59,7 @@
 
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
-int skullsPerScreen[18] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2 };
+int skullsPerScreen[21] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2,0,0,0 };
 int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7  },{ 25,13 },{ 17,17 },
 										   { 18,9  },{ 18,19 },{ 16,5  },{ 26,11 },
 										   {  8,5  },{ 20,17 },
@@ -68,17 +68,17 @@ int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7 
 int enemyPositions[4][2] = { {34,11}, {10,11}, {22,9}, {24,11} };
 static const int num_keys_Scene = 14;
 Key* keyScene = new Key[num_keys_Scene];
-int keysPerScreen[18] = { 0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,2 };
+int keysPerScreen[21] = { 0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,2,0,0,0 };
 int initKeysPos[num_keys_Scene][3] = { { 16,17,1 },{ 30,7,1 },{ 14,17,1 },{ 23,5,1 },{ 35,19,1 },{ 22,5,1 },{ 14,5,1 },{ 27,13,1 },{ 9,7,1 },{ 21,5,1 },{ 19,9,1 },{ 14,17,1 },{ 15,5,1 },{ 6,9,1 } };
 
 static const int num_padlocks_Scene = 14;
 Padlock* padlockScene = new Padlock[num_padlocks_Scene];
-int padlocksPerScreen[18] = { 0,0,0,1,0,2,1,1,0,0,2,0,2,0,2,0,1,2 };
+int padlocksPerScreen[21] = { 0,0,0,1,0,2,1,1,0,0,2,0,2,0,2,0,1,2,0,0,0 };
 int initPadlocksPos[num_padlocks_Scene][3] = { { 27,17,1 },{ 32,13,1 },{ 32,12,1 },{ 7,11,1 },{ 25,19,1 },{ 15,11,1 },{ 15,10,1 },{ 21,17,1 },{ 21,16,1 },{ 32,5,1 },{ 32,4,1 },{ 24,17,1 },{ 24,9,1 },{ 24,8,1 } };
 
 static const int num_door_Scene = 9;
 Door* doorScene = new Door[num_door_Scene];
-int doorPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
+int doorPerScreen[21] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1,0,0,0 };
 int DoorPos[num_door_Scene][3] = { { 28,15,1 },{ 33,11,1 },
 { 8,9,1 },{ 26,17,1 },
 { 16,9,1 },
@@ -87,17 +87,17 @@ int DoorPos[num_door_Scene][3] = { { 28,15,1 },{ 33,11,1 },
 
 static const int num_objectes_porta_Scene = 9;
 Goonie* objectesScene = new Goonie[num_objectes_porta_Scene];
-int objectesPerScreen[18] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1 };
+int objectesPerScreen[21] = { 0,0,0,1,0,1,1,1,0,0,1,0,1,0,1,0,1,1,0,0,0 };
 int objectPos[num_objectes_porta_Scene][3] = { { 29,17,1 },{ 34,13,1 },{ 9,11,1 },{ 27,19,1 },{ 17,11,1 },{ 23,17,1 },{ 34,5,1 },{ 26,17,1 },{ 26,9,1 } };
 
 static const int num_power_ups = 5;
 PowerUps* powerupsScene = new PowerUps[num_power_ups];
-int powerUpsPerScreen[18] = { 0,0,0,1,0,0,1,0,0,1,1,0,0,0,1,0,0,0 };
+int powerUpsPerScreen[21] = { 0,0,0,1,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,0 };
 int powerupsPos[num_power_ups][3] = { { 14,11,1 },{ 16,5,1 },{ 17,5,1 },{ 11,11,1 },{ 15,9,1 } };
 
 static const int num_water_drop = 20;
 WaterDrop* waterdropScene = new WaterDrop[num_water_drop];
-int waterDropsPerScreen[18] = { 0,0,0,2,1,1,0,0,1,1,1,2,1,0,3,2,2,3 };
+int waterDropsPerScreen[21] = { 0,0,0,2,1,1,0,0,1,1,1,2,1,0,3,2,2,3,0,0,0 };
 int initwaterdropsPos[num_water_drop][2] = { { 19,14 },{ 31,8 },{ 15,4 },{ 27,10 },
 { 11,8 },
 { 15,8 },{ 23,8 },{ 31,8 },{ 23,14 },
@@ -109,7 +109,7 @@ int steamPos[6][2] = { { 16,8 },{ 16,16 },{ 32,16 },{ 19,8 },{ 19,16 },{ 27,16 }
 
 static const int num_stalactites = 10;
 Stalactites* stalactitesScene = new Stalactites[num_stalactites];
-int stalactitesPerScreen[18] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0 };
+int stalactitesPerScreen[21] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0,0,0,0 };
 int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 13,8,1 } };
 
 Scene::Scene()
@@ -119,9 +119,12 @@ Scene::Scene()
 	key = false;
 	level = 0;
 	estat = 0;
+	punts = 0;
 	health = 20;
 	exp = 0;
 	god = false;
+	isInPortal = false;
+	isDying = false;
 	HyperShoes = false;
 	GrayRaincoat = false;
 	YellowRaincoat = false;
@@ -136,6 +139,7 @@ Scene::~Scene()
 	if (player != NULL)
 		delete player;
 }
+
 
 void Scene::init()
 {
@@ -305,9 +309,38 @@ void Scene::init()
 	//int i = goToScreen(3);
 }
 
+void Scene::gameOver(int x) {
+	switch (x) {
+		case 0:
+			isDying = true;
+			contDying = 0;
+			break;
+		case 1:
+			isDying = false;
+			estat = 26;
+			Game::instance().goToScreen(20);
+			break;
+		default:
+			break;
+	}
+}
+
 void Scene::restartGame() {
-	konami->initKonami(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	key = false;
+	level = 0;
 	estat = 2;
+	punts = 0;
+	health = 20;
+	exp = 0;
+	god = false;
+	isInPortal = false;
+	isDying = false;
+	HyperShoes = false;
+	GrayRaincoat = false;
+	YellowRaincoat = false;
+	Helmet = false;
+	BlueSpellbook = false;
+	init();
 	Game::instance().goToScreen(1);
 }
 
@@ -316,7 +349,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		powerupHelmet();
+		gameOver(0);
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
@@ -344,7 +377,7 @@ void Scene::update(int deltaTime)
 	estat = 22;
 	level = 2;
 	}
-	if (!portalStatus()) {
+	if (!portalStatus() && !isDying) {
 		switch (level) {
 		case(0):
 			msx->update(deltaTime, 0, estat);
@@ -388,6 +421,11 @@ void Scene::update(int deltaTime)
 				playStart->update(deltaTime, 7, estat);
 			}
 			break;
+		case (20):
+			if (estat == 26) {
+				map = TileMap::createTileMap("levels/GameOver.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+				playStart->update(deltaTime, 7, estat);
+			}
 		default:
 			if (!portalStatus()) {
 				for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
@@ -459,7 +497,13 @@ void Scene::update(int deltaTime)
 			break;
 		}
 	}
-	if (!portalStatus()) {
+	else if (isDying) {
+		player->godMode();
+		player->got_hit();
+		++contDying;
+		if (contDying > 20) gameOver(1);
+	}
+	if (!portalStatus() && !isDying) {
 		switch (level) {
 		case(12):
 			for (int i = 0; i < 3; ++i) {
@@ -473,6 +517,7 @@ void Scene::update(int deltaTime)
 			break;
 		}
 	}
+
 	if (level >= 3 && level <= 17) {
 		for (int i = 0; i < 8; ++i) {
 			puntuation[i].update(deltaTime, i, maxPunts, level);

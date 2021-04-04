@@ -21,6 +21,7 @@
 #include "WaterDrop.h"
 #include "Steam.h"
 #include "Stalactites.h"
+#include <windows.h>
 
 
 // Scene contains all the entities of our game.
@@ -39,6 +40,7 @@ public:
 	void render();
 	void updateScene(bool portal);
 	void restartGame();
+	void gameOver(int x); 
 	int nextScreen();
 	int prevScreen();
 	int goToScreen(int x);
@@ -122,6 +124,8 @@ private:
 	bool Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat, HyperShoes;
 	bool god;
 	int control;
+	bool isDying;
+	int contDying;
 };
 
 

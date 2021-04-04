@@ -84,6 +84,9 @@ void Game::powerupBlueSpellbook() {
 	scene.powerupBlueSpellbook();
 }
 
+void Game::gameOver() {
+	scene.gameOver(0);
+}
 
 void Game::restartGame() {
 	if (points > higherPuntuation) higherPuntuation = points;

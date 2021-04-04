@@ -22,7 +22,7 @@ enum msxAnimation {
 };
 
 enum estats {
-	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START, PLAY_START2, PLAY_START3, PLAY_START4
+	MSX, MSX2, KONAMI, KONAMI2, LLETRES_GOONIES, GOON, GOONIE1, GOONIE2, GOONIE3, GOONIE4, GOONIE5, GOONIE6, EVIL, STUN_GOON, GOONIE1_GONE, GOONIE2_GONE, GOONIE3_GONE, GOONIE4_GONE, GOONIE5_GONE, GOONIE6_GONE, EVIL_LAUGH, GOON_TURNBACK, PLAY_START, PLAY_START2, PLAY_START3, PLAY_START4, GAME_OVER
 };
 
 enum lletres {
@@ -292,6 +292,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 					posPJ.y = 272;
 					endwait = clock() + 0.5 * CLOCKS_PER_SEC;
 					waiting = true;
+					cont = 0;
 				}
 				else if (waiting && clock() > endwait) {
 					if (Game::instance().getSpecialKey(GLUT_KEY_DOWN) && key_down_released) {
@@ -336,6 +337,10 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 					estat = PLAY_START;
 					Game::instance().goToScreen(2);
 				}
+			}
+			else if (estat == GAME_OVER) {
+				cont++;
+				if (cont > 200) Game::instance().restartGame();
 			}
 			break;
 

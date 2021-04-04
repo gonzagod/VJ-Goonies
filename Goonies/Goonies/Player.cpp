@@ -569,7 +569,7 @@ bool Player::got_hit()
 		}
 		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
-			Game::instance().restartGame();
+			Game::instance().gameOver();
 		}
 		damaged = true;
 		invencible = true;
@@ -587,7 +587,7 @@ bool Player::got_hit_by_water()
 		}
 		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
-			Game::instance().restartGame();
+			Game::instance().gameOver();
 		}
 		damaged = true;
 		invencible = true;
@@ -605,7 +605,7 @@ bool Player::got_hit_by_steam()
 
 		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
-			Game::instance().restartGame();
+			Game::instance().gameOver();
 		}
 		damaged = true;
 		invencible = true;
@@ -624,7 +624,7 @@ bool Player::got_hit_by_stalactite()
 
 		else Game::instance().modifyHP(-2);
 		if (Game::instance().noHealth()) {
-			Game::instance().restartGame();
+			Game::instance().gameOver();
 		}
 		damaged = true;
 		invencible = true;

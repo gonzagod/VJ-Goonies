@@ -55,6 +55,7 @@ public:
 	void powerupYellowRaincoat();
 
 	void restartGame();
+	void gameOver();
 
 	// Input callback methods
 	void keyPressed(int key);
