@@ -568,13 +568,17 @@ glm::ivec2 Player::getPosition()
 	return posPlayer;
 }
 
-bool Player::got_hit()
+bool Player::got_hit(int num_enemy)
 {
 	if (!invencible) {
 		if (BlueSpellbook || isGodMode) {
 			Game::instance().modifyHP(0);
 		}
-		else Game::instance().modifyHP(-2);
+		else {
+			if(num_enemy == 20 || num_enemy == 22) Game::instance().modifyHP(-2);
+			else if(num_enemy == 21) Game::instance().modifyHP(-4);
+			else if(num_enemy == 23) Game::instance().modifyHP(-1);
+		}
 		if (Game::instance().noHealth()) {
 			Game::instance().gameOver();
 		}
@@ -610,7 +614,7 @@ bool Player::got_hit_by_steam()
 			Game::instance().modifyHP(0);
 		}
 
-		else Game::instance().modifyHP(-2);
+		else Game::instance().modifyHP(-1);
 		if (Game::instance().noHealth()) {
 			Game::instance().gameOver();
 		}

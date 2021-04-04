@@ -29,7 +29,7 @@ public:
 	void powerupHelmet();
 	void godMode();
 
-	bool got_hit();
+	bool got_hit(int num_enemy);
 	bool got_hit_by_water();
 	bool got_hit_by_stalactite();
 	bool got_hit_by_steam();
