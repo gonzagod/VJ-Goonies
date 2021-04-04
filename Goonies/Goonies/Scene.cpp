@@ -501,7 +501,7 @@ void Scene::update(int deltaTime)
 		player->godMode();
 		player->got_hit();
 		++contDying;
-		if (contDying > 20) gameOver(1);
+		if (contDying > 50) gameOver(1);
 	}
 	if (!portalStatus() && !isDying) {
 		switch (level) {

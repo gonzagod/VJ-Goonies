@@ -40,9 +40,9 @@ void WaterDrop::update(int deltaTime) {
 		switch (estat) {
 		case 0:
 			++cont;
+			y = 0;
 			if (cont > 15) {
 				estat = 1;
-				y = 0;
 			}
 			sprite->changeAnimation(0);
 			break;
