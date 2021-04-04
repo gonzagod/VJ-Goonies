@@ -112,6 +112,11 @@ Stalactites* stalactitesScene = new Stalactites[num_stalactites];
 int stalactitesPerScreen[18] = { 0,0,0,1,0,0,0,2,0,0,2,1,1,1,0,1,1,0 };
 int initStalactitesPos[num_stalactites][3] = { { 20,8,1 },{ 20,12,1 },{ 32,16,1 },{ 32,8,1 },{ 8,4,1 },{ 8,8,1 },{ 20,4,1 },{ 8,16,1 },{ 12,4,1 },{ 13,8,1 } };
 
+Cascade* Cascade1 = new Cascade[15];
+Cascade* Cascade2 = new Cascade[11];
+Cascade* Cascade3 = new Cascade[9];
+Cascade* Cascade4 = new Cascade[17];
+
 Scene::Scene()
 {
 	map = NULL;
@@ -302,7 +307,8 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	//int i = goToScreen(3);
+
+	int i = goToScreen(3);
 }
 
 void Scene::restartGame() {
@@ -382,7 +388,6 @@ void Scene::update(int deltaTime)
 				padlockScene[k].update(deltaTime);
 			}
 			for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
-				_RPT1(0, "DoorLevel = %d\n", l);
 				if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
 				else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
 				else doorScene[l].update(deltaTime, 0);
@@ -390,7 +395,6 @@ void Scene::update(int deltaTime)
 
 			for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
 				switch (m) {
-					_RPT1(0, "ObjectLevel = %d\n", m);
 				case 0:
 					objectesScene[m].update(deltaTime, 0);
 					break;
@@ -490,7 +494,7 @@ void Scene::update(int deltaTime)
 		glm::ivec2 PlayerPos = getPlayerPosition();
 		enemy->setPlayerPos(PlayerPos, level);
 		int enemy_level = enemy->getLevelEnemy();
-		setEnemyMap(enemy_level);
+		//setEnemyMap(enemy_level);
 		enemy->update(deltaTime);
 		glm::ivec2 EnemyPos = enemy->getPosition();
 		if (enemy->isShot()) {
@@ -509,14 +513,16 @@ void Scene::update(int deltaTime)
 		bool hit = false;
 		bool hit_side = true; //True = LEFT ||False = Right
 		if (player_attacking) {
-			_RPT1(0, "attack_side = %d\n", attack_side);
 			hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
 		}
 		else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
 		if (hit) {
 			if (num_enemy == 22) {
-				bool bullet_hit = player->got_hit();
+				bool bullet_hit = player->got_hit(22);
 				if (bullet_hit) bullet->player_hit();
+			}
+			if (num_enemy == 23) {
+				bool cascade_hit = player->got_hit(23);
 			}
 			else {
 				if (player_attacking && attack_side == hit_side) {
@@ -525,8 +531,8 @@ void Scene::update(int deltaTime)
 				}
 				else {
 					bool fratelli_hit = false;
-					if (num_enemy < 21) bool enemy_hit = player->got_hit();
-					else if (num_enemy == 21 && enemy->can_dmg()) fratelli_hit = player->got_hit();
+					if (num_enemy < 21) bool enemy_hit = player->got_hit(20);
+					else if (num_enemy == 21 && enemy->can_dmg()) fratelli_hit = player->got_hit(21);
 					if (fratelli_hit) enemy->collided_player();
 				}
 			}
@@ -539,6 +545,11 @@ void Scene::update(int deltaTime)
 		colisio = collision_with_steam();
 		colisio = collision_with_stalactites();
 		activateStalactites();
+
+		if (level == 4 || level == 9 ) updateCascade(1, deltaTime);
+		if (level == 9 || level == 10) updateCascade(2, deltaTime);
+		if (level == 13) updateCascade(3, deltaTime);
+		if (level == 14) updateCascade(4, deltaTime);
 	}
 }
 
@@ -655,6 +666,29 @@ void Scene::render()
 		int enemyLevel = enemy->getLevelEnemy();
 		if(enemyLevel == level && enemy->is_Alive()) enemy->render();
 		if (bullet->is_Alive()) bullet->render();
+
+		switch (level)
+		{
+			case(4):
+				renderCascade(1);
+				break;
+			case(9):
+				renderCascade(1);
+				renderCascade(2);
+				break;
+			case(10):
+				renderCascade(2);
+				break;
+			case(13):
+				renderCascade(3);
+				break;
+			case(14):
+				renderCascade(4);
+				break;
+			default:
+				break;
+		}
+
 		player->render();
 	}
 }
@@ -681,8 +715,6 @@ int Scene::nextScreen()
 	}
 	firstStalactiteLevel = maxStalactiteLevel;
 	maxStalactiteLevel += stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -709,8 +741,6 @@ int Scene::prevScreen()
 	}
 	firstStalactiteLevel -= stalactitesPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -773,8 +803,6 @@ int Scene::goToScreen(int x) {
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(true);
 	return level;
 }
@@ -924,6 +952,34 @@ void Scene::updateScene(bool portal)
 	default:
 		break;
 	}
+
+	switch (level)
+	{
+	case 4:
+		initCascade(1, 21, 4, 19);
+		break;
+
+	case 9:
+		initCascade(1, 21, 4, 19);
+		initCascade(2, 25, 8, 19);
+		break;
+
+	case 10:
+		initCascade(2, 27, 8, 19);
+		break;
+
+	case 13:
+		initCascade(3, 26, 12, 21);
+		break;
+
+	case 14:
+		initCascade(4, 18, 4, 21);
+		break;
+
+	default:
+		break;
+	}
+
 	if (level >= 3) {
 		player->setTileMap(map);
 		 
@@ -996,6 +1052,7 @@ void Scene::updateScene(bool portal)
 
 		int enemyLevel = enemy->getLevelEnemy();
 		setEnemyMap(enemyLevel);
+
 	}
 }
 
@@ -1068,6 +1125,59 @@ bool Scene::colision_with_enemies(bool attack_side, int& num_enemy, int attack_d
 			if (PlayerPos.x > (posBullet.x - (16 + x_right)) && PlayerPos.x < (posBullet.x + (16 + x_left))) {
 				num_enemy = 22;
 				return true;
+			}
+		}
+	}
+
+	if (level == 4 || level == 9) {
+		for (int i = 0; i < 15; ++i) {
+			glm::ivec2 posCascade = Cascade1[i].getPosition();
+			if (Cascade1[i].is_Alive()) {
+				if (PlayerPos.y > (posCascade.y - 32) && PlayerPos.y < (posCascade.y + 16)) {
+					if (PlayerPos.x >(posCascade.x - (16 + x_right)) && PlayerPos.x < (posCascade.x + (48 + x_left))) {
+						num_enemy = 23;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	if (level == 9 || level == 10) {
+		for (int i = 0; i < 11; ++i) {
+			glm::ivec2 posCascade = Cascade2[i].getPosition();
+			if (Cascade2[i].is_Alive()) {
+				if (PlayerPos.y >(posCascade.y - 32) && PlayerPos.y < (posCascade.y + 16)) {
+					if (PlayerPos.x >(posCascade.x - (16 + x_right)) && PlayerPos.x < (posCascade.x + (48 + x_left))) {
+						num_enemy = 23;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	if (level == 13) {
+		for (int i = 0; i < 9; ++i) {
+			glm::ivec2 posCascade = Cascade3[i].getPosition();
+			if (Cascade3[i].is_Alive()) {
+				if (PlayerPos.y >(posCascade.y - 32) && PlayerPos.y < (posCascade.y + 16)) {
+					if (PlayerPos.x >(posCascade.x - (16 + x_right)) && PlayerPos.x < (posCascade.x + (48 + x_left))) {
+						num_enemy = 23;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	if (level == 14) {
+		for (int i = 0; i < 17; ++i) {
+			glm::ivec2 posCascade = Cascade4[i].getPosition();
+			if (Cascade4[i].is_Alive()) {
+				if (PlayerPos.y >(posCascade.y - 32) && PlayerPos.y < (posCascade.y + 16)) {
+					if (PlayerPos.x >(posCascade.x - (16 + x_right)) && PlayerPos.x < (posCascade.x + (48 + x_left))) {
+						num_enemy = 23;
+						return true;
+					}
+				}
 			}
 		}
 	}
@@ -1162,6 +1272,61 @@ void Scene::setEnemyMap(int enemy_level) {
 		break;
 	}
 	enemy->setTileMap(map_enemy);
+}
+
+void Scene::initCascade(int num, int x, int y, int max_y)
+{
+	switch (num)
+	{
+		case 1:
+			_RPT0(0, "Entra initCascade\n");
+			for (int i = 0; i < 15; ++i) {
+				Cascade1[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				Cascade1[i].setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+				Cascade1[i].setSub_y(i);
+				Cascade1[i].setMax_y(max_y * map->getTileSize());
+				Cascade1[i].setSize(15);
+			}
+			Cascade1[0].isFirst();
+			break;
+
+		case 2:
+			for (int i = 0; i < 11; ++i) {
+				Cascade2[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				Cascade2[i].setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+				Cascade2[i].setSub_y(i);
+				Cascade2[i].setMax_y(max_y * map->getTileSize());
+				Cascade2[i].setSize(11);
+			}
+			Cascade2[0].isFirst();
+			break;
+
+		case 3:
+			for (int i = 0; i < 9; ++i) {
+				Cascade3[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				Cascade3[i].setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+				Cascade3[i].setSub_y(i);
+				Cascade3[i].setMax_y(max_y * map->getTileSize());
+				Cascade3[i].setSize(9);
+			}
+			Cascade3[0].isFirst();
+			break;
+
+		case 4:
+			for (int i = 0; i < 17; ++i) {
+				Cascade4[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+				Cascade4[i].setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+				Cascade4[i].setSub_y(i);
+				Cascade4[i].setMax_y(max_y * map->getTileSize());
+				Cascade4[i].setSize(17);
+			}
+			Cascade4[0].isFirst();
+			break;
+
+		default:
+			break;
+	}
+	
 }
 
 bool Scene::collision_with_keys()
@@ -1325,4 +1490,52 @@ bool Scene::collision_with_stalactites() {
 		}
 	}
 	return false;
+}
+
+void Scene::updateCascade(int num, int deltaTime) {
+	switch (num)
+	{
+	case 1:
+		for (int i = 0; i < 15; ++i) Cascade1[i].update(deltaTime);
+		break;
+
+	case 2:
+		for (int i = 0; i < 11; ++i) Cascade2[i].update(deltaTime);
+		break;
+
+	case 3:
+		for (int i = 0; i < 9; ++i) Cascade3[i].update(deltaTime);
+		break;
+
+	case 4:
+		for (int i = 0; i < 17; ++i) Cascade4[i].update(deltaTime);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Scene::renderCascade(int num) {
+	switch (num)
+	{
+	case 1:
+		for (int i = 0; i < 15; ++i) Cascade1[i].render();
+		break;
+
+	case 2:
+		for (int i = 0; i < 11; ++i) Cascade2[i].render();
+		break;
+
+	case 3:
+		for (int i = 0; i < 9; ++i) Cascade3[i].render();
+		break;
+
+	case 4:
+		for (int i = 0; i < 17; ++i) Cascade4[i].render();
+		break;
+
+	default:
+		break;
+	}
 }

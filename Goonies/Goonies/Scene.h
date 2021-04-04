@@ -21,6 +21,7 @@
 #include "WaterDrop.h"
 #include "Steam.h"
 #include "Stalactites.h"
+#include "Cascade.h"
 
 
 // Scene contains all the entities of our game.
@@ -77,6 +78,10 @@ private:
 
 	void activateStalactites();
 	void setEnemyMap(int enemy_level);
+
+	void initCascade(int num, int x, int y, int max_y);
+	void updateCascade(int num, int deltaTime);
+	void renderCascade(int num);
 
 private:
 	TileMap *map, *map_enemy;
