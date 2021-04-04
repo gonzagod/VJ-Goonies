@@ -60,15 +60,21 @@
 #define FINAL_DOOR_X_TILES 17
 #define FINAL_DOOR_Y_TILES 15
 
+int debug_level = 3;
+
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
 int skullsPerScreen[21] = { 0,0,0,1,2,3,0,2,2,1,0,1,0,2,1,2,2,2,0,0,0 };
-int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7  },{ 23,7  },{ 25,13 },{ 17,17 },
-										   { 18,9  },{ 18,19 },{ 16,5  },{ 26,11 },
-										   {  8,5  },{ 20,17 },
-										   { 10,13 },{ 14,19 },{ 25,19 },
-										   { 22,15 },{  6,17 },{ 17,11 },{ 20,17 },{  8,9 },{ 11,21 } };
-int enemyPositions[4][2] = { {34,11}, {10,11}, {22,9}, {24,11} };
+int initSkullsPos[num_skulls_Scene][2] = { { 24,17 },{ 10,11 },{ 26,7 },{ 23,7 },{ 25,13 },{ 17,17 },
+{ 18,9 },{ 18,19 },{ 16,5 },{ 26,11 },
+{ 8,5 },{ 20,17 },
+{ 10,13 },{ 14,19 },{ 25,19 },
+{ 22,15 },{ 6,17 },{ 17,11 },{ 20,17 },{ 8,9 },{ 11,21 } };
+int jumpingSkulls[num_skulls_Scene] = { 0,0,0,0,0,0, 0,0,0,0, 0,1, 0,1,0, 0,0,0,1,0,0 };
+int skullsDistance[num_skulls_Scene][2] = { { 6,34 },{ 5,15 },{ 13,35 },{ 16,32 },{ 21,34 },{ 6,19 },{ 16,34 },
+{ 16,34 },{ 16,24 },{ 25,34 },{ 6,19 },{ 6,34 },{ 6,19 },{ 6,35 },
+{ 5,34 },{ 21,34 },{ 6,19 },{ 6,28 },{ 6,34 },{ 6,26 },{ 6,34 } };
+int enemyPositions[4][2] = { { 34,11 },{ 10,11 },{ 22,9 },{ 24,11 } };
 static const int num_keys_Scene = 14;
 Key* keyScene = new Key[num_keys_Scene];
 int keysPerScreen[21] = { 0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,2,0,0,0 };
@@ -314,22 +320,23 @@ void Scene::init()
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
-	//int i = goToScreen(3);
+
+	int i = goToScreen(debug_level);
 }
 
 void Scene::gameOver(int x) {
 	switch (x) {
-		case 0:
-			isDying = true;
-			contDying = 0;
-			break;
-		case 1:
-			isDying = false;
-			estat = 26;
-			Game::instance().goToScreen(20);
-			break;
-		default:
-			break;
+	case 0:
+		isDying = true;
+		contDying = 0;
+		break;
+	case 1:
+		isDying = false;
+		estat = 26;
+		Game::instance().goToScreen(20);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -386,9 +393,9 @@ void Scene::update(int deltaTime)
 		if (level > 4) prevScreen();
 	}
 	if ((level > 0 && level <= 2) && Game::instance().getKey(32)) {
-	control = 0;
-	estat = 22;
-	level = 2;
+		control = 0;
+		estat = 22;
+		level = 2;
 	}
 	if (!portalStatus() && !isDying) {
 		switch (level) {
@@ -459,7 +466,6 @@ void Scene::update(int deltaTime)
 				padlockScene[k].update(deltaTime);
 			}
 			for (int l = firstDoorLevel; l < maxDoorLevel; ++l) {
-				_RPT1(0, "DoorLevel = %d\n", l);
 				if (l == 2 || l == 3) doorScene[l].update(deltaTime, 1);
 				else if (l == 7 || l == 8) doorScene[l].update(deltaTime, 2);
 				else doorScene[l].update(deltaTime, 0);
@@ -467,7 +473,6 @@ void Scene::update(int deltaTime)
 
 			for (int m = firstObjectLevel; m < maxObjectLevel; ++m) {
 				switch (m) {
-					_RPT1(0, "ObjectLevel = %d\n", m);
 				case 0:
 					objectesScene[m].update(deltaTime, 0);
 					break;
@@ -577,14 +582,13 @@ void Scene::update(int deltaTime)
 		glm::ivec2 PlayerPos = getPlayerPosition();
 		enemy->setPlayerPos(PlayerPos, level);
 		int enemy_level = enemy->getLevelEnemy();
-		setEnemyMap(enemy_level);
 		enemy->update(deltaTime);
 		glm::ivec2 EnemyPos = enemy->getPosition();
 		if (enemy->isShot()) {
 			bool b_dir = enemy->getBulletDir();
 			bullet->setTileMap(map);
-			if (b_dir) bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y+4));
-			else bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y+4));
+			if (b_dir) bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y + 4));
+			else bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y + 4));
 			bullet->setDirection(b_dir);
 		}
 
@@ -596,7 +600,6 @@ void Scene::update(int deltaTime)
 		bool hit = false;
 		bool hit_side = true; //True = LEFT ||False = Right
 		if (player_attacking) {
-			_RPT1(0, "attack_side = %d\n", attack_side);
 			hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
 		}
 		else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
@@ -743,8 +746,8 @@ void Scene::render()
 			}
 		}
 		int enemyLevel = enemy->getLevelEnemy();
-		if(enemyLevel == level && enemy->is_Alive()) enemy->render();
-		if (bullet->is_Alive()) bullet->render();
+		if (enemyLevel == level && enemy->is_Alive()) enemy->render();
+		if (enemyLevel == level && bullet->is_Alive()) bullet->render();
 		player->render();
 	}
 }
@@ -771,8 +774,6 @@ int Scene::nextScreen()
 	}
 	firstStalactiteLevel = maxStalactiteLevel;
 	maxStalactiteLevel += stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -799,8 +800,6 @@ int Scene::prevScreen()
 	}
 	firstStalactiteLevel -= stalactitesPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(false);
 	return level;
 }
@@ -863,8 +862,6 @@ int Scene::goToScreen(int x) {
 	maxPowerUpLevel = firstPowerUpLevel + powerUpsPerScreen[level];
 	maxWaterDropLevel = firstWaterDropLevel + waterDropsPerScreen[level];
 	maxStalactiteLevel = firstStalactiteLevel + stalactitesPerScreen[level];
-	_RPT1(0, "New firstSkullLevel = %d\n", firstSkullLevel);
-	_RPT1(0, "New maxSkullLevel = %d\n", maxSkullLevel);
 	updateScene(true);
 	return level;
 }
@@ -1020,11 +1017,16 @@ void Scene::updateScene(bool portal)
 	}
 	if (level >= 3) {
 		player->setTileMap(map);
-		 
+		glm::ivec2 playerPos = player->getPosition();
+
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 			skullsScene[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			skullsScene[i].setPosition(glm::vec2(initSkullsPos[i][0] * map->getTileSize(), initSkullsPos[i][1] * map->getTileSize()));
 			skullsScene[i].setTileMap(map);
+			bool move = playerPos.x > initSkullsPos[i][0];
+			skullsScene[i].setFirstMove(playerPos.x > initSkullsPos[i][0] * map->getTileSize());
+			skullsScene[i].setJumper(jumpingSkulls[i]);
+			skullsScene[i].setDistance(skullsDistance[i][0] * map->getTileSize(), skullsDistance[i][1] * map->getTileSize());
 		}
 
 		for (int j = firstKeyLevel; j < maxKeyLevel; ++j) {
@@ -1079,7 +1081,7 @@ void Scene::updateScene(bool portal)
 			}
 		}
 
-		if (portal && (level == 3 || level == 6 || level == 12 || level == 15)) {
+		if (level == 3 || (portal && (level == 6 || level == 12 || level == 15))) {
 			enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			enemy->setLevelEnemy(level);
 			glm::ivec2 newEnemyPos;
@@ -1133,7 +1135,7 @@ bool Scene::colision_with_enemies(bool attack_side, int& num_enemy, int attack_d
 	for (int i = firstSkullLevel; i < maxSkullLevel; ++i) {
 		glm::ivec2 SkullPos = skullsScene[i].getPosition();
 		num_enemy = i;
-		if (skullsScene[i].isAlive()) {
+		if (skullsScene[i].isAlive() && skullsScene[i].isReady()) {
 			if (PlayerPos.y >(SkullPos.y - 32) && PlayerPos.y < (SkullPos.y + 16)) {
 				if (PlayerPos.x >(SkullPos.x - (16 + x_right)) && PlayerPos.x < (SkullPos.x + (16 + x_left))) {
 					hit_side = SkullPos.x < PlayerPos.x;
@@ -1158,8 +1160,8 @@ bool Scene::colision_with_enemies(bool attack_side, int& num_enemy, int attack_d
 
 	glm::ivec2 posBullet = bullet->getPosition();
 	if (bullet->is_Alive()) {
-		if (PlayerPos.y > (posBullet.y - 16) && PlayerPos.y < (posBullet.y + 32)) {
-			if (PlayerPos.x > (posBullet.x - (16 + x_right)) && PlayerPos.x < (posBullet.x + (16 + x_left))) {
+		if (PlayerPos.y >(posBullet.y - 16) && PlayerPos.y < (posBullet.y + 32)) {
+			if (PlayerPos.x >(posBullet.x - (16 + x_right)) && PlayerPos.x < (posBullet.x + (16 + x_left))) {
 				num_enemy = 22;
 				return true;
 			}
@@ -1419,4 +1421,9 @@ bool Scene::collision_with_stalactites() {
 		}
 	}
 	return false;
+}
+
+void Scene::updateEnemyMap() {
+	int enemy_level = enemy->getLevelEnemy();
+	setEnemyMap(enemy_level);
 }
