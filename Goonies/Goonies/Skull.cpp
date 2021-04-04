@@ -12,6 +12,8 @@ enum SkullAnims
 	MOVE_LEFT, MOVE_RIGHT, RESPAWN, DEAD
 };
 
+int jump_array[20] = { 5,5,5,4,4,4,3,2,1,0,0,1,2,3,4,4,4,5,5,5 };
+
 void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	spritesheet.loadFromFile("images/Skull.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -39,28 +41,46 @@ void Skull::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	alive = true;
 	dying = false;
+	ready = false;
 	cont_spawn = 0;
 	cont_dying = 0;
+	first_move = false; //true -> RIGHT || false -> LEFT
+	jumper = false;
+	jumping_cont = 0;
+	max_x = 0;
+	min_x = 0;
 }
 
 void Skull::update(int deltaTime)
 {
 	sprite->update(deltaTime);
-	if (sprite->animation() == RESPAWN && cont_spawn > 75) sprite->changeAnimation(MOVE_LEFT);
+	if (sprite->animation() != RESPAWN && sprite->animation() != DEAD && alive) ready = true;
+	if (sprite->animation() == RESPAWN && cont_spawn > 75) {
+		if (first_move) sprite->changeAnimation(MOVE_RIGHT);
+		else sprite->changeAnimation(MOVE_LEFT);
+	}
 	else if (sprite->animation() == RESPAWN) ++cont_spawn;
 	else if (sprite->animation() == MOVE_RIGHT) {
-		if (map->collisionMoveRight(posSkull, glm::ivec2(16, 16)) || !map->skullsobreterra(posSkull, glm::ivec2(16, 16), true)) sprite->changeAnimation(MOVE_LEFT);
+		if (posSkull.x >= max_x) sprite->changeAnimation(MOVE_LEFT);
 		else posSkull.x += 3;
 	}
 	else if (sprite->animation() == MOVE_LEFT) {
-		if (map->collisionMoveLeft(posSkull, glm::ivec2(16, 16)) || !map->skullsobreterra(posSkull, glm::ivec2(16, 16), false)) sprite->changeAnimation(MOVE_RIGHT);
+		if (posSkull.x <= min_x) sprite->changeAnimation(MOVE_RIGHT);
 		else posSkull.x -= 3;
+	}
+
+	if (jumper && ready) {
+		if (jumping_cont > 19) jumping_cont = 0;
+		if (jumping_cont > 10) posSkull.y += jump_array[jumping_cont];
+		else posSkull.y -= jump_array[jumping_cont];
+		++jumping_cont;
 	}
 
 	if (cont_dying == 16) {
 		cont_dying = 0;
 		alive = false;
 		dying = false;
+		ready = false;
 	}
 	if (dying) ++cont_dying;
 
@@ -102,4 +122,21 @@ bool Skull::isAlive() {
 	return (alive && !dying);
 }
 
+bool Skull::isReady() {
+	return ready;
+}
+
+void Skull::setFirstMove(bool side) {
+	first_move = side;
+}
+
+void Skull::setJumper(bool jump)
+{
+	jumper = jump;
+}
+
+void Skull::setDistance(int min, int max) {
+	min_x = min;
+	max_x = max;
+}
 

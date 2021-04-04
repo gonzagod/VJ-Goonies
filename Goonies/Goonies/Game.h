@@ -71,6 +71,8 @@ public:
 	bool getKey(int key) const;
 	bool getSpecialKey(int key) const;
 
+	void updateEnemyMap();
+
 private:
 	bool bPlay;                       // Continue to play game?
 	int points;

@@ -554,6 +554,7 @@ void Enemy::update(int deltaTime)
 			posEnemy.y = 64;
 		}
 		else posEnemy.x = 96;
+		Game::instance().updateEnemyMap();
 	}
 
 	if (map->prevScreen(posEnemy, glm::ivec2(32, 32))) {
@@ -562,6 +563,7 @@ void Enemy::update(int deltaTime)
 			posEnemy.y = 320;
 		}
 		else posEnemy.x = 548;
+		Game::instance().updateEnemyMap();
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
@@ -654,9 +656,17 @@ void Enemy::collided_player()
 		prev_state = WALKING_RIGHT;
 		state = WALKING_RIGHT;
 	}
-	else {
+	else if(state == WALKING_RIGHT){
 		movingR = false;
 		prev_state = WALKING_LEFT;
 		state = WALKING_LEFT;
+	}
+	else if (state == DESC) {
+		state_cont = 0;
+		state = CLIMBING;
+	}
+	else if (state == CLIMBING) {
+		state_cont = 0;
+		state = DESC;
 	}
 }
