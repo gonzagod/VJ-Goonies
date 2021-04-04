@@ -340,7 +340,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			}
 			else if (estat == GAME_OVER) {
 				cont++;
-				if (cont > 200) Game::instance().restartGame();
+				if (cont > 100) Game::instance().restartGame();
 			}
 			break;
 

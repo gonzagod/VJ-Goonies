@@ -60,7 +60,8 @@
 #define FINAL_DOOR_X_TILES 17
 #define FINAL_DOOR_Y_TILES 15
 
-int debug_level = 3;
+int debug_level = 4;
+bool debug = false;
 
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
@@ -326,7 +327,7 @@ void Scene::init()
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 
-	int i = goToScreen(debug_level);
+	if (debug) int i = goToScreen(debug_level);
 }
 
 void Scene::gameOver(int x) {
@@ -374,7 +375,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		addGoonies();
+		gameOver(0);
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
@@ -529,9 +530,9 @@ void Scene::update(int deltaTime)
 	}
 	else if (isDying) {
 		player->godMode();
-		player->got_hit();
+		player->got_hit(24);
 		++contDying;
-		if (contDying > 35) gameOver(1);
+		if (contDying > 20) gameOver(1);
 	}
 	if (!portalStatus() && !isDying) {
 		switch (level) {
@@ -549,100 +550,103 @@ void Scene::update(int deltaTime)
 		default:
 			break;
 		}
-	}
 
-	if (level >= 3 && level <= 17) {
-		for (int i = 0; i < 8; ++i) {
-			puntuation[i].update(deltaTime, i, maxPunts, level);
-		}
-		for (int i = 8; i < 14; ++i) {
-			puntuation[i].update(deltaTime, i, punts, level);
-		}
-		healthBar->update(deltaTime, health);
-		expBar->update(deltaTime, exp);
-		player->update(deltaTime);
-		playerKey->update(deltaTime, 1);
-		gooniePoints->update(deltaTime, gooniesRescued);
-
-		for (int i = 0; i < 5; ++i) {
-			switch (i) {
-			case 0:
-				if (GrayRaincoat) viewpu[i].update(deltaTime, 0);
-				break;
-			case 1:
-				if (Helmet) viewpu[i].update(deltaTime, 1);
-				break;
-			case 2:
-				if (HyperShoes) viewpu[i].update(deltaTime, 2);
-				break;
-			case 3:
-				if (YellowRaincoat) viewpu[i].update(deltaTime, 3);
-				break;
-			case 4:
-				if (BlueSpellbook) viewpu[i].update(deltaTime, 4);
-				break;
+		if (level >= 3 && level <= 17) {
+			for (int i = 0; i < 8; ++i) {
+				puntuation[i].update(deltaTime, i, maxPunts, level);
 			}
-		}
-
-		glm::ivec2 PlayerPos = getPlayerPosition();
-		enemy->setPlayerPos(PlayerPos, level);
-		int enemy_level = enemy->getLevelEnemy();
-		enemy->update(deltaTime);
-		glm::ivec2 EnemyPos = enemy->getPosition();
-		if (enemy->isShot()) {
-			bool b_dir = enemy->getBulletDir();
-			bullet->setTileMap(map);
-			if (b_dir) bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y + 4));
-			else bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y + 4));
-			bullet->setDirection(b_dir);
-		}
-
-		if (bullet->is_Alive()) bullet->update(deltaTime);
-
-		bool attack_side = true; //True = LEFT ||False = Right
-		int num_enemy = 0;
-		bool player_attacking = player->isAttacking(attack_side);
-		bool hit = false;
-		bool hit_side = true; //True = LEFT ||False = Right
-		if (player_attacking) {
-			hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
-		}
-		else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
-		if (hit) {
-			if (num_enemy == 22) {
-				bool bullet_hit = player->got_hit(22);
-				if (bullet_hit) bullet->player_hit();
+			for (int i = 8; i < 14; ++i) {
+				puntuation[i].update(deltaTime, i, punts, level);
 			}
-			if (num_enemy == 23) {
-				bool cascade_hit = player->got_hit(23);
+			
+			expBar->update(deltaTime, exp);
+			playerKey->update(deltaTime, 1);
+			gooniePoints->update(deltaTime, gooniesRescued);
+
+			for (int i = 0; i < 5; ++i) {
+				switch (i) {
+				case 0:
+					if (GrayRaincoat) viewpu[i].update(deltaTime, 0);
+					break;
+				case 1:
+					if (Helmet) viewpu[i].update(deltaTime, 1);
+					break;
+				case 2:
+					if (HyperShoes) viewpu[i].update(deltaTime, 2);
+					break;
+				case 3:
+					if (YellowRaincoat) viewpu[i].update(deltaTime, 3);
+					break;
+				case 4:
+					if (BlueSpellbook) viewpu[i].update(deltaTime, 4);
+					break;
+				}
 			}
-			else {
-				if (player_attacking && attack_side == hit_side) {
-					if (num_enemy < 21) skullsScene[num_enemy].die();
-					else if (num_enemy == 21) enemy->get_damage();
+
+			glm::ivec2 PlayerPos = getPlayerPosition();
+			enemy->setPlayerPos(PlayerPos, level);
+			int enemy_level = enemy->getLevelEnemy();
+			enemy->update(deltaTime);
+			glm::ivec2 EnemyPos = enemy->getPosition();
+			if (enemy->isShot()) {
+				bool b_dir = enemy->getBulletDir();
+				bullet->setTileMap(map);
+				if (b_dir) bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y + 4));
+				else bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y + 4));
+				bullet->setDirection(b_dir);
+			}
+
+			if (bullet->is_Alive()) bullet->update(deltaTime);
+
+			bool attack_side = true; //True = LEFT ||False = Right
+			int num_enemy = 0;
+			bool player_attacking = player->isAttacking(attack_side);
+			bool hit = false;
+			bool hit_side = true; //True = LEFT ||False = Right
+			if (player_attacking) {
+				hit = colision_with_enemies(attack_side, num_enemy, 8, hit_side);
+			}
+			else hit = colision_with_enemies(attack_side, num_enemy, 0, hit_side);
+			if (hit) {
+				if (num_enemy == 22) {
+					bool bullet_hit = player->got_hit(22);
+					if (bullet_hit) bullet->player_hit();
+				}
+				if (num_enemy == 23) {
+					bool cascade_hit = player->got_hit(23);
 				}
 				else {
-					bool fratelli_hit = false;
-					if (num_enemy < 21) bool enemy_hit = player->got_hit(20);
-					else if (num_enemy == 21 && enemy->can_dmg()) fratelli_hit = player->got_hit(21);
-					if (fratelli_hit) enemy->collided_player();
+					if (player_attacking && attack_side == hit_side) {
+						if (num_enemy < 21) skullsScene[num_enemy].die();
+						else if (num_enemy == 21) enemy->get_damage();
+					}
+					else {
+						bool fratelli_hit = false;
+						if (num_enemy < 21) bool enemy_hit = player->got_hit(20);
+						else if (num_enemy == 21 && enemy->can_dmg()) fratelli_hit = player->got_hit(21);
+						if (fratelli_hit) enemy->collided_player();
+					}
 				}
 			}
-		}
-		bool colisio = collision_with_keys();
-		colisio = collision_with_padlocks();
-		colisio = collision_with_objects_door();
-		colisio = collision_with_powerups();
-		colisio = collision_with_waterdrops();
-		colisio = collision_with_steam();
-		colisio = collision_with_stalactites();
-		activateStalactites();
+			bool colisio = collision_with_keys();
+			colisio = collision_with_padlocks();
+			colisio = collision_with_objects_door();
+			colisio = collision_with_powerups();
+			colisio = collision_with_waterdrops();
+			colisio = collision_with_steam();
+			colisio = collision_with_stalactites();
+			activateStalactites();
 
-		if (level == 4 || level == 9) updateCascade(1, deltaTime);
-		if (level == 9 || level == 10) updateCascade(2, deltaTime);
-		if (level == 13) updateCascade(3, deltaTime);
-		if (level == 14) updateCascade(4, deltaTime);
+			if (level == 4 || level == 9) updateCascade(1, deltaTime);
+			if (level == 9 || level == 10) updateCascade(2, deltaTime);
+			if (level == 13) updateCascade(3, deltaTime);
+			if (level == 14) updateCascade(4, deltaTime);
+		}
 	}
+
+	healthBar->update(deltaTime, health);
+	player->update(deltaTime);
+
 }
 
 void Scene::render()
@@ -911,6 +915,7 @@ int Scene::addPoints(int points)
 int Scene::modifyHP(int healthPoints) {
 	health += healthPoints;
 	if (health > 20) health = 20;
+	else if (health < 0) health = 0;
 	return health;
 }
 

@@ -48,6 +48,7 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	void dmg_sprite_manager();
+	bool cant_move;
 };
 
 
