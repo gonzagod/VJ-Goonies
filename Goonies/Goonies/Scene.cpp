@@ -133,6 +133,15 @@ Cascade* Cascade2 = new Cascade[11];
 Cascade* Cascade3 = new Cascade[9];
 Cascade* Cascade4 = new Cascade[17];
 
+int rescue_cont = 0;
+bool rescue_bool = false;
+bool default_music = false;
+bool bool_default_music = false;
+int cont_music_level_default = 0;
+bool music_level_blue = false;
+bool bool_blue = false;
+int cont_music_level_blue = 0;
+
 Scene::Scene()
 {
 	map = NULL;
@@ -400,13 +409,14 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		gameWin();
+		goToScreen(17);
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
+		addKey();
 	}
 	if (Game::instance().getKey(50)) {
-		player->give_bullet();
+		addGoonies();
 	}
 	if (Game::instance().getKey(51)) {
 		powerupBlueSpellbook();
@@ -570,6 +580,7 @@ void Scene::update(int deltaTime)
 		player->godMode();
 		player->got_hit(24);
 		++contDying;
+		if (contDying == 1) Game::instance().play_game_over();
 		if (contDying > 20) gameOver(1);
 	}
 	if (!portalStatus() && !isDying) {
@@ -635,6 +646,7 @@ void Scene::update(int deltaTime)
 				if (b_dir) enemy_bullet->setPosition(glm::vec2(EnemyPos.x + 32, EnemyPos.y + 4));
 				else enemy_bullet->setPosition(glm::vec2(EnemyPos.x - 16, EnemyPos.y + 4));
 				enemy_bullet->setDirection(b_dir);
+				Game::instance().play_shot();
 			}
 
 			enemy_bullet->update(deltaTime);
@@ -698,6 +710,26 @@ void Scene::update(int deltaTime)
 			if (level == 9 || level == 10) updateCascade(2, deltaTime);
 			if (level == 13) updateCascade(3, deltaTime);
 			if (level == 14) updateCascade(4, deltaTime);
+
+			if (rescue_bool) ++rescue_cont;
+			if (rescue_cont == 38) {
+				rescue_bool = false;
+				rescue_cont = 0;
+				if ((level >=4 && level<=5) || (level >= 15 && level <= 17)) Game::instance().play_level1_3_cut();
+				else if (level >= 6 && level <= 14) Game::instance().play_level_blue();
+			}
+			if (bool_blue) ++cont_music_level_blue;
+			if (cont_music_level_blue == 25) {
+				bool_blue = false;
+				cont_music_level_blue = 0;
+				Game::instance().play_level_blue();
+			}
+			if (bool_default_music) ++cont_music_level_default;
+			if (cont_music_level_default == 25) {
+				bool_default_music = false;
+				cont_music_level_default = 0;
+				Game::instance().play_level1_3_cut();
+			}
 		}
 	}
 
@@ -986,6 +1018,8 @@ int Scene::addPoints(int points)
 
 int Scene::modifyHP(int healthPoints) {
 	health += healthPoints;
+	if (healthPoints < 0 && health > 4) Game::instance().play_damage_player();
+	else if(health>0) Game::instance().play_low_health();
 	if (health > 20) health = 20;
 	else if (health < 0) health = 0;
 	return health;
@@ -1003,6 +1037,7 @@ int Scene::modifyExp(int expPoints) {
 int Scene::addGoonies() {
 	++gooniesRescued;
 	addPoints(2000);
+	rescue_bool = true;
 	return gooniesRescued;
 }
 
@@ -1160,6 +1195,24 @@ void Scene::updateScene(bool portal)
 		player->setTileMap(map);
 
 		if (player_bullet->is_Alive()) player_bullet->player_hit();
+		if (skullsPerScreen[level] > 0 && level>3) Game::instance().play_skull_spawn();
+
+		if (portal) {
+			music_level_blue = false;
+			default_music = false;
+		}
+
+		if (level >= 6 && level <= 14 && !music_level_blue) {
+			music_level_blue = true;
+			bool_blue = true;
+			cont_music_level_blue = 0;
+		}
+
+		if (((level >= 4 && level <= 5) || (level >= 15 && level <= 17)) && !default_music) {
+			default_music = true;
+			bool_default_music = true;
+			cont_music_level_default = 0;
+		}
 
 		for (int i = firstSkullLevel; i < maxSkullLevel; ++i) skullsScene[i].init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 
@@ -1726,6 +1779,7 @@ void Scene::player_shoots(bool side) {
 	if (side) player_bullet->setPosition(glm::vec2(playerPos.x + 32, playerPos.y + 4));
 	else player_bullet->setPosition(glm::vec2(playerPos.x - 16, playerPos.y + 4));
 	player_bullet->setDirection(side);
+	Game::instance().play_shot();
 }
 
 bool Scene::player_bullet_hits(int& num_enemy) {

@@ -4,9 +4,12 @@ using namespace irrklang;
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Game.h"
+#include "windows.h"
 #include <crtdbg.h> 
 
 ISoundEngine *SoundEngine = createIrrKlangDevice();
+
+int chrono = 0;
 
 void Game::init()
 {
@@ -20,13 +23,13 @@ void Game::init()
 bool Game::update(int deltaTime)
 {
 	scene.update(deltaTime);
+	++chrono;
 
 	return bPlay;
 }
 
 int Game::nextScreen()
 {
-	//SoundEngine->play2D("sounds/08_-_Goonies_-_MSX_-_Stage_Clear", false);
 	return scene.nextScreen();
 }
 
@@ -100,6 +103,68 @@ void Game::play_potion()
 {
 	SoundEngine->play2D("sounds/potion.wav", false);
 }
+
+void Game::play_skull_spawn()
+{
+	SoundEngine->play2D("sounds/skull_spawn.wav", false);
+}
+
+void Game::play_damage_player()
+{
+	SoundEngine->play2D("sounds/damage.wav", false);
+}
+
+void Game::play_rescue_goonie()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/05_-_Goonies_-_MSX_-_Rescued_Goonie.wav", false);
+}
+
+void Game::play_level1_3_cut()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/level1_3_cut.wav", true);
+}
+
+void Game::play_portal()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/portal.wav", false);
+}
+
+void Game::play_level_blue()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/04_-_Goonies_-_MSX_-_Stage_Music.wav", true);
+}
+
+void Game::play_shot()
+{
+	SoundEngine->play2D("sounds/shot.wav", false);
+}
+
+void Game::play_boots()
+{
+	SoundEngine->play2D("sounds/boots.wav", false);
+}
+
+void Game::play_low_health()
+{
+	SoundEngine->play2D("sounds/low_health.wav", false);
+}
+
+void Game::play_game_over()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/game_over.wav", false);
+}
+
+void Game::play_the_end()
+{
+	SoundEngine->stopAllSounds();
+	SoundEngine->play2D("sounds/the_end.wav", false);
+}
+
 
 bool Game::noHealth() {
 	return scene.noHealth();

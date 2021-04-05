@@ -224,12 +224,14 @@ void Player::update(int deltaTime)
 			isInPortal = true;
 			cont = 0;
 			sprite->changeAnimation(PORTAL);
+			Game::instance().play_portal();
 		}
 		else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && Game::instance().howManyGoonies() >= 6 && map->finalDoor(posPlayer, glm::ivec2(32, 32))) {
 			bool portal = map->finalDoorPos(posPlayer, glm::ivec2(32, 32), &posPlayer.x, &posPlayer.y);
 			isInPortal = true;
 			cont = 0;
 			sprite->changeAnimation(PORTAL);
+			Game::instance().play_the_end();
 		}
 
 		//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
@@ -759,6 +761,7 @@ bool Player::portalStatus() {
 void Player::powerupHyperShoes() {
 	HyperShoes = true;
 	player_speed = 4;
+	Game::instance().play_boots();
 }
 
 void Player::powerupGrayRaincoat() {

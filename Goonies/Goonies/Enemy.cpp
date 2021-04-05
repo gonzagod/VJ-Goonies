@@ -436,7 +436,10 @@ void Enemy::update(int deltaTime)
 			break;
 		case 9: //STUNS
 			if (state_cont <= 96) {
-				if (sprite->animation() != STUN)sprite->changeAnimation(STUN);
+				if (sprite->animation() != STUN) {
+					sprite->changeAnimation(STUN);
+					Game::instance().play_skull_die();
+				}
 				looking_loop_cont = 0;
 				next_time_climb = false;
 				next_time_desc = false;

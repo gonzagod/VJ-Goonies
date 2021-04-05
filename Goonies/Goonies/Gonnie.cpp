@@ -81,6 +81,7 @@ void Goonie::rescue() {
 		Game::instance().addPoints(500);
 	}
 	else {
+		Game::instance().play_rescue_goonie();
 		Game::instance().addGoonies();
 	}
 	alive = false;
