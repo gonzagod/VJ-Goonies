@@ -400,13 +400,13 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		gameWin();
+		powerupHelmet();
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
 	}
 	if (Game::instance().getKey(50)) {
-		player->give_bullet();
+		powerupGrayRaincoat();
 	}
 	if (Game::instance().getKey(51)) {
 		powerupBlueSpellbook();
@@ -414,6 +414,35 @@ void Scene::update(int deltaTime)
 	if (Game::instance().getKey(52)) {
 		powerupYellowRaincoat();
 	}
+	if (Game::instance().getKey(53)) {
+		player->give_bullet();
+	}
+	if (Game::instance().getKey(54)) {
+		addGoonies();
+	}
+	if (Game::instance().getKey(55)) {
+		modifyExp(2);
+	}
+	if (Game::instance().getKey(56)) {
+		modifyHP(2);
+	}
+	if (Game::instance().getKey(57)) {
+		addPoints(200);
+	}
+
+	if (Game::instance().getKey(108)) {
+		gameOver(0);
+	}
+	if (Game::instance().getKey(119)) {
+		gameWin();
+	}
+	if (Game::instance().getKey(114)) {
+		restartGame();
+	}
+	if (Game::instance().getKey(107)) {
+		addKey();
+	}
+
 	if (Game::instance().getKey(103)) { //g
 		godMode();
 	}

@@ -56,3 +56,25 @@ SPACEBAR: atacar.
 
 Funcionalitat Extra:
 F: En cas de no tindre bales al inventari parar bales(i recollir-les), i en cas de tindre bales, disparar.
+
+TECLES PER SALTAR CONTINGUT:
+
+Del KeyPad:
+'0': obtindre el powerup Helmet.
+'1': obtindre el powerup HyperShoes.
+'2': obtindre el powerup GrayRaincoat.
+'3': obtindre el powerup BlueSpellbook.
+'4': obtindre el powerup YellowRaincoat.
+'5': obtindre una bala.
+'6': afegir un goonie als goonies rescatats (No elimina els goonies del mapa).
+'7': Guanya 10% de la barra d'exp.
+'8': Guanya 10% de vida.
+'9': Guanya 200 punts.
+
+Tecles:
+'l' = perdre la partida.
+'w' = guanyar la partida.
+'g' = godMode, no pots morir, les coses no et fan mal.
+'h' = següent pantalla.
+'i' = pantalla prèvia.
+'r' = restart game.
