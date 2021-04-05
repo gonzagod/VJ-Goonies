@@ -523,12 +523,15 @@ void Player::update(int deltaTime)
 		}
 
 		if (map->prevScreen(posPlayer, glm::ivec2(32, 32))) {
-			int level = Game::instance().prevScreen();
-			if (posPlayer.x > 160) {
-				posPlayer.y = 320;
+
+			if ((bClimbing && posPlayer.y < 120) || posPlayer.y > 120) {
+				int level = Game::instance().prevScreen();
+				if (posPlayer.x > 160) {
+					posPlayer.y = 320;
+				}
+				else if (bClimbing && posPlayer.y < 120) posPlayer.y = 320;
+				else posPlayer.x = 548;
 			}
-			else if (bClimbing && posPlayer.y < 120) posPlayer.y = 320;
-			else posPlayer.x = 548;
 		}
 
 		if (isInPortal) {
