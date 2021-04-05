@@ -96,6 +96,12 @@
     <ClInclude Include="FinalDoor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Cascade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParryIcon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -177,6 +183,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FinalDoor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cascade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParryIcon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

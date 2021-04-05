@@ -86,6 +86,7 @@ void Skull::update(int deltaTime)
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
 
+	
 	//_RPT1(0,"%d\n", posSkull.x);
 	//_RPT1(0, "%d\n", posSkull.y);
 }

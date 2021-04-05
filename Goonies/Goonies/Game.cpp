@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Game.h"
+#include <crtdbg.h> 
 
 
 void Game::init()
@@ -58,6 +59,11 @@ bool Game::removeKey() {
 
 bool Game::keyStatus() {
 	return scene.keyStatus();
+}
+
+void Game::player_shoot(bool side)
+{
+	scene.player_shoots(side);
 }
 
 bool Game::noHealth() {

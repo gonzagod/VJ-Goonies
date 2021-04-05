@@ -16,6 +16,7 @@ void Bullet::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) {
 	movingR = false;
 	alive = false;
 	bullet_speed = 4;
+	friendly = false;
 
 	spritesheet.loadFromFile("images/TheGoonies-MapTiles2.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
@@ -51,6 +52,7 @@ void Bullet::update(int deltaTime) {
 			movingR = false;
 			alive = false;
 		}
+		if (posBullet.x >= 576) alive = false;
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posBullet.x), float(tileMapDispl.y + posBullet.y)));
@@ -58,8 +60,10 @@ void Bullet::update(int deltaTime) {
 
 void Bullet::render()
 {
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posBullet.x), float(tileMapDispl.y + posBullet.y)));
-	sprite->render();
+	if (alive) {
+		sprite->setPosition(glm::vec2(float(tileMapDispl.x + posBullet.x), float(tileMapDispl.y + posBullet.y)));
+		sprite->render();
+	}
 }
 
 void Bullet::setTileMap(TileMap *tileMap)
@@ -99,4 +103,9 @@ void Bullet::setDirection(bool side)
 		movingR = false;
 	}
 	alive = true;
+}
+
+void Bullet::setFriendly()
+{
+	friendly = true;
 }

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _VIEWPOWERUP_INCLUDE
-#define _VIEWPOWERUP_INCLUDE
+#ifndef _PARRYICON_INCLUDE
+#define _PARRYICON_INCLUDE
 
 #include "Sprite.h"
 #include "TileMap.h"
@@ -9,7 +9,7 @@
 
 
 
-class ViewPowerUp
+class ParryIcon
 {
 
 public:
@@ -17,17 +17,17 @@ public:
 	void update(int deltaTime, int x);
 	void render();
 
-	void open();
 	bool isAlive();
 	glm::ivec2 getPosition();
 
 	void setTileMap(TileMap* tileMap);
 	void setPosition(const glm::vec2& pos);
+	void bullet(bool b);
 
 private:
 	glm::ivec2 tileMapDispl, posPJ;
 	int startX, startY;
-	bool alive;
+	bool alive, bullet_icon;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

@@ -18,9 +18,10 @@ public:
 	bool is_Alive();
 	void player_hit();
 	void setDirection(bool side);
+	void setFriendly();
 
 private:
-	bool movingR, movingL, alive;
+	bool movingR, movingL, alive, friendly;
 	int bullet_speed;
 	glm::ivec2 tileMapDispl, posBullet;
 	Texture spritesheet;
