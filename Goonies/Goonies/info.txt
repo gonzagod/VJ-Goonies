@@ -1,0 +1,58 @@
+Noms dels integrants del grup:
+
+- Joan Febrer Nafría
+- Alex Gonzàlez Godoy
+
+Hem implementat les següents funcionalitats.
+
+Dos tipus d'enemics:
+- Calaveres: normals i saltadores.
+- Fratelli groc.
+
+Quatre obstacles:
+- Gotes d'aigua.
+- Estalactites.
+- Vapor.
+- Cascada.
+
+Cinc powerups:
+- Super Botes: et permeten correr més ràpid.
+- Impermeable gris: les gotes no et fa mal.
+- Impermeable groc: el vapor no et fa mal.
+- Llibre blau: les calaveres no et fan mal.
+- Casc: les estalactites no et fan mal.
+
+5 Portals:
+Per a viatjar entre escenes.
+
+5 escenes amb 3 pantalles cadascuna.
+
+Funcionalitats del jugador:
+
+-Punts de vida: 
+Es perden quan el jugador colisiona amb obstacles o enemics.
+Es guanyen quan pujem de nivell (acumular certa experiència) i amb les pocions (surten darrera les portes)
+
+-Punts d'experiència:
+Es guanyen al derrotar un enemic.
+
+-Punts:
+Es guanyen recollint objectes i derrotant enemics.
+
+-Recollir objectes i rescatar goonies. El jugador pot recollir objectes que hi ha pel mapa, com ara claus i bosses, i també pot rescatar els goonies que hi ha darrera les portes, que s'obren amb claus.
+
+Funcionalitat Extra:
+- El jugador pot parar les bales del fratelli. Per a que es pugui realitzar aquesta parada s'ha de realitzar en el moment precís.
+  Aquesta parada té un temps de refredament.
+- El jugador pot disparar bales, sempre i quan les hagi recollit prèviament. Només pot portar una bala a sobre. 
+
+Instruccions:
+
+LEFT ARROW: moure's a la esquerra.
+RIGHT ARROW: moure's a la dreta.
+UP ARROW: saltar, entrar a portals i pujar enfiladisses.
+DOWN ARROW: per baixar enfiladisses.
+SPACEBAR: atacar.
+
+Funcionalitat Extra:
+F: En cas de no tindre bales al inventari parar bales(i recollir-les), i en cas de tindre bales, disparar.
