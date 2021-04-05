@@ -28,27 +28,32 @@ public:
 	void powerupBlueSpellbook();
 	void powerupHelmet();
 	void godMode();
+	void give_bullet();
+	int getParryCont();
+	bool hasBullet();
 
 	bool got_hit(int num_enemy);
 	bool got_hit_by_water();
 	bool got_hit_by_stalactite();
 	bool got_hit_by_steam();
 	bool isAttacking(bool& side);
+	bool isParrying(bool& side);
 	bool portalStatus();
 
 private:
-	bool bJumping, bAttacking, bFalling, bClimbing, jump_colision;
-	bool movingR, movingL, up_key_released, damaged, invencible, space_key_released;
+	bool bJumping, bAttacking, bFalling, bClimbing, jump_colision, bParrying, bShooting;
+	bool movingR, movingL, up_key_released, damaged, invencible, space_key_released, parry_key_released, got_bullet;
 	bool HyperShoes, Helmet, GrayRaincoat, BlueSpellbook, YellowRaincoat;
 	bool isGodMode, isInPortal;
 	int cont;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jump_cont, startY, hit_cont, attack_cont, player_speed, falling_cont, falling_add, falling_seq;
+	int jump_cont, startY, hit_cont, attack_cont, player_speed,	falling_cont, falling_add,
+		falling_seq, parry_cont, shot_cont, parry_again_cont, shoot_cont;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
 	void dmg_sprite_manager();
-	bool cant_move;
+	bool cant_move, canParry;
 };
 
 

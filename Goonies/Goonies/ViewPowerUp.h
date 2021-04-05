@@ -28,7 +28,6 @@ private:
 	glm::ivec2 tileMapDispl, posPJ;
 	int startX, startY;
 	bool alive;
-	clock_t endwait;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

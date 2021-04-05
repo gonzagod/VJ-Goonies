@@ -209,6 +209,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 			}
 			else if (estat == LLETRES_GOONIES && waiting) {
 				if (clock() > endwait) {
+					Game::instance().play_goonies1(true);
 					waiting = false;
 					estat = GOON;
 				}
@@ -226,6 +227,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 				posPJ.x -= 5;
 				if (posPJ.x <= 102) {
 					endwait = clock() + 4 * CLOCKS_PER_SEC;
+					Game::instance().play_goonies1(false);
 					estat = PLAY_START;
 				}
 			}
@@ -322,6 +324,7 @@ void pjLoadingScreen::update(int deltaTime, int numPersonatge, int &estat)
 				if (sprite->animation() != PLAYSTART) sprite->changeAnimation(PLAYSTART);
 			}
 			else if (estat == PLAY_START2) {
+				Game::instance().play_sound1_3(true);
 				int level = Game::instance().nextScreen();
 			}
 			else if (estat == PLAY_START3) {

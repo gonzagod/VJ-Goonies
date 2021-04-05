@@ -6,14 +6,19 @@
 #include "Game.h"
 #include <crtdbg.h>
 
+#include <irrKlang.h>
+using namespace irrklang;
+
 #define SPACEBAR 32
+#define PARRY_SHOT 102
 
 int jumping_array[24] = {8,6,6,4,4,4,2,2,2,2,0,0,0,0};
 
 enum PlayerAnims
 {
 	STAND_RIGHT, STAND_LEFT, MOVE_LEFT, MOVE_RIGHT, JUMP_LEFT, JUMP_RIGHT, ATTACK_LEFT,
-	ATTACK_RIGHT, CLIMB, DEAD, CLIMB_ANIM1, CLIMB_ANIM2, ATTACK_AIR_LEFT, ATTACK_AIR_RIGHT, PORTAL
+	ATTACK_RIGHT, CLIMB, DEAD, CLIMB_ANIM1, CLIMB_ANIM2, ATTACK_AIR_LEFT, ATTACK_AIR_RIGHT, 
+	PORTAL, PARRY_LEFT, PARRY_RIGHT, SHOOT_LEFT, SHOOT_RIGHT,
 };
 
 bool last_anim_before_climb = true; //true -> STAND_RIGHT || false -> STAND_LEFT
@@ -21,16 +26,24 @@ bool last_anim_before_climb = true; //true -> STAND_RIGHT || false -> STAND_LEFT
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
+	
 	bJumping = false;
 	bAttacking = false;
+	bParrying = false;
+	canParry = false;
+	bShooting = false;
 	jump_cont = 0; //Salt sembla correcte, però velocitat massa ràpida
 	up_key_released = true;
 	jump_colision = false;
 	damaged = false;
 	hit_cont = 0;
 	attack_cont = 0;
+	parry_cont = 0;
+	shoot_cont = 0;
+	parry_again_cont = 111;
 	invencible = false;
 	space_key_released = true;
+	parry_key_released = true;
 	player_speed = 2;
 	falling_add = 2;
 	falling_cont = 4;
@@ -43,42 +56,43 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	isGodMode = false;
 	isInPortal = false;
 	cant_move = false;
+	got_bullet = false;
 
 	//Carreguem la spritesheet del personatge.
 	spritesheet.loadFromFile("images/Goon_128.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.2, 0.25), &spritesheet, &shaderProgram);
-	//Creem un vector de 14 posicions, amb els diferents moviments del personatge.
-	sprite->setNumberAnimations(15);
+	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.2, 0.2), &spritesheet, &shaderProgram);
+	//Creem un vector de 18 posicions, amb els diferents moviments del personatge.
+	sprite->setNumberAnimations(19);
 
 	sprite->setAnimationSpeed(STAND_LEFT, 8);
-	sprite->addKeyframe(STAND_LEFT, glm::vec2(0.2f, 0.5f));
+	sprite->addKeyframe(STAND_LEFT, glm::vec2(0.2f, 0.4f));
 
 	sprite->setAnimationSpeed(STAND_RIGHT, 8);
 	sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.4f, 0.f));
 
 	sprite->setAnimationSpeed(MOVE_LEFT, 8);
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.75f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.5f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.4f, 0.5f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.5f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.6f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.4f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.4f, 0.4f));
+	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.2f, 0.4f));
 
 	sprite->setAnimationSpeed(MOVE_RIGHT, 8);
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.5f));
+	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.4f));
 	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.4f, 0.f));
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.25f));
+	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.f, 0.2f));
 	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.4f, 0.f));
 
 	sprite->setAnimationSpeed(JUMP_LEFT, 8);
-	sprite->addKeyframe(JUMP_LEFT, glm::vec2(0.2f, 0.75f));
+	sprite->addKeyframe(JUMP_LEFT, glm::vec2(0.2f, 0.6f));
 
 	sprite->setAnimationSpeed(JUMP_RIGHT, 8);
-	sprite->addKeyframe(JUMP_RIGHT, glm::vec2(0.2f, 0.25f));
+	sprite->addKeyframe(JUMP_RIGHT, glm::vec2(0.2f, 0.2f));
 
 	sprite->setAnimationSpeed(ATTACK_LEFT, 8);
-	sprite->addKeyframe(ATTACK_LEFT, glm::vec2(0.4f, 0.75f));
+	sprite->addKeyframe(ATTACK_LEFT, glm::vec2(0.4f, 0.6f));
 
 	sprite->setAnimationSpeed(ATTACK_RIGHT, 8);
-	sprite->addKeyframe(ATTACK_RIGHT, glm::vec2(0.4f, 0.25f));
+	sprite->addKeyframe(ATTACK_RIGHT, glm::vec2(0.4f, 0.2f));
 
 	sprite->setAnimationSpeed(CLIMB, 8);
 	sprite->addKeyframe(CLIMB, glm::vec2(0.f, 0.f));
@@ -91,7 +105,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	sprite->addKeyframe(CLIMB_ANIM2, glm::vec2(0.2f, 0.f));
 
 	sprite->setAnimationSpeed(ATTACK_AIR_LEFT, 8);
-	sprite->addKeyframe(ATTACK_AIR_LEFT, glm::vec2(0.8f, 0.25f));
+	sprite->addKeyframe(ATTACK_AIR_LEFT, glm::vec2(0.8f, 0.2f));
 
 	sprite->setAnimationSpeed(ATTACK_AIR_RIGHT, 8);
 	sprite->addKeyframe(ATTACK_AIR_RIGHT, glm::vec2(0.8f, 0.f));
@@ -99,9 +113,21 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	sprite->setAnimationSpeed(PORTAL, 8);
 	sprite->addKeyframe(PORTAL, glm::vec2(0.4f, 0.f));
 	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.f));
-	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.25f));
-	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.5f));
-	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.75f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.2f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.4f));
+	sprite->addKeyframe(PORTAL, glm::vec2(0.6f, 0.6f));
+
+	sprite->setAnimationSpeed(PARRY_LEFT, 8);
+	sprite->addKeyframe(PARRY_LEFT, glm::vec2(0.2f, 0.8f));
+
+	sprite->setAnimationSpeed(PARRY_RIGHT, 8);
+	sprite->addKeyframe(PARRY_RIGHT, glm::vec2(0.f, 0.8f));
+
+	sprite->setAnimationSpeed(SHOOT_LEFT, 8);
+	sprite->addKeyframe(SHOOT_LEFT, glm::vec2(0.6f, 0.8f));
+
+	sprite->setAnimationSpeed(SHOOT_RIGHT, 8);
+	sprite->addKeyframe(SHOOT_RIGHT, glm::vec2(0.4f, 0.8f));
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -118,9 +144,9 @@ void Player::update(int deltaTime)
 		//Reiniciem les variables només començar el update.
 		bFalling = false;
 
-
 		if (!Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping) up_key_released = true;
 		if (!Game::instance().getKey(SPACEBAR)) space_key_released = true;
+		if (!Game::instance().getKey(PARRY_SHOT)) parry_key_released = true;
 
 		if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)))
 		{
@@ -135,6 +161,35 @@ void Player::update(int deltaTime)
 			if (!bClimbing) {
 				int offsetPos_y = posPlayer.y % 16;
 				if (offsetPos_y >= 3) posPlayer.y -= offsetPos_y;
+			}
+
+			if (shoot_cont == 7) {
+				if (sprite->animation() == SHOOT_LEFT) Game::instance().player_shoot(false);
+				else Game::instance().player_shoot(true);
+			}
+
+			if (sprite->animation() == PARRY_LEFT && parry_cont == 5) {
+				sprite->changeAnimation(STAND_LEFT);
+				parry_cont = 0;
+				bParrying = false;
+				parry_again_cont = 0;
+			}
+			else if (sprite->animation() == PARRY_RIGHT && parry_cont == 5) {
+				sprite->changeAnimation(STAND_RIGHT);
+				parry_cont = 0;
+				bParrying = false;
+				parry_again_cont = 0;
+			}else if (sprite->animation() == SHOOT_LEFT && shoot_cont == 14) {
+				sprite->changeAnimation(STAND_LEFT);
+				got_bullet = false;
+				shoot_cont = 0;
+				bShooting = false;
+			}
+			else if (sprite->animation() == SHOOT_RIGHT && shoot_cont == 14) {
+				sprite->changeAnimation(STAND_RIGHT);
+				got_bullet = false;
+				shoot_cont = 0;
+				bShooting = false;
 			}
 		}
 
@@ -178,7 +233,7 @@ void Player::update(int deltaTime)
 		}
 
 		//Si premem fletxa esquerra, ens movem a la esquerra, sempre que no colisionem amb res
-		else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
+		else if (Game::instance().getSpecialKey(GLUT_KEY_LEFT) && !bClimbing && !bFalling && !bJumping && !bAttacking && !bParrying && !bShooting)
 		{
 			movingL = true;
 			//Si l'animació no era la correcta la posem
@@ -201,6 +256,7 @@ void Player::update(int deltaTime)
 					sprite->changeAnimation(CLIMB_ANIM1);
 				}
 				else {
+					Game::instance().play_jump();
 					jump_cont = 0;
 					bJumping = true;
 					up_key_released = false;
@@ -217,7 +273,7 @@ void Player::update(int deltaTime)
 		}
 
 		//Si premem fletxa dreta, ens movem a la dreta, sempre que no colisionem amb res
-		else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling && !bJumping && !bAttacking)
+		else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT) && !bClimbing && !bFalling && !bJumping && !bAttacking && !bParrying && !bShooting)
 		{
 			movingR = true;
 
@@ -241,6 +297,7 @@ void Player::update(int deltaTime)
 					sprite->changeAnimation(CLIMB_ANIM1);
 				}
 				else {
+					Game::instance().play_jump();
 					jump_cont = 0;
 					bJumping = true;
 					up_key_released = false;
@@ -254,15 +311,10 @@ void Player::update(int deltaTime)
 					sprite->changeAnimation(CLIMB_ANIM2);
 				}
 			}
-			/*else {
-			_RPTF0(0, "choca ");
-			_RPT1(0, "%d\n", posPlayer.x);
-			}*/
 		}
 
-		else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping && up_key_released)
+		else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping && up_key_released && !bAttacking && !bParrying && !bShooting)
 		{
-
 			if (bClimbing) {
 				if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
 				else sprite->changeAnimation(CLIMB_ANIM1);
@@ -294,13 +346,14 @@ void Player::update(int deltaTime)
 				posPlayer.y -= player_speed; //Moviment menys fluit però més similar al joc real.
 			}
 			else if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bClimbing) {
+				Game::instance().play_jump();
 				up_key_released = false;
 				jump_cont = 0;
 				bJumping = true;
 			}
 		}
 
-		else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+		else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN) && !bAttacking && !bParrying && !bShooting) {
 
 			if (bClimbing) {
 				if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
@@ -349,7 +402,7 @@ void Player::update(int deltaTime)
 			}
 		}
 
-		if (Game::instance().getKey(SPACEBAR) && space_key_released && !bClimbing)
+		if (Game::instance().getKey(SPACEBAR) && space_key_released && !bClimbing && !bParrying && !bShooting)
 		{
 			bAttacking = true;
 			space_key_released = false;
@@ -361,6 +414,26 @@ void Player::update(int deltaTime)
 				sprite->changeAnimation(ATTACK_AIR_LEFT);
 			else if (sprite->animation() == (JUMP_RIGHT))
 				sprite->changeAnimation(ATTACK_AIR_RIGHT);
+		}
+
+		if (Game::instance().getKey(PARRY_SHOT) && parry_key_released && !bClimbing && !bAttacking && !bJumping && !bFalling) {
+			if (got_bullet) {
+				bShooting = true;
+				parry_key_released = false;
+				if (sprite->animation() == (MOVE_LEFT) || sprite->animation() == (STAND_LEFT))
+					sprite->changeAnimation(SHOOT_LEFT);
+				else if (sprite->animation() == (MOVE_RIGHT) || sprite->animation() == (STAND_RIGHT))
+					sprite->changeAnimation(SHOOT_RIGHT);
+			}
+			else if(canParry) {
+				bParrying = true;
+				parry_key_released = false;
+				if (sprite->animation() == (MOVE_LEFT) || sprite->animation() == (STAND_LEFT))
+					sprite->changeAnimation(PARRY_LEFT);
+				else if (sprite->animation() == (MOVE_RIGHT) || sprite->animation() == (STAND_RIGHT))
+					sprite->changeAnimation(PARRY_RIGHT);
+				canParry = false;
+			}
 		}
 
 		if (bJumping) {
@@ -526,14 +599,19 @@ void Player::update(int deltaTime)
 		}
 
 		if (bAttacking) ++attack_cont;
+		if (bParrying) ++parry_cont;
+		if (bShooting) ++shoot_cont;
 		if (falling_seq >= falling_cont) {
 			falling_seq = 0;
 			if (falling_add < 8) falling_add += 2;
 			if (falling_cont > 1) --falling_cont;
 		}
 
-		//_RPT1(0, "%d\n", posPlayer.x);
-		//_RPT1(0, "%d\n", posPlayer.y);
+		if (parry_again_cont == 112 && !bParrying) {
+			canParry = true;
+		}
+		if (!canParry && parry_again_cont < 112) ++parry_again_cont;
+
 		sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 	}
 
@@ -579,6 +657,8 @@ bool Player::got_hit(int num_enemy)
 		Game::instance().modifyHP(-20);
 		cant_move = true;
 	}
+
+	if (num_enemy == 22 && bParrying) return true;
 
 	if (!invencible) {
 		if (BlueSpellbook || isGodMode) {
@@ -667,10 +747,14 @@ bool Player::isAttacking(bool& side) {
 	return bAttacking;
 }
 
+bool Player::isParrying(bool& side) {
+	side = (sprite->animation() == PARRY_RIGHT);
+	return bParrying;
+}
+
 bool Player::portalStatus() {
 	return isInPortal;
 }
-
 
 void Player::powerupHyperShoes() {
 	HyperShoes = true;
@@ -695,4 +779,16 @@ void Player::powerupYellowRaincoat() {
 
 void Player::godMode() {
 	isGodMode = true;
+}
+
+void Player::give_bullet() {
+	got_bullet = true;
+}
+
+int Player::getParryCont() {
+	return parry_again_cont;
+}
+
+bool Player::hasBullet() {
+	return got_bullet;
 }

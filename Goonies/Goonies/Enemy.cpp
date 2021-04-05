@@ -28,7 +28,7 @@ void Enemy::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) {
 	damaged = false;
 	stun_cont = 0;
 	attack_cont = 0;
-	enemy_speed = 2;
+	enemy_speed = 3;
 	falling_add = 2;
 	falling_cont = 4;
 	falling_seq = 0;
@@ -37,7 +37,7 @@ void Enemy::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) {
 	prev_state = NONE;
 	looking_loop_cont = 3;
 	cont_until_look = 0;
-	max_cont_look = 110;
+	max_cont_look = 75;
 	next_time_climb = false;
 	next_time_desc = false;
 	jump_cont = 550;
@@ -121,7 +121,7 @@ void Enemy::update(int deltaTime)
 
 	if (state != STUNS && level_enemy == level_player) chase = true;
 
-	if (map->esticSobreTerra(posEnemy, glm::ivec2(32, 32)) && !bClimbing)
+	if (map->esticSobreTerra(posEnemy, glm::ivec2(32, 32)) && !bClimbing && !bJumping)
 	{
 		bFalling = false;
 		bJumping = false;
@@ -136,7 +136,7 @@ void Enemy::update(int deltaTime)
 		}
 
 		int offsetPos_y = posEnemy.y % 16;
-		if (offsetPos_y > 3) {
+		if (offsetPos_y > 2) {
 			posEnemy.y -= offsetPos_y;
 		}
 
@@ -153,7 +153,7 @@ void Enemy::update(int deltaTime)
 		bFalling = true;
 	}
 	else {
-		if (looking_loop_cont >= 1 && (abs(posEnemy.y - posPlayer.y) <= 8) && state != STUNS && !bClimbing && chase) {
+		if (looking_loop_cont >= 1 && (abs(posEnemy.y - posPlayer.y) <= 8) && state != STUNS && !bClimbing && chase && !bJumping) {
 			state = LOOKING_PLAYER;
 			state_cont = 0;
 			cont_until_look = 0;
@@ -341,10 +341,10 @@ void Enemy::update(int deltaTime)
 		case 7: //WALKING LEFT
 			++cont_until_look;
 			prev_state = WALKING_LEFT;
-			if (state_cont <= 104) {
+			if (state_cont <= 75) {
 				movingL = true;
 				if (sprite->animation() != MOVE_LEFT) sprite->changeAnimation(MOVE_LEFT);
-				if (!map->collisionMoveLeft(posEnemy, glm::ivec2(16, 32)))
+				if (!map->collisionMoveLeft(posEnemy, glm::ivec2(16, 30)))
 				{
 					posEnemy.x -= enemy_speed; //Moviment menys fluit però més similar al joc real.
 				}
@@ -389,10 +389,10 @@ void Enemy::update(int deltaTime)
 		case 8: //WALKING RIGHT
 			++cont_until_look;
 			prev_state = WALKING_RIGHT;
-			if (state_cont <= 104) {
+			if (state_cont <= 75) {
 				movingR = true;
 				if (sprite->animation() != MOVE_RIGHT) sprite->changeAnimation(MOVE_RIGHT);
-				if (!map->collisionMoveRight(posEnemy, glm::ivec2(16, 32)))
+				if (!map->collisionMoveRight(posEnemy, glm::ivec2(16, 30)))
 				{
 					posEnemy.x += enemy_speed; //Moviment menys fluit però més similar al joc real.
 				}
@@ -476,7 +476,7 @@ void Enemy::update(int deltaTime)
 				bClimbing = false;
 				//Perquè estigui a una posició múltiple de 16.
 				//int miss = posEnemy.y % 16;
-				posEnemy.y -= 16;
+				//posEnemy.y -= miss;
 				if (last_state_before_climb) state = WALKING_RIGHT;
 				else  state = WALKING_LEFT;
 				prev_state = CLIMBING;

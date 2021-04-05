@@ -86,6 +86,7 @@ void Skull::update(int deltaTime)
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posSkull.x), float(tileMapDispl.y + posSkull.y)));
 
+	
 	//_RPT1(0,"%d\n", posSkull.x);
 	//_RPT1(0, "%d\n", posSkull.y);
 }
@@ -112,6 +113,7 @@ glm::ivec2 Skull::getPosition()
 }
 
 void Skull::die() {
+	Game::instance().play_skull_die();
 	Game::instance().addPoints(50);
 	Game::instance().modifyExp(2);
 	dying = true;

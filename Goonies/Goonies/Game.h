@@ -44,6 +44,13 @@ public:
 	bool removeKey();
 	bool noHealth();
 	bool keyStatus();
+	void player_shoot(bool side);
+
+	void play_goonies1(bool play);
+	void play_sound1_3(bool play);
+	void play_jump();
+	void play_skull_die();
+	void play_potion();
 
 	int addGoonies();
 

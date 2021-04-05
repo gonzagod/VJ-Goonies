@@ -1,7 +1,12 @@
+#include <irrKlang.h>
+using namespace irrklang;
+
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Game.h"
+#include <crtdbg.h> 
 
+ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 void Game::init()
 {
@@ -9,6 +14,7 @@ void Game::init()
 	points = 0;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	scene.init();
+	
 }
 
 bool Game::update(int deltaTime)
@@ -20,6 +26,7 @@ bool Game::update(int deltaTime)
 
 int Game::nextScreen()
 {
+	//SoundEngine->play2D("sounds/08_-_Goonies_-_MSX_-_Stage_Clear", false);
 	return scene.nextScreen();
 }
 
@@ -49,15 +56,49 @@ int Game::addGoonies() {
 }
 
 bool Game::addKey() {
+	SoundEngine->play2D("sounds/key.wav", false);
 	return scene.addKey();
 }
 
 bool Game::removeKey() {
+	SoundEngine->play2D("sounds/paddlock.wav", false);
 	return scene.removeKey();
 }
 
 bool Game::keyStatus() {
 	return scene.keyStatus();
+}
+
+void Game::player_shoot(bool side)
+{
+	scene.player_shoots(side);
+}
+
+void Game::play_goonies1(bool play)
+{
+	if (play) SoundEngine->play2D("sounds/01_-_Goonies_-_MSX_-_Title.wav", true);
+	else SoundEngine->stopAllSounds();
+}
+
+void Game::play_sound1_3(bool play)
+{
+	if(play) SoundEngine->play2D("sounds/02_-_Goonies_-_MSX_-_The_Goonies_'R'_Good_Enough.wav", true);
+	else SoundEngine->stopAllSounds();
+}
+
+void Game::play_jump()
+{
+	SoundEngine->play2D("sounds/jump.wav", false);
+}
+
+void Game::play_skull_die()
+{
+	SoundEngine->play2D("sounds/skull_die.wav", false);
+}
+
+void Game::play_potion()
+{
+	SoundEngine->play2D("sounds/potion.wav", false);
 }
 
 bool Game::noHealth() {
