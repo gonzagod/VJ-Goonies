@@ -113,6 +113,7 @@ glm::ivec2 Skull::getPosition()
 }
 
 void Skull::die() {
+	Game::instance().play_skull_die();
 	Game::instance().addPoints(50);
 	Game::instance().modifyExp(2);
 	dying = true;

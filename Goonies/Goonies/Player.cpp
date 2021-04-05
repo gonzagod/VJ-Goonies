@@ -6,6 +6,9 @@
 #include "Game.h"
 #include <crtdbg.h>
 
+#include <irrKlang.h>
+using namespace irrklang;
+
 #define SPACEBAR 32
 #define PARRY_SHOT 102
 
@@ -23,6 +26,7 @@ bool last_anim_before_climb = true; //true -> STAND_RIGHT || false -> STAND_LEFT
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
+	
 	bJumping = false;
 	bAttacking = false;
 	bParrying = false;
@@ -252,6 +256,7 @@ void Player::update(int deltaTime)
 					sprite->changeAnimation(CLIMB_ANIM1);
 				}
 				else {
+					Game::instance().play_jump();
 					jump_cont = 0;
 					bJumping = true;
 					up_key_released = false;
@@ -292,6 +297,7 @@ void Player::update(int deltaTime)
 					sprite->changeAnimation(CLIMB_ANIM1);
 				}
 				else {
+					Game::instance().play_jump();
 					jump_cont = 0;
 					bJumping = true;
 					up_key_released = false;
@@ -309,7 +315,6 @@ void Player::update(int deltaTime)
 
 		else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping && up_key_released && !bAttacking && !bParrying && !bShooting)
 		{
-
 			if (bClimbing) {
 				if ((posPlayer.y / 8) % 2) sprite->changeAnimation(CLIMB_ANIM2);
 				else sprite->changeAnimation(CLIMB_ANIM1);
@@ -341,6 +346,7 @@ void Player::update(int deltaTime)
 				posPlayer.y -= player_speed; //Moviment menys fluit però més similar al joc real.
 			}
 			else if (map->esticSobreTerra(posPlayer, glm::ivec2(32, 32)) && !bClimbing) {
+				Game::instance().play_jump();
 				up_key_released = false;
 				jump_cont = 0;
 				bJumping = true;

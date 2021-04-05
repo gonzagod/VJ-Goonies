@@ -63,7 +63,7 @@
 #define PARRY_ICON_X_TILES 30
 #define PARRY_ICON_Y_TILES 23
 
-int debug_level = 3;
+int debug_level = 2;
 bool debug = true;
 
 static const int num_skulls_Scene = 21;
@@ -685,7 +685,7 @@ void Scene::update(int deltaTime)
 	}
 
 	healthBar->update(deltaTime, health);
-	player->update(deltaTime);
+	if (level >= 3) player->update(deltaTime);
 	if (level >= 3 && level <= 17) {
 		int parry_cont = player->getParryCont();
 		bool b = player->hasBullet();
