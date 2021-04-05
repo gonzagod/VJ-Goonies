@@ -11,6 +11,7 @@
 
 void FinalDoor::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
+	cont = 0;
 	alive = false;
 	spritesheet.loadFromFile("images/FinalDoor.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(64, 64), glm::vec2(0.5, 1), &spritesheet, &shaderProgram);
@@ -38,8 +39,15 @@ void FinalDoor::update(int deltaTime) {
 
 }
 
+void FinalDoor::updateInitial(int deltaTime) {
+	++cont;
+	if (sprite->animation() != 1) sprite->changeAnimation(1);
+	sprite->update(deltaTime);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPJ.x), float(tileMapDispl.y + posPJ.y)));
+}
+
 void FinalDoor::render() {
-	sprite->render();
+	if (cont <= 10) sprite->render();
 }
 
 void FinalDoor::setTileMap(TileMap* tileMap)

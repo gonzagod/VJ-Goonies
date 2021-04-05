@@ -23,6 +23,7 @@
 #include "Stalactites.h"
 #include "Cascade.h"
 #include "FinalDoor.h"
+#include "TheEnd.h"
 #include <windows.h>
 
 
@@ -108,6 +109,8 @@ private:
 	ViewPowerUp* viewpu = new ViewPowerUp[5];
 	Enemy *enemy;
 	FinalDoor *finalDoor;
+	FinalDoor *initialDoor;
+	TheEnd *Escenafinal;
 	ShaderProgram texProgram, texProgram2;
 	float currentTime;
 	int estat;

@@ -141,6 +141,7 @@ void Enemy::update(int deltaTime)
 		}
 
 		if (damaged) {
+			Game::instance().addPoints(200);
 			state = STUNS;
 			state_cont = 0;
 			damaged = false;

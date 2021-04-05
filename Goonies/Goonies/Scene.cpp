@@ -60,6 +60,9 @@
 #define FINAL_DOOR_X_TILES 17
 #define FINAL_DOOR_Y_TILES 15
 
+#define INITIAL_DOOR_X_TILES 17
+#define INITIAL_DOOR_Y_TILES 9
+
 int debug_level = 16;
 bool debug = false;
 
@@ -324,6 +327,19 @@ void Scene::init()
 	finalDoor->setPosition(glm::vec2(FINAL_DOOR_X_TILES*map->getTileSize(), FINAL_DOOR_Y_TILES*map->getTileSize() - 1));
 	finalDoor->setTileMap(map);
 
+	initialDoor = new FinalDoor();
+	initialDoor->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	initialDoor->setPosition(glm::vec2(INITIAL_DOOR_X_TILES*map->getTileSize() - 4, INITIAL_DOOR_Y_TILES*map->getTileSize() - 1));
+	initialDoor->setTileMap(map);
+	initialDoor->open();
+
+	Escenafinal = new TheEnd();
+	Escenafinal->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	Escenafinal->setPosition(glm::vec2(80, 48));
+	Escenafinal->setTileMap(map);
+	
+
+
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 
@@ -375,7 +391,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		gameOver(0);
+		gameWin();
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
@@ -457,6 +473,7 @@ void Scene::update(int deltaTime)
 			if (estat == 26) {
 				map = TileMap::createTileMap("levels/gameWin.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 				playStart->update(deltaTime, 7, estat);
+				Escenafinal->update(deltaTime);
 			}
 			break;
 		default:
@@ -536,6 +553,9 @@ void Scene::update(int deltaTime)
 	}
 	if (!portalStatus() && !isDying) {
 		switch (level) {
+		case(3):
+			initialDoor->updateInitial(deltaTime);
+			break;
 		case(12):
 			for (int i = 0; i < 3; ++i) {
 				steam[i].update(deltaTime, 0);
@@ -693,6 +713,9 @@ void Scene::render()
 		if (estat >= 12 && estat <= 21) evil->render();
 		if (estat == 22 || estat == 23) playStart->render();
 		break;
+	case(3):
+		initialDoor->render();
+		break;
 	case(12):
 		for (int i = 0; i < 3; ++i) {
 			steam[i].render();
@@ -703,6 +726,10 @@ void Scene::render()
 		break;
 	case(17):
 		finalDoor->render();
+		break;
+
+	case(21):
+		Escenafinal->render();
 		break;
 	default:
 		break;

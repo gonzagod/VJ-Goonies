@@ -148,6 +148,7 @@
     <ClInclude Include="Stalactites.h" />
     <ClInclude Include="Steam.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TheEnd.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="ViewPowerUp.h" />
     <ClInclude Include="WaterDrop.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Stalactites.cpp" />
     <ClCompile Include="Steam.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TheEnd.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="ViewPowerUp.cpp" />
     <ClCompile Include="WaterDrop.cpp" />
