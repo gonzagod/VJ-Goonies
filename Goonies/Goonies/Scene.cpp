@@ -409,20 +409,46 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	if (punts > maxPunts) maxPunts = punts;
 	if (Game::instance().getKey(48)) {
-		goToScreen(17);
+		powerupHelmet();
 	}
 	if (Game::instance().getKey(49)) {
 		powerupHyperShoes();
-		addKey();
 	}
 	if (Game::instance().getKey(50)) {
-		addGoonies();
+		powerupGrayRaincoat();
 	}
 	if (Game::instance().getKey(51)) {
 		powerupBlueSpellbook();
 	}
 	if (Game::instance().getKey(52)) {
 		powerupYellowRaincoat();
+	}
+	if (Game::instance().getKey(53)) {
+		player->give_bullet();
+	}
+	if (Game::instance().getKey(54)) {
+		addGoonies();
+	}
+	if (Game::instance().getKey(55)) {
+		modifyExp(2);
+	}
+	if (Game::instance().getKey(56)) {
+		modifyHP(2);
+	}
+	if (Game::instance().getKey(57)) {
+		addPoints(200);
+	}
+	if (Game::instance().getKey(108)) {
+		gameOver(0);
+	}
+	if (Game::instance().getKey(119)) {
+		gameWin();
+	}
+	if (Game::instance().getKey(114)) {
+		restartGame();
+	}
+	if (Game::instance().getKey(107)) {
+		addKey();
 	}
 	if (Game::instance().getKey(103)) { //g
 		godMode();
@@ -715,7 +741,7 @@ void Scene::update(int deltaTime)
 			if (rescue_cont == 38) {
 				rescue_bool = false;
 				rescue_cont = 0;
-				if ((level >=4 && level<=5) || (level >= 15 && level <= 17)) Game::instance().play_level1_3_cut();
+				if ((level >= 4 && level <= 5) || (level >= 15 && level <= 17)) Game::instance().play_level1_3_cut();
 				else if (level >= 6 && level <= 14) Game::instance().play_level_blue();
 			}
 			if (bool_blue) ++cont_music_level_blue;
@@ -1019,7 +1045,7 @@ int Scene::addPoints(int points)
 int Scene::modifyHP(int healthPoints) {
 	health += healthPoints;
 	if (healthPoints < 0 && health > 4) Game::instance().play_damage_player();
-	else if(health>0) Game::instance().play_low_health();
+	else if (health>0) Game::instance().play_low_health();
 	if (health > 20) health = 20;
 	else if (health < 0) health = 0;
 	return health;
