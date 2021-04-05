@@ -99,9 +99,14 @@ void Game::play_skull_die()
 	SoundEngine->play2D("sounds/skull_die.wav", false);
 }
 
-void Game::play_potion()
+void Game::play_power_up()
 {
-	SoundEngine->play2D("sounds/potion.wav", false);
+	SoundEngine->play2D("sounds/power_up.wav", false);
+}
+
+void Game::play_parry()
+{
+	SoundEngine->play2D("sounds/parry.wav", false);
 }
 
 void Game::play_skull_spawn()
@@ -141,11 +146,6 @@ void Game::play_level_blue()
 void Game::play_shot()
 {
 	SoundEngine->play2D("sounds/shot.wav", false);
-}
-
-void Game::play_boots()
-{
-	SoundEngine->play2D("sounds/boots.wav", false);
 }
 
 void Game::play_low_health()

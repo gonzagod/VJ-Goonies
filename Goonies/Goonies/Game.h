@@ -50,7 +50,8 @@ public:
 	void play_sound1_3(bool play);
 	void play_jump();
 	void play_skull_die();
-	void play_potion();
+	void play_power_up();
+	void play_parry();
 	void play_skull_spawn();
 	void play_damage_player();
 	void play_rescue_goonie();
@@ -58,7 +59,6 @@ public:
 	void play_portal();
 	void play_level_blue();
 	void play_shot();
-	void play_boots();
 	void play_low_health();
 	void play_game_over();
 	void play_the_end();

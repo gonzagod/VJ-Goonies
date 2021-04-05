@@ -764,23 +764,27 @@ bool Player::portalStatus() {
 void Player::powerupHyperShoes() {
 	HyperShoes = true;
 	player_speed = 4;
-	Game::instance().play_boots();
+	Game::instance().play_power_up();
 }
 
 void Player::powerupGrayRaincoat() {
 	GrayRaincoat = true;
+	Game::instance().play_power_up();
 }
 
 void Player::powerupBlueSpellbook() {
 	BlueSpellbook = true;
+	Game::instance().play_power_up();
 }
 
 void Player::powerupHelmet() {
 	Helmet = true;
+	Game::instance().play_power_up();
 }
 
 void Player::powerupYellowRaincoat() {
 	YellowRaincoat = true;
+	Game::instance().play_power_up();
 }
 
 void Player::godMode() {
@@ -789,6 +793,7 @@ void Player::godMode() {
 
 void Player::give_bullet() {
 	got_bullet = true;
+	Game::instance().play_parry();
 }
 
 int Player::getParryCont() {
