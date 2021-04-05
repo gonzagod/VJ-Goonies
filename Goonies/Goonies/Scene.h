@@ -24,6 +24,7 @@
 #include "Cascade.h"
 #include "FinalDoor.h"
 #include "TheEnd.h"
+#include "ParryIcon.h"
 #include <windows.h>
 
 
@@ -70,10 +71,11 @@ public:
 	glm::ivec2 getPlayerPosition();
 
 	void updateEnemyMap();
+	void player_shoots(bool side);
 
 private:
 	void initShaders();
-	bool colision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side);
+	bool collision_with_enemies(bool attack_side, int& enemy, int attack_dist, bool& hit_side);
 	bool collision_with_keys();
 	bool collision_with_padlocks();
 	bool collision_with_objects_door();
@@ -88,6 +90,7 @@ private:
 	void initCascade(int num, int x, int y, int max_y);
 	void updateCascade(int num, int deltaTime);
 	void renderCascade(int num);
+	bool player_bullet_hits(int& num);
 
 private:
 	TileMap *map, *map_enemy;
@@ -102,11 +105,12 @@ private:
 	Bars* healthBar;
 	Bars* expBar;
 	Key* playerKey;
-	Bullet *bullet;
+	Bullet *enemy_bullet, *player_bullet;
 	Puntuacio* puntuation = new Puntuacio[14];
 	Player *player;
 	GooniePoints* gooniePoints;
 	ViewPowerUp* viewpu = new ViewPowerUp[5];
+	ParryIcon* parryIcon;
 	Enemy *enemy;
 	FinalDoor *finalDoor;
 	FinalDoor *initialDoor;
