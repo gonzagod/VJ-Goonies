@@ -67,7 +67,7 @@
 #define PARRY_ICON_Y_TILES 23
 
 int debug_level = 2;
-bool debug = true;
+bool debug = false;
 
 static const int num_skulls_Scene = 21;
 Skull* skullsScene = new Skull[num_skulls_Scene];
