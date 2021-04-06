@@ -63,7 +63,7 @@
 #define INITIAL_DOOR_X_TILES 17
 #define INITIAL_DOOR_Y_TILES 9
 
-#define PARRY_ICON_X_TILES 30
+#define PARRY_ICON_X_TILES 28
 #define PARRY_ICON_Y_TILES 23
 
 int debug_level = 2;
@@ -760,7 +760,7 @@ void Scene::update(int deltaTime)
 	}
 
 	healthBar->update(deltaTime, health);
-	if (level >= 3) player->update(deltaTime);
+	if (level >= 3 && level <= 17) player->update(deltaTime);
 	if (level >= 3 && level <= 17) {
 		int parry_cont = player->getParryCont();
 		bool b = player->hasBullet();
@@ -1589,7 +1589,7 @@ bool Scene::collision_with_keys()
 	for (int i = firstKeyLevel; i < maxKeyLevel; ++i) {
 		glm::ivec2 KeyPos = keyScene[i].getPosition();
 		int keys = i;
-		if (keyScene[i].isAlive()) {
+		if (keyScene[i].isAlive() && !keyStatus()) {
 			if ((PlayerPos.x >= KeyPos.x - 16 && PlayerPos.x <= KeyPos.x + 16) && (PlayerPos.y >= KeyPos.y - 16 && PlayerPos.y <= KeyPos.y + 16)) {
 				initKeysPos[i][2] = 0;
 				keyScene[i].collect();

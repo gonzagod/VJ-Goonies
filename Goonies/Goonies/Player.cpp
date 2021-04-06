@@ -532,9 +532,14 @@ void Player::update(int deltaTime)
 				else if (bClimbing && posPlayer.y < 120) posPlayer.y = 320;
 				else posPlayer.x = 548;
 			}
+			else {
+				int level = Game::instance().prevScreen();
+				posPlayer.x = 548;
+			}
 		}
 
 		if (isInPortal) {
+			bClimbing = false;
 			if (cont > 16) {
 				isInPortal = false;
 				sprite->changeAnimation(STAND_RIGHT);
