@@ -85,6 +85,7 @@ void Game::play_goonies1(bool play)
 
 void Game::play_sound1_3(bool play)
 {
+	SoundEngine->stopAllSounds();
 	if(play) SoundEngine->play2D("sounds/02_-_Goonies_-_MSX_-_The_Goonies_'R'_Good_Enough.wav", true);
 	else SoundEngine->stopAllSounds();
 }
@@ -163,6 +164,11 @@ void Game::play_the_end()
 {
 	SoundEngine->stopAllSounds();
 	SoundEngine->play2D("sounds/the_end.wav", false);
+}
+
+void Game::stop_sounds()
+{
+	SoundEngine->stopAllSounds();
 }
 
 

@@ -62,6 +62,7 @@ public:
 	void play_low_health();
 	void play_game_over();
 	void play_the_end();
+	void stop_sounds();
 
 	int addGoonies();
 
