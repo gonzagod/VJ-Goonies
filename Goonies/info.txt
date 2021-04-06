@@ -1,5 +1,3 @@
-Problema amb el executable. Dins del Visual Studio ens funciona (F5) però l'executable no funciona, no sabem ben bè perquè.
-
 Noms dels integrants del grup:
 
 - Joan Febrer Nafría
